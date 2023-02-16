@@ -1,37 +1,15 @@
-
-import Logo from '../../assets/Logo.svg'
 import SearchIcon from '../../assets/icon_search.png'
 import bellIcon from '../../assets/bell.png'
 import MessageIcon from '../../assets/msg.png'
 import ClientIcon from '../../assets/client_img.png'
+import SideBar from '../../components/Sidebar/SideBar'
 
 
 const SuperAdmin = () => {
   return (
     <div className='flex'>
       {/* Sidebar */}
-      <div className='bg-white w-[270px] h-[100vh]'>
-        <div className='py-3'>
-          <img src={Logo} alt="PaySequr Logo" className='mx-auto'/>
-        </div>
-        <div>
-            <div className='p-4'>
-              <a href="/Transactions"><h2 className='text-orange-400 font-bold text-xl hover:bg-orange-100 ease-in duration-300 rounded-md p-3'>Transactions</h2></a>
-            </div>
-            <div className='p-4'>
-              <a href="/Users"><h2 className='text-orange-400 font-bold text-xl hover:bg-orange-100 ease-in duration-300 rounded-md p-3'>Users</h2></a>
-            </div>
-            <div className='p-4'>
-              <a href="/Merchants"><h2 className='text-orange-400 font-bold text-xl hover:bg-orange-100 ease-in duration-300 rounded-md p-3'>Merchants</h2></a>
-            </div>
-            <div className='p-4'>
-              <a href="/Products"><h2 className='text-orange-400 font-bold text-xl hover:bg-orange-100 ease-in duration-300 rounded-md p-3'>Products</h2></a>
-            </div>
-            <div className='p-4'>
-              <a href="/Wallets"><h2 className='text-orange-400 font-bold text-xl hover:bg-orange-100 ease-in duration-300 rounded-md p-3'>Wallets</h2></a>
-            </div>
-        </div>
-      </div>
+      <SideBar />
       <main className='flex-grow'>
         {/* NavBar */}
       <nav className='bg-slate-50 w-full h-[50px] flex justify-between'>
@@ -49,6 +27,14 @@ const SuperAdmin = () => {
             </div>
           </div>
       </nav>
+      <section>
+        <div className='flex justify-between gap-8 p-4 items-center'>
+          <div className='py-[43px] px-[50px] bg-white rounded-md'><h2 className='align-middle text-center font-bold'>23,900<br/><p className='font-normal'>Users</p></h2></div>
+          <div className='py-[43px] px-[38.5px] bg-white rounded-md'><h2 className='align-middle text-center font-bold'>253,900<br/><p className='font-normal'>Transactions</p></h2></div>
+          <div className='py-[43px] px-[38.5px] bg-white rounded-md'><h2 className='align-middle text-center font-bold'>53,900<br/><p className='font-normal'>Merchants</p></h2></div>
+          <div className='py-[43px] px-[38.5px] bg-white rounded-md'><h2 className='align-middle text-center font-bold'>209,900<br/><p className='font-normal'>Products</p></h2></div>
+        </div>
+      </section>
       </main>
     </div>
   )
