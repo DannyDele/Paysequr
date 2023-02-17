@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LightModeOutlined, DarkModeOutlined, Menu as MenuIcon, Search, SettingsOutlined, ArrowDropDownOutlined, Input } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import {setMode} from '../state';
@@ -6,11 +6,14 @@ import profileImage from '../assets/client_img.png'
 import { AppBar, IconButton, InputBase, Toolbar, useTheme } from '@mui/material';
 import FlexBetween from './FlexBetween';
 
-const Navbar = () => {
+const Navbar = ({
+  isSideBarOpen,
+  setIsSideBarOpen,
+}) => {
 const dispatch = useDispatch();
 const theme = useTheme();
 
-  return (
+return (
     <AppBar 
     sx={{
         position : "static",
@@ -21,7 +24,7 @@ const theme = useTheme();
         <Toolbar sx={{justifyContent: "space-between"}}>
             {/* LEFT SIDE */}
             <FlexBetween>
-                <IconButton onClick={() => console.log('open/close sidebar')}>
+            <IconButton onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
                   <MenuIcon/>
                 </IconButton>
                 <FlexBetween
