@@ -1,5 +1,6 @@
 import React ,{useState} from 'react'
-import { Box, useMediaQuery } from '@mui/material';
+import { Box } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Navbar from '../../components/Navbar';
@@ -12,6 +13,7 @@ const Layout = () => {
   const userId = useSelector((state) => state.global.userId);
   const { data } = useGetUserQuery(userId);
   console.log('data', data);
+  console.log(isNonMobile);
 
   return (
     <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">
