@@ -7,6 +7,7 @@ import globalReducer from './state/index';
 import { Provider } from 'react-redux';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { api } from './state/api';
+import { ToastContainer } from 'react-toastify';
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
     <App />
+    <ToastContainer/>
     </Provider>
   </React.StrictMode>
 );

@@ -31,7 +31,7 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
-import profileImage from "../assets/client_img.png";
+import Logo from "../assets/Logo.svg";
 
 const navItems = [
   {
@@ -130,11 +130,14 @@ const Sidebar = ({
           <Box width="100%">
             <Box m="1.5rem 2rem 2rem 3rem">
               <FlexBetween color={theme.palette.secondary.main}>
-                <Box display="flex" alignItems="center" gap="0.5rem">
-                  <Typography variant="h4" fontWeight="bold">
-                    Paysequr
-                  </Typography>
-                </Box>
+              <Box
+                component="img"
+                alt="Logo"
+                src={Logo}
+                height="50px"
+                width="150px"
+                sx={{ objectFit: "contain" }}
+              />
                 {!isNonMobile && (
                   <IconButton onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
                     <ChevronLeft />
