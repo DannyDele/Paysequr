@@ -12,7 +12,6 @@ const UserActions = ({ params }) => {
 //     state: { currentUser },
 //   } = useValue();
 
-const notify = () => toast("Wow so easy !");
 
 async function viewUser(id) {
   try {
@@ -24,33 +23,11 @@ async function viewUser(id) {
 }
 
 async function deleteUser(id) {
-  try {
     const response = await axios.delete(`https://paysequr.com/api-admin/user/${id}`);
     console.log(response);
-  } catch (error) {
-    console.log(error)
-  }
+    return response;
 }
 
-// const response = await toast.promise(
-//   fetch("A_URL"),
-//   {
-//     pending: 'Promise is pending',
-//     success: 'Promise resolved 👌',
-//     error: 'Promise rejected 🤯'
-//   }
-// );
-// console.log(response)
-
-// const resolveAfter3Sec = new Promise(resolve => setTimeout(resolve, 3000));
-// toast.promise(
-//     resolveAfter3Sec,
-//     {
-//       pending: 'Promise is pending',
-//       success: 'Promise resolved 👌',
-//       error: 'Promise rejected 🤯'
-//     }
-// )
 
   return (
     <Box>
@@ -75,9 +52,12 @@ async function deleteUser(id) {
               deleteUser(params.row.id),
               {
                 pending: 'Deleting user. ⏳',
-                success: 'User has been deleted. ✅',
+                success: {
+                    return: 'User has been deleted. ✅',
+                    },
                 error: 'Could not delete user. ❌',
               },
+              //REMEMBER TO FIX
               setTimeout(() => {
                 window.location.reload()
               }, 5000)

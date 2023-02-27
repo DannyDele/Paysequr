@@ -3,7 +3,7 @@ import { Box, Button, ButtonBase, useTheme } from '@mui/material';
 import { useGetCustomersQuery } from '../../state/api';
 import Header from '../../components/Header';
 import {DataGrid} from '@mui/x-data-grid';
-import UserActions from '../../components/UserActions';
+import UserActions from './UserActions';
 
 const Customers = () => {
     const theme = useTheme();
