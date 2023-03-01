@@ -18,17 +18,19 @@ import Monthly from "./scenes/monthly";
 import Breakdown from "./scenes/breakdown";
 import Admin from "./scenes/admin";
 import Performance from "./scenes/performance";
+import SignUp from "./scenes/signup";
 
 function App() {
 const mode = useSelector((state) => state.global.mode);
 const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
 
   return (
-    <div>
+    <main>
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline/>
           <Routes>
+            <Route path="/signup" element={<SignUp/>}/>
             <Route element={<Layout/>}>
             <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
             <Route path="/dashboard" element = {<Dashboard/>} />
@@ -46,7 +48,7 @@ const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
           </Routes>
         </ThemeProvider>
         </BrowserRouter>
-    </div>
+    </main>
   );
 }
 
