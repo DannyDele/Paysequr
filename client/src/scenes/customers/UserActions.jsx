@@ -58,9 +58,9 @@ async function deleteUser(id) {
                 error: 'Could not delete user. ❌',
               },
               //REMEMBER TO FIX
-              setTimeout(() => {
-                window.location.reload()
-              }, 5000)
+              // setTimeout(() => {
+              //   window.location.reload()
+              // }, 5000)
           );
           }}
         >
