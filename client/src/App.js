@@ -8,7 +8,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { themeSettings } from "./theme";
 import Dashboard from "./scenes/dashboard";
 import Layout from "./scenes/layout";
-import Products from './scenes/products';
+import Bills from './scenes/bills';
 import Customers from './scenes/customers';
 import Transactions from './scenes/transactions';
 import Geography from "./scenes/geography";
@@ -18,7 +18,7 @@ import Monthly from "./scenes/monthly";
 import Breakdown from "./scenes/breakdown";
 import Admin from "./scenes/admin";
 import Performance from "./scenes/performance";
-import SignUp from "./scenes/signup";
+import SignIn from "./scenes/signin";
 
 function App() {
 const mode = useSelector((state) => state.global.mode);
@@ -30,14 +30,15 @@ const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
         <ThemeProvider theme={theme}>
           <CssBaseline/>
           <Routes>
-            <Route path="/signup" element={<SignUp/>}/>
+            <Route path="/" element={<Navigate to="/login" replace/>}/>
+            <Route path="/login" element = {<SignIn/>} />
             <Route element={<Layout/>}>
-            <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
+            {/* <Route path="/dashboard" /> */}
             <Route path="/dashboard" element = {<Dashboard/>} />
-            <Route path="/products" element = {<Products/>} />
+            <Route path="/bills" element = {<Bills/>} />
             <Route path="/customers" element ={<Customers/>} />
             <Route path="/transactions" element ={<Transactions/>} />
-            <Route path="/geography" element ={<Geography/>} />
+            {/* <Route path="/geography" element ={<Geography/>} /> */}
             <Route path="/overview" element ={<Overview/>} />
             <Route path="/daily" element ={<Daily/>} />
             <Route path="/monthly" element ={<Monthly/>} />

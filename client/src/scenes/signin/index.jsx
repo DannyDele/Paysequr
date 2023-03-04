@@ -50,6 +50,7 @@ export default function SignIn() {
 
     const [usernameErr, setUsernameErr] = React.useState("");
     const [passwordErr, setPasswordErr] = React.useState("");
+    const theme = useTheme();
 
     const handleFormSubmit = (data) => {
         console.log("Form Data is", data);
@@ -118,15 +119,15 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" color={theme.palette.text.default}>
                   Forgot password?
                 </Link>
               </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
+              {/* <Grid item>
+                <Link href="#" variant="body2" color={theme.palette.text.default}>
                   {"Don't have an account? Sign Up"}
                 </Link>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Box>
         </Box>

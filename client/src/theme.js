@@ -40,6 +40,17 @@ export const tokensDark = {
       800: "#665429",
       900: "#332a14",
     },
+    orange: {
+          100: "#fbe5d3",
+          200: "#f7cba7",
+          300: "#f3b07c",
+          400: "#ef9650",
+          500: "#eb7c24",
+          600: "#bc631d",
+          700: "#8d4a16",
+          800: "#5e320e",
+          900: "#2f1907"
+},
   };
   
   // function that reverses the color palette
@@ -84,6 +95,9 @@ export const tokensDark = {
                 default: tokensDark.primary[600],
                 alt: tokensDark.primary[500],
               },
+              text: {
+                default: "#fff"
+              }
             }
           : {
               // palette values for light mode
@@ -105,6 +119,9 @@ export const tokensDark = {
                 default: tokensDark.grey[0],
                 alt: tokensDark.grey[50],
               },
+              text: {
+                default: "#111"
+              }
             }),
       },
       typography: {
