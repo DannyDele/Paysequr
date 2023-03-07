@@ -32,7 +32,8 @@ import {
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
-import Logo from "../assets/Logo.svg";
+import DarkLogo from "../assets/Logo.svg";
+import LightLogo from '../assets/LightLogo.png'
 
 const navItems = [
   {
@@ -40,17 +41,14 @@ const navItems = [
     icon: <HomeOutlined />,
   },
   {
-    text: "Client Facing",
+    text: "Bill Management",
     icon: null,
   },
   {
     text: "Bills",
     icon: <ReceiptLong />,
   },
-  {
-    text: "Customers",
-    icon: <Groups2Outlined />,
-  },
+  
   {
     text: "Transactions",
     icon: <ReceiptLongOutlined />,
@@ -60,7 +58,7 @@ const navItems = [
   //   icon: <PublicOutlined />,
   // },
   {
-    text: "Sales",
+    text: "Escrow Pay",
     icon: null,
   },
   {
@@ -80,12 +78,16 @@ const navItems = [
     icon: <PieChartOutlined />,
   },
   {
-    text: "Management",
+    text: "User Management",
     icon: null,
   },
+  // {
+  //   text: "Admin",
+  //   icon: <AdminPanelSettingsOutlined />,
+  // },
   {
-    text: "Admin",
-    icon: <AdminPanelSettingsOutlined />,
+    text: "Customers",
+    icon: <Groups2Outlined />,
   },
   {
     text: "Performance",
@@ -108,6 +110,7 @@ const Sidebar = ({
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
+  console.log(theme);
 
   return (
     <Box component="nav">
@@ -131,14 +134,23 @@ const Sidebar = ({
           <Box width="100%">
             <Box m="1.5rem 2rem 2rem 3rem">
               <FlexBetween color={theme.palette.secondary.main}>
+              {theme.palette.mode === "dark" ? 
               <Box
+              component="img"
+              alt="Light Logo"
+              src={LightLogo}
+              height="50px"
+              width="150px"
+              sx={{ objectFit: "contain" }}
+            /> :
+            <Box
                 component="img"
-                alt="Logo"
-                src={Logo}
-                height="50px"
+                alt="Light Logo"
+                src={DarkLogo}
+                // height="50px"
                 width="150px"
                 sx={{ objectFit: "contain" }}
-              />
+              />}
                 {!isNonMobile && (
                   <IconButton onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
                     <ChevronLeft />
