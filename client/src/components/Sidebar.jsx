@@ -27,8 +27,10 @@ import {
   AdminPanelSettingsOutlined,
   TrendingUpOutlined,
   PieChartOutlined,
-  ReceiptLong
+  ReceiptLong,
 } from "@mui/icons-material";
+import PaymentIcon from '@mui/icons-material/Payment';
+import EmailIcon from '@mui/icons-material/Email';
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
@@ -46,11 +48,11 @@ const navItems = [
   },
   {
     text: "Bills",
-    icon: <ReceiptLong />,
+    icon: <PaymentIcon />,
   },
   
   {
-    text: "Transactions",
+    text: "Bill Transactions",
     icon: <ReceiptLongOutlined />,
   },
   // {
@@ -62,8 +64,8 @@ const navItems = [
     icon: null,
   },
   {
-    text: "Overview",
-    icon: <PointOfSaleOutlined />,
+    text: "Escrow Pay Transactions",
+    icon: <ReceiptLongOutlined />,
   },
   {
     text: "Daily",
@@ -93,6 +95,14 @@ const navItems = [
     text: "Performance",
     icon: <TrendingUpOutlined />,
   },
+  {
+    text: "Message Section",
+    icon: null,
+  },
+  {
+    text: "Message",
+    icon: <EmailIcon />,
+  },
 ];
 
 const Sidebar = ({
@@ -110,7 +120,6 @@ const Sidebar = ({
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
-  console.log(theme);
 
   return (
     <Box component="nav">
@@ -167,7 +176,12 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase();
+                let lcText = text.toLowerCase();
+                const lcTextArr = lcText.split(" ");
+                //console.log(lcTextArr);
+                if(lcTextArr.length > 1){
+                  lcText = lcTextArr.join("-")
+                }
 
                 return (
                   <ListItem key={text} disablePadding ={true}>
