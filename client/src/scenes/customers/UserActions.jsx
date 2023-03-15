@@ -31,7 +31,7 @@ async function deleteUser(id) {
 
   return (
     <Box>
-      <Tooltip title="View user details">
+      <Tooltip title="View">
         <IconButton
            onClick={() => {
             viewUser(params.row.id);
@@ -40,12 +40,12 @@ async function deleteUser(id) {
           <Preview />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Edit this user">
+      <Tooltip title="Edit">
         <IconButton onClick={() => {}}>
           <Edit />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Delete this user">
+      <Tooltip title="Delete">
         <IconButton
            onClick={() => {
             toast.promise(

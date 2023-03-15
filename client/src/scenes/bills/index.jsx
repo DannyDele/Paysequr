@@ -6,6 +6,7 @@ import {DataGrid} from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import FlexBetween from '../../components/FlexBetween';
 import ModalComponent from '../../components/Modal';
+import UserActions from '../customers/UserActions';
 // import UserActions from './UserActions';
 
 const Bills = () => {
@@ -81,6 +82,13 @@ const Bills = () => {
             headerName: "Transaction Description",
             flex : 0.5,
         },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            type: 'actions',
+            width: 150,
+            renderCell: (params) => <UserActions {...{ params }} />,
+          },
      ]
 
   return (
