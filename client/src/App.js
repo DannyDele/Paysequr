@@ -19,6 +19,9 @@ import Breakdown from "./scenes/breakdown";
 import Admin from "./scenes/admin";
 import Performance from "./scenes/performance";
 import SignIn from "./scenes/signin";
+import EscrowTransactions from "./components/EscrowTransactions";
+import BillTransactions from "./components/BillTransactions";
+import Message from "./scenes/message";
 
 function App() {
 const mode = useSelector((state) => state.global.mode);
@@ -37,7 +40,8 @@ const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
             <Route path="/dashboard" element = {<Dashboard/>} />
             <Route path="/bills" element = {<Bills/>} />
             <Route path="/customers" element ={<Customers/>} />
-            <Route path="/transactions" element ={<Transactions/>} />
+            <Route path="/bill-transactions" element ={<BillTransactions/>} />
+            <Route path="/escrow-pay-transactions" element ={<EscrowTransactions/>} />
             {/* <Route path="/geography" element ={<Geography/>} /> */}
             <Route path="/overview" element ={<Overview/>} />
             <Route path="/daily" element ={<Daily/>} />
@@ -45,6 +49,7 @@ const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
             <Route path="/breakdown" element ={<Breakdown/>} />
             <Route path="/admin" element ={<Admin/>} />
             <Route path="/performance" element ={<Performance/>} />
+            <Route path="/message" element ={<Message/>} />
             </Route>
           </Routes>
         </ThemeProvider>

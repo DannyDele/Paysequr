@@ -27,12 +27,15 @@ import {
   AdminPanelSettingsOutlined,
   TrendingUpOutlined,
   PieChartOutlined,
-  ReceiptLong
+  ReceiptLong,
 } from "@mui/icons-material";
+import PaymentIcon from '@mui/icons-material/Payment';
+import EmailIcon from '@mui/icons-material/Email';
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
-import Logo from "../assets/Logo.svg";
+import DarkLogo from "../assets/Logo.svg";
+import LightLogo from '../assets/LightLogo.png'
 
 const navItems = [
   {
@@ -40,19 +43,16 @@ const navItems = [
     icon: <HomeOutlined />,
   },
   {
-    text: "Client Facing",
+    text: "Bill Management",
     icon: null,
   },
   {
     text: "Bills",
-    icon: <ReceiptLong />,
+    icon: <PaymentIcon />,
   },
+  
   {
-    text: "Customers",
-    icon: <Groups2Outlined />,
-  },
-  {
-    text: "Transactions",
+    text: "Bill Transactions",
     icon: <ReceiptLongOutlined />,
   },
   // {
@@ -60,12 +60,12 @@ const navItems = [
   //   icon: <PublicOutlined />,
   // },
   {
-    text: "Sales",
+    text: "Escrow Pay",
     icon: null,
   },
   {
-    text: "Overview",
-    icon: <PointOfSaleOutlined />,
+    text: "Escrow Pay Transactions",
+    icon: <ReceiptLongOutlined />,
   },
   {
     text: "Daily",
@@ -80,16 +80,28 @@ const navItems = [
     icon: <PieChartOutlined />,
   },
   {
-    text: "Management",
+    text: "User Management",
     icon: null,
   },
+  // {
+  //   text: "Admin",
+  //   icon: <AdminPanelSettingsOutlined />,
+  // },
   {
-    text: "Admin",
-    icon: <AdminPanelSettingsOutlined />,
+    text: "Customers",
+    icon: <Groups2Outlined />,
   },
   {
     text: "Performance",
     icon: <TrendingUpOutlined />,
+  },
+  {
+    text: "Message Section",
+    icon: null,
+  },
+  {
+    text: "Message",
+    icon: <EmailIcon />,
   },
 ];
 
@@ -131,14 +143,23 @@ const Sidebar = ({
           <Box width="100%">
             <Box m="1.5rem 2rem 2rem 3rem">
               <FlexBetween color={theme.palette.secondary.main}>
+              {theme.palette.mode === "dark" ? 
               <Box
+              component="img"
+              alt="Light Logo"
+              src={LightLogo}
+              height="50px"
+              width="150px"
+              sx={{ objectFit: "contain" }}
+            /> :
+            <Box
                 component="img"
-                alt="Logo"
-                src={Logo}
-                height="50px"
+                alt="Light Logo"
+                src={DarkLogo}
+                // height="50px"
                 width="150px"
                 sx={{ objectFit: "contain" }}
-              />
+              />}
                 {!isNonMobile && (
                   <IconButton onClick={() => setIsSideBarOpen(!isSideBarOpen)}>
                     <ChevronLeft />
@@ -155,7 +176,12 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase();
+                let lcText = text.toLowerCase();
+                const lcTextArr = lcText.split(" ");
+                //console.log(lcTextArr);
+                if(lcTextArr.length > 1){
+                  lcText = lcTextArr.join("-")
+                }
 
                 return (
                   <ListItem key={text} disablePadding ={true}>

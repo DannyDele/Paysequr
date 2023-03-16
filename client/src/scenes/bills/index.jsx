@@ -3,12 +3,20 @@ import { Box, Button, ButtonBase, useTheme } from '@mui/material';
 import { useGetCustomersQuery } from '../../state/api';
 import Header from '../../components/Header';
 import {DataGrid} from '@mui/x-data-grid';
+import AddIcon from '@mui/icons-material/Add';
+import FlexBetween from '../../components/FlexBetween';
+import ModalComponent from '../../components/Modal';
+import UserActions from '../customers/UserActions';
 // import UserActions from './UserActions';
 
 const Bills = () => {
     const theme = useTheme();
     const {data, isLoading} = useGetCustomersQuery();
-    console.log('Customers data', data);
+    const [isOpen, setIsOpen] = useState(false);
+    
+    const addBill = () =>{
+        setIsOpen(true)
+    };
     
             // FOR THE ACTUAL API
     // const fetchData = async () => {
@@ -34,7 +42,7 @@ const Bills = () => {
         {
             field: "_id",
             headerName: "ID",
-            flex : 1,
+            flex : 0.5,
         },
         {
             field: "name",
@@ -74,13 +82,37 @@ const Bills = () => {
             headerName: "Transaction Description",
             flex : 0.5,
         },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            type: 'actions',
+            width: 150,
+            renderCell: (params) => <UserActions {...{ params }} />,
+          },
      ]
 
   return (
 
     <Box m="1.5rem 2.5rem">
+        <FlexBetween>
         <Header title="Bills Management" subtitle="Details about Bill Payments made"/>
-        {/* <Button variant='primary' color='primary'>Test</Button> */}
+        <Box>
+          <Button
+            onClick={addBill}
+            sx={{
+              backgroundColor: theme.palette.secondary.light,
+              color: theme.palette.background.alt,
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 20px",
+            }}
+          >
+            <AddIcon sx={{ mr: "5px" }} />
+            Add Bill Payment
+          </Button>
+        </Box>
+        <ModalComponent open = {isOpen} onClose={() => setIsOpen(false)} />
+        </FlexBetween>
         <Box
             mt="40px"
             height="75vh"
