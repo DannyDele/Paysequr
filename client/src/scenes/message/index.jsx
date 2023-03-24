@@ -105,6 +105,10 @@ export default function Message() {
               id="password"
               autoComplete="current-password"
               {...register("Password", {required: true, maxLength: 50})}
+              multiline
+              rows={5}
+              maxRows={10}
+            
             />
             <Button
               type="submit"

@@ -6,7 +6,8 @@ import {DataGrid} from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import FlexBetween from '../../components/FlexBetween';
 import ModalComponent from '../../components/Modal';
-import UserActions from '../customers/UserActions';
+import BillActions from './BillActions';
+import DataGridCustomToolbar from '../../components/DataGridCustomToolbar';
 // import UserActions from './UserActions';
 
 const Bills = () => {
@@ -14,9 +15,13 @@ const Bills = () => {
     const {data, isLoading} = useGetCustomersQuery();
     const [isOpen, setIsOpen] = useState(false);
     
-    const addBill = () =>{
+     const addBill = () =>{
         setIsOpen(true)
     };
+
+    const [search, setSearch] = useState("");
+
+    const [searchInput, setSearchInput] = useState("")
     
             // FOR THE ACTUAL API
     // const fetchData = async () => {
@@ -87,7 +92,7 @@ const Bills = () => {
             headerName: 'Actions',
             type: 'actions',
             width: 150,
-            renderCell: (params) => <UserActions {...{ params }} />,
+            renderCell: (params) => <BillActions {...{ params }} />,
           },
      ]
 
@@ -116,33 +121,6 @@ const Bills = () => {
         <Box
             mt="40px"
             height="75vh"
-            // sx={{
-            //     "& .MuiDataGrid-root": {
-            //       border: "none",
-            //     },
-            //     "& .MuiDataGrid-cell": {
-            //       borderBottom: "none",
-            //     },
-            //     "& .MuiDataGrid-columnHeaders": {
-            //       backgroundColor: theme.palette.background.alt,
-            //       color: theme.palette.secondary[100],
-            //       borderBottom: "none",
-            //     },
-            //     "& .MuiDataGrid-virtualScroller": {
-            //       backgroundColor: theme.palette.primary.light,
-            //     },
-            //     "& .MuiDataGrid-footerContainer": {
-            //       backgroundColor: theme.palette.background.alt,
-            //       color: theme.palette.secondary[100],
-            //       borderTop: "none",
-            //     },
-            //     "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-            //       color: `${theme.palette.secondary[200]} !important`,
-            //     },
-            //     "& .PrivateSwitchBase-input css-1m9pwf3": {
-            //       color: "red"
-            //     }
-            //   }}
         >
             <DataGrid
                 loading = {isLoading || !data}
@@ -150,6 +128,10 @@ const Bills = () => {
                 rows= { data || [] }
                 columns={columns}
                 checkboxSelection
+                components={{Toolbar: DataGridCustomToolbar}}
+                componentsProps={{
+                toolbar: { searchInput, setSearchInput, setSearch },
+            }}
             />
         </Box>
     </Box>

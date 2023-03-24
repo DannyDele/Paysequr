@@ -8,12 +8,23 @@ import { Provider } from 'react-redux';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { api } from './state/api';
 import { ToastContainer } from 'react-toastify';
+import authReducer from './features/authSlice';
+
+const persistedAuthState = {
+  auth: {
+    user: localStorage.getItem('user'),
+    token: localStorage.getItem('authToken'),
+    isAuthenticated: Boolean(localStorage.getItem('authToken')),
+  },
+};
 
 const store = configureStore({
   reducer: {
     global : globalReducer,
     [api.reducerPath] : api.reducer,
+    auth: authReducer
   },
+  preloadedState: persistedAuthState,
   middleware: (getDefault) => getDefault().concat(api.middleware)
 });
 setupListeners(store.dispatch);

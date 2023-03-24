@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { LightModeOutlined, DarkModeOutlined, Menu as MenuIcon, Search, SettingsOutlined, ArrowDropDownOutlined, Input } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {setMode} from '../state';
 import profileImage from '../assets/client_img.png'
 import { AppBar, Button, IconButton, InputBase, Menu, MenuItem, Toolbar, useTheme, Box, Typography } from '@mui/material';
 import FlexBetween from './FlexBetween';
+import { logOut } from '../features/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({
   user,
@@ -13,11 +15,16 @@ const Navbar = ({
 }) => {
 const dispatch = useDispatch();
 const theme = useTheme();
+const navigate = useNavigate();
 
 const [anchorEl, setAnchorEl] = useState(null);
 const isOpen = Boolean(anchorEl);
 const handleClick = (event) => setAnchorEl(event.currentTarget);
 const handleClose = () => setAnchorEl(null);
+const handleLogOut = () =>{
+  dispatch(logOut());
+  navigate("/login")
+}
 
 return (
     <AppBar 
@@ -79,13 +86,13 @@ return (
                   fontSize="0.85rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-                  {user.name}
+                  {user?.username}
                 </Typography>
                 <Typography
                   fontSize="0.75rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-                  {user.occupation}
+                  {user?.type}
                 </Typography>
                 </Box>
                 <ArrowDropDownOutlined sx={{
@@ -94,7 +101,7 @@ return (
                 }}/>
                 </Button>
                 <Menu anchorEl={anchorEl} open={isOpen} onClose={handleClose} anchorOrigin={{vertical: "bottom", horizontal: "center"}}>
-                  <MenuItem onClick={handleClick}>Log Out</MenuItem>
+                  <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
                 </Menu>
               </FlexBetween>
             </FlexBetween>

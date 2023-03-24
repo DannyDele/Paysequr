@@ -67,18 +67,18 @@ const navItems = [
     text: "Escrow Pay Transactions",
     icon: <ReceiptLongOutlined />,
   },
-  {
-    text: "Daily",
-    icon: <TodayOutlined />,
-  },
-  {
-    text: "Monthly",
-    icon: <CalendarMonthOutlined />,
-  },
-  {
-    text: "Breakdown",
-    icon: <PieChartOutlined />,
-  },
+  // {
+  //   text: "Daily",
+  //   icon: <TodayOutlined />,
+  // },
+  // {
+  //   text: "Monthly",
+  //   icon: <CalendarMonthOutlined />,
+  // },
+  // {
+  //   text: "Breakdown",
+  //   icon: <PieChartOutlined />,
+  // },
   {
     text: "User Management",
     icon: null,
@@ -88,7 +88,7 @@ const navItems = [
   //   icon: <AdminPanelSettingsOutlined />,
   // },
   {
-    text: "Customers",
+    text: "Users",
     icon: <Groups2Outlined />,
   },
   {

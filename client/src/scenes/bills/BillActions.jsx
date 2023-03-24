@@ -3,15 +3,18 @@ import { Delete, Edit, Preview } from '@mui/icons-material';
 import axios, { AxiosError } from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useState } from 'react';
+import BillUpdateModal from './BillUpdateModal';
 //import { useValue } from '../../../context/ContextProvider';
 //import { deleteRoom } from '../../../actions/room';
 
-const UserActions = ({ params }) => {
+const BillActions = ({ params }) => {
 //   const {
 //     dispatch,
 //     state: { currentUser },
 //   } = useValue();
 
+const [isOpen, setIsOpen] = useState(false);
 
 async function viewUser(id) {
   try {
@@ -31,7 +34,8 @@ async function deleteUser(id) {
 
   return (
     <Box>
-      {/* <Tooltip title="View">
+        <BillUpdateModal open = {isOpen} onClose={() => setIsOpen(false)} />
+      <Tooltip title="View">
         <IconButton
            onClick={() => {
             viewUser(params.row.id);
@@ -39,32 +43,32 @@ async function deleteUser(id) {
         >
           <Preview />
         </IconButton>
-      </Tooltip> */}
-      {/* <Tooltip title="Edit">
-        <IconButton onClick={() => {}}>
+      </Tooltip>
+      <Tooltip title="Edit">
+        <IconButton onClick={() => { setIsOpen(true) }}>
           <Edit />
         </IconButton>
-      </Tooltip> */}
+      </Tooltip>
       <Tooltip title="Delete">
         <IconButton
            onClick={() => {
-            toast("Are you sure you want to delete?", {
-              autoClose: false
-            });
-          //   toast.promise(
-          //     deleteUser(params.row.id),
-          //     {
-          //       pending: 'Deleting user. ⏳',
-          //       success: {
-          //           return: 'User has been deleted. ✅',
-          //           },
-          //       error: 'Could not delete user. ❌',
-          //     },
-          //     //REMEMBER TO FIX
-          //     // setTimeout(() => {
-          //     //   window.location.reload()
-          //     // }, 5000)
-          // );
+            // toast("Are you sure you want to delete Bill?", {
+            //   autoClose: false
+            // });
+            toast.promise(
+              deleteUser(params.row.id),
+              {
+                pending: 'Deleting Bill. ⏳',
+                success: {
+                    return: 'Bill has been deleted. ✅',
+                    },
+                error: 'Could not delete Bill. ❌',
+              },
+              //REMEMBER TO FIX
+              // setTimeout(() => {
+              //   window.location.reload()
+              // }, 5000)
+          );
           }}
         >
           <Delete />
@@ -74,4 +78,4 @@ async function deleteUser(id) {
   );
 };
 
-export default UserActions;
+export default BillActions;
