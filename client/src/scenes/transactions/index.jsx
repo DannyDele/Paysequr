@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, useTheme } from '@mui/material';
-import {DataGrid} from '@mui/x-data-grid';
-import {useGetTransactionsQuery} from '../../state/api';
+import {DataGrid, GridToolbarQuickFilter} from '@mui/x-data-grid';
+import {useGetCustomersQuery, useGetTransactionsQuery} from '../../state/api';
 import Header from '../../components/Header';
 import DataGridCustomToolbar from '../../components/DataGridCustomToolbar'
 
@@ -16,73 +16,86 @@ const Transactions = () => {
 
   const [searchInput, setSearchInput] = useState("")
 
-  const { data, isLoading } = useGetTransactionsQuery({
-    page,
-    pageSize,
-    sort: JSON.stringify(sort),
-    search 
-  });
+  // const { data, isLoading } = useGetTransactionsQuery({
+  //   page,
+  //   pageSize,
+  //   sort: JSON.stringify(sort),
+  //   search 
+  // });
+
+  const { data, isLoading } = useGetCustomersQuery()
 
   console.log("Transaction Data", data);
 
   const columns = [
     {
-        field: "_id",
+        field: "id",
         headerName: "ID",
         flex : 1,
     },
+    // {
+    //     field: "name",
+    //     headerName: "Name",
+    //     flex : 0.5,
+    // },
     {
-        field: "userId",
-        headerName: "User ID",
-        flex : 1,
+        field: "firstname",
+        headerName: "First Name",
+        flex : 0.5,
     },
     {
-        field: "createdAt",
-        headerName: "Created At",
-        flex : 1,
+        field: "lastname",
+        headerName: "Last Name",
+        flex : 0.5,
     },
     {
-        field: "products",
-        headerName: "# of Products",
+        field: "email",
+        headerName: "Email",
+        flex : 1,
+    },
+    // {
+    //     field: "phoneNumber",
+    //     headerName: "Phone Number",
+    //     flex : 0.5,
+    //     renderCell: (params) => {
+    //         return params.value.replace(/^(\d{3})(\d{3})(\d{4})/, "($1)$2-$3");
+    //     }
+    // },
+    {
+        field: "country",
+        headerName: "Country",
         flex : 0.4,
-        sortable: false,
-        renderCell: (params) => params.value.length
     },
     {
-        field: "cost",
-        headerName: "Cost",
-        flex : 1,
-        renderCell: (params) => `$${Number(params.value).toFixed(2)}`
+        field: "occupation",
+        headerName: "Occupation",
+        flex : 0.5,
     },
+
  ]
 
-  return (
-    <Box m="1.5rem 2.5rem">
-        <Header title="TRANSACTIONS"  subtitle="Entire List of Transactions"/>
-        <Box height="80vh">
-          <DataGrid 
-            loading={isLoading || !data}
-            getRowId={(row) => row._id}
-            rows={(data && data.transactions || [])}
+return (
+
+<Box m="1.5rem 2.5rem">
+    <Header title="USERS" subtitle="List of Users"/>
+    <Box
+        mt="40px"
+        height="75vh"
+    >
+        <DataGrid
+            loading = {isLoading || !data}
+            getRowId={(row) => row.id}
+            rows= { data?.users?.result || [] }
             columns={columns}
-            rowCount={(data && data.total) || 0}
-            rowsPerPageOptions={[20, 50, 100]}
-            pagination
-            page={page}
-            pageSize={pageSize}
-            paginationMode="server"
-            sortingMode="server"
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onSortModelChange={(newSortModel) => setSort(...newSortModel)}
+            checkboxSelection
             components={{Toolbar: DataGridCustomToolbar}}
             componentsProps={{
               toolbar: { searchInput, setSearchInput, setSearch },
             }}
-          />
-        </Box>
+        />
     </Box>
-  )
+</Box>
+)
 }
 
 export default Transactions

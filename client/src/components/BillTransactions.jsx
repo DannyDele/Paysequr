@@ -3,12 +3,17 @@ import { Box, Button, ButtonBase, useTheme } from '@mui/material';
 import { useGetCustomersQuery } from '../state/api';
 import Header from './Header';
 import {DataGrid} from '@mui/x-data-grid';
+import DataGridCustomToolbar from './DataGridCustomToolbar';
 // import UserActions from '../scenes/customers/UserActions';
 
 const BillTransactions = () => {
     const theme = useTheme();
     const {data, isLoading} = useGetCustomersQuery();
     console.log('Customers data', data);
+
+    const [search, setSearch] = useState("");
+
+    const [searchInput, setSearchInput] = useState("")
     
             // FOR THE ACTUAL API
     // const fetchData = async () => {
@@ -91,6 +96,10 @@ const BillTransactions = () => {
                 rows= { data || [] }
                 columns={columns}
                 checkboxSelection
+                components={{Toolbar: DataGridCustomToolbar}}
+                componentsProps={{
+                  toolbar: { searchInput, setSearchInput, setSearch },
+                }}
             />
         </Box>
     </Box>

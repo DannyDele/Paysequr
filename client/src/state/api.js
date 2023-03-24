@@ -1,9 +1,19 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
+import { setCredentials, logOut } from '../features/authSlice';
 
 export const api = createApi({
-    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:5001'}),
+    baseQuery: fetchBaseQuery({baseUrl: 'https://paysequr.com/api-admin',
+    // credentials: 'include',
+    prepareHeaders: (headers, {getState}) =>{
+        const token = getState().auth?.token
+        if (token){
+            headers.set("authorization", `Bearer ${token}`)
+        }
+        return headers
+    }}
+),
     reducerPath: "adminApi",
-    tagTypes: ["User", "Products", "Customers", "Transactions", "Geography", "Sales", "Admins", "Performance", "Dashboard"],
+    tagTypes: ["User", "Products", "Customers", "Transactions", "Geography", "Sales", "Admins", "Performance", "Dashboard", "CustomerInfo", "KYCApproval", "KYCDisapproval"],
     endpoints: (build) => ({
         getUser: build.query({
             query: (id) => `general/user/${id}`,
@@ -14,8 +24,26 @@ export const api = createApi({
             providesTags: ["Products"],
         }),
         getCustomers: build.query({
-            query: () => "client/customers",
+            query: () => "/all_users",
             providesTags: ["Customers"],
+        }),
+        getCustomerInfo: build.query({
+            query: (id) => `/user/info/${id}`,
+            providesTags: ["CustomerInfo"],
+        }),
+        getKYCApproval: build.mutation({
+            query: (id) => ({
+                url: `/user/kyc/approve/${id}`,
+                method: "PUT"
+            }),
+            providesTags: ["KYCApproval"],
+        }),
+        getKYCDisapproval: build.mutation({
+            query: (id) => ({
+                url: `/user/kyc/disapprove/${id}`,
+                method: "PUT"
+            }),
+            providesTags: ["KYCDisapproval"],
         }),
         getTransactions: build.query({
             query: ({page, pageSize, sort, search}) => ({
@@ -52,6 +80,9 @@ export const {
     useGetUserQuery,
     useGetProductsQuery,
     useGetCustomersQuery,
+    useGetCustomerInfoQuery,
+    useGetKYCApprovalMutation,
+    useGetKYCDisapprovalMutation,
     useGetTransactionsQuery,
     useGetGeographyQuery,
     useGetSalesQuery,

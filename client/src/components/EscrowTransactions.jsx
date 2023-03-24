@@ -4,11 +4,16 @@ import { useGetCustomersQuery } from '../state/api';
 import Header from './Header';
 import {DataGrid} from '@mui/x-data-grid';
 import UserActions from '../scenes/customers/UserActions';
+import DataGridCustomToolbar from './DataGridCustomToolbar';
 
 const EscrowTransactions = () => {
     const theme = useTheme();
     const {data, isLoading} = useGetCustomersQuery();
     console.log('Customers data', data);
+
+    const [search, setSearch] = useState("");
+
+    const [searchInput, setSearchInput] = useState("")
     
             // FOR THE ACTUAL API
     // const fetchData = async () => {
@@ -91,6 +96,10 @@ const EscrowTransactions = () => {
                 rows= { data || [] }
                 columns={columns}
                 checkboxSelection
+                components={{Toolbar: DataGridCustomToolbar}}
+                componentsProps={{
+                  toolbar: { searchInput, setSearchInput, setSearch },
+                }}
             />
         </Box>
     </Box>

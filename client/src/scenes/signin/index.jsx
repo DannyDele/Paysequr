@@ -17,6 +17,11 @@ import { useDispatch } from 'react-redux';
 import {setMode} from '../../state';
 import { useTheme } from '@mui/material';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { setCredentials } from '../../features/authSlice';
+import { useLoginMutation } from '../../features/authApiSlice';
+import { toast } from 'react-toastify';
+
 
 function Copyright(props) {
     const dispatch = useDispatch();
@@ -48,19 +53,50 @@ export default function SignIn() {
 
     const { register, handleSubmit, formState: { errors } } = useForm();
 
-    const [usernameErr, setUsernameErr] = React.useState("");
-    const [passwordErr, setPasswordErr] = React.useState("");
+    // const [username, setUsername] = React.useState("");
+    // const [password, setPassword] = React.useState("");
+    const [errMsg, setErrMsg] = React.useState("");
+    const [successMsg, setSuccessMsg] = React.useState("");
+    const navigate = useNavigate();
+
+    const [login, {isLoading}] = useLoginMutation();
+    const dispatch = useDispatch();
+
     const theme = useTheme();
 
-    const handleFormSubmit = (data) => {
-        console.log("Form Data is", data);
-        if(!data.Username || !data.Username.length){
-            setUsernameErr("Username is Required");
-            return false;
-        }else{
-            setUsernameErr("");
-        }
-        return true;
+    const handleFormSubmit = async (data) => {
+          //  e.preventDefault()
+          try{
+          console.log({ data });
+          const username = data.Username;
+          const password = data.Password;
+              const userData = await login({username, password}).unwrap()
+              console.log("User data", userData);
+              dispatch(setCredentials({...userData, username}))
+              setSuccessMsg("Logged In")
+              const user = userData.user;
+              console.log(user);
+              localStorage.setItem('user', JSON.stringify(user));
+              const authToken = userData.token;
+              localStorage.setItem('authToken', authToken);
+              toast.success(userData.msg);
+              navigate("/dashboard")
+           } catch (error) {
+            console.log(error)
+            if(!error?.data.msg) {
+              setErrMsg("No server response");
+              toast.error(errMsg)
+            }else if (error?.status === 401){
+              setErrMsg("Incorrect Username or Password")
+              toast.error(error.data.msg)
+            }else if (error?.status === 400){
+              setErrMsg("Unauthorized")
+              toast.error(error.data.msg)
+            }else{
+              setErrMsg("Login Failed")
+              toast.error(error.data.msg)
+            }
+           }
       };
 
     return (
@@ -82,7 +118,6 @@ export default function SignIn() {
           </Typography>
           <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} noValidate sx={{ mt: 1 }}>
             <TextField
-              error={usernameErr && usernameErr.length ? true : false}
               margin="normal"
               required
               fullWidth
@@ -91,7 +126,7 @@ export default function SignIn() {
               name="username"
               autoComplete="username"
               autoFocus
-              helperText={usernameErr}
+              // onChange={handleUserInput}
               {...register("Username", {required: true, maxLength: 80})}
             />
             <TextField
@@ -114,6 +149,7 @@ export default function SignIn() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2, backgroundColor: "orange"}}
+
             >
               Sign In
             </Button>

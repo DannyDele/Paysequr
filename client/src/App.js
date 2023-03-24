@@ -22,6 +22,8 @@ import SignIn from "./scenes/signin";
 import EscrowTransactions from "./components/EscrowTransactions";
 import BillTransactions from "./components/BillTransactions";
 import Message from "./scenes/message";
+import RequireAuth from "./features/RequireAuth";
+import UserInfo from "./scenes/userinfo";
 
 function App() {
 const mode = useSelector((state) => state.global.mode);
@@ -35,11 +37,13 @@ const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace/>}/>
             <Route path="/login" element = {<SignIn/>} />
+                        {/*PROTECTED ROUTES*/}
+            <Route element={<RequireAuth/>}>
             <Route element={<Layout/>}>
-            {/* <Route path="/dashboard" /> */}
             <Route path="/dashboard" element = {<Dashboard/>} />
             <Route path="/bills" element = {<Bills/>} />
-            <Route path="/customers" element ={<Customers/>} />
+            <Route path="/users" element ={<Customers/>} />
+            <Route path="/users/:id" element ={<UserInfo/>} />
             <Route path="/bill-transactions" element ={<BillTransactions/>} />
             <Route path="/escrow-pay-transactions" element ={<EscrowTransactions/>} />
             {/* <Route path="/geography" element ={<Geography/>} /> */}
@@ -50,6 +54,8 @@ const theme = useMemo(() => createTheme(themeSettings(mode)), [mode])
             <Route path="/admin" element ={<Admin/>} />
             <Route path="/performance" element ={<Performance/>} />
             <Route path="/message" element ={<Message/>} />
+            </Route>
+            <Route path="/transactions" element ={<Transactions/>} />
             </Route>
           </Routes>
         </ThemeProvider>
