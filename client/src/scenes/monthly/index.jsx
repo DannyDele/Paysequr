@@ -140,7 +140,7 @@ const Monthly = () => {
                   {
                     on: "hover",
                     style: {
-                      itemBackground: "rgba(0, 0, 0, .03)",
+                      itemBackground: "#ffffff",
                       itemOpacity: 1,
                     },
                   },
