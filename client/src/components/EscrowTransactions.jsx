@@ -2,43 +2,65 @@ import React from "react";
 import { Box, Button } from "@mui/material";
 import Header from "./Header";
 import { DataGrid } from "@mui/x-data-grid";
-import DataGridCustomToolbar from "./DataGridCustomToolbar";
+// import DataGridCustomToolbar from "./DataGridCustomToolbar";
+import { rows } from "../RawData/escrow";
 
 const EscrowTransactions = () => {
-    const columns = [
-      {
-        field: "createdAt",
-        headerName: "Date",
-        maxWidth: 100,
-      },
+
+  const columns = [
     {
-      field: "length",
+      field: "id",
+      headerName: "ID",
+      width: 10,
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      width: 170,
+    },
+    {
+      field: "escrowID",
       headerName: "Escrow ID",
-      maxWidth: 100,
+      width: 170,
     },
     {
-      field: "product_id",
+      field: "buyerUsername",
       headerName: "Buyer ID",
-      maxWidth: 100,
+      width: 150,
     },
     {
-      field: "product_name",
+      field: "merchantUsername",
       headerName: "Merchant ID",
-      maxWidth: 100,
+      width: 150,
     },
     {
-      field: "seller_id",
-      headerName: "Amount",
+      field: "amount",
+      headerName: "Amount (N)",
+      width: 100,
     },
     {
-      field: "buyer_id",
+      field: "productType",
       headerName: "Product Type",
-      maxWidth: 100,
+      width: 150,
     },
     {
-      field: "delivery_status",
+      field: "deliveryStatus",
       headerName: "Delivery Status",
-      maxWidth: 100,
+      width: 100,
+      renderCell: (params) => (
+        <div
+          style={{
+            color:
+              params.value === "Delivered"
+                ? "green"
+                : params.value === "On transit"
+                ? "pink"
+                : "red",
+          }}
+        >
+          {params.value}
+        </div>
+      ),
     },
   ];
 
@@ -47,19 +69,15 @@ const EscrowTransactions = () => {
       <Header
         title="Escrow Pay Transactions"
         subtitle="List of All Escrow Pay Transactions"
-          />
-          <Button>Investigator</Button>
-      <Box mt="40px" height="75vh">
+      />
+      <Button>Investigator</Button>
+      <Box style={{ height: "75vh", width: "100%" }}>
         {/* Filter based on status and investigator===> Escrow ID and trx date(The buyer details by the left, and the seller details by the right. Then the general details at the middle.) */}
         <DataGrid
-          loading={true}
-          rows={[]}
+          // loading={true}
+          rows={rows}
           columns={columns}
-          //   checkboxSelection
-          components={{ Toolbar: DataGridCustomToolbar }}
-          // componentsProps={{
-          //   toolbar: { searchInput, setSearchInput, setSearch },
-          // }}
+          checkboxSelection
         />
       </Box>
     </Box>

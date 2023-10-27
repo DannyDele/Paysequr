@@ -1,11 +1,11 @@
 import React from "react";
-import FlexBetween from "../components/FlexBetween";
+import FlexBetween from "../../components/FlexBetween";
 // import { PointOfSale } from "@mui/icons-material";
 import { Box, useMediaQuery } from "@mui/material";
-import Header from "../components/Header";
-import StatBox from "../components/StatBox";
+import Header from "../../components/Header";
+import StatBox from "../../components/StatBox";
 
-const Dashboard = () => {
+const Overview = () => {
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
 
   return (
@@ -30,14 +30,7 @@ const Dashboard = () => {
         {/* ROW 1 */}
         <StatBox
           title="Total Ongoing"
-          // value={data && data.totalCustomers}
           increase="3,455"
-          // description="Since last month"
-          // icon={
-          //   <Email
-          //     sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
-          //   />
-          // }
         />
         <StatBox title="Total Pending Approval" increase="1,967" />
         <StatBox title="Total completed" increase="356,987,979" />
@@ -46,4 +39,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Overview;

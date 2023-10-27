@@ -1,10 +1,10 @@
 import React from "react";
-import Header from "../components/Header";
-import { Box, Button, Stack } from "@mui/material";
+import Header from "../../components/Header";
+import { Box } from "@mui/material";
 // import DataGridCustomToolbar from "../components/DataGridCustomToolbar";
 import { DataGrid } from "@mui/x-data-grid";
 
-const DisputeCases = () => {
+const DisputeHistory = () => {
   const columns = [
     {
       field: "date",
@@ -12,17 +12,17 @@ const DisputeCases = () => {
       maxWidth: 400,
     },
     {
-      field: "length",
+      field: "escrowId",
       headerName: "Escrow ID",
       maxWidth: 100,
     },
     {
-      field: "seller",
+      field: "sellerId",
       headerName: "Merchant ID",
       maxWidth: 100,
     },
     {
-      field: "buyer-id",
+      field: "buyerId",
       headerName: "Buyer ID",
       maxWidth: 100,
     },
@@ -32,33 +32,15 @@ const DisputeCases = () => {
       maxWidth: 100,
     },
     {
-      field: "action",
-      headerName: "Action",
+      field: "status",
+      headerName: "Status",
       minWidth: 100,
-      renderCell: (params) => {
-        return (
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="outlined"
-              color="warning"
-              size="small"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModal2"
-              htmlFor="my-modal-3"
-              className="book-buttons  py-1 px-4"
-            >
-              View Dispute
-              {/* Got to a chat box */}
-            </Button>
-          </Stack>
-        );
-      },
     },
   ];
 
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="Dispute Resolution" subtitle="Dispute cases" />
+      <Header title="Dispute History" subtitle="" />
       <Box mt="40px" height="75vh">
         <DataGrid
           loading={true}
@@ -71,4 +53,4 @@ const DisputeCases = () => {
   );
 };
 
-export default DisputeCases;
+export default DisputeHistory;
