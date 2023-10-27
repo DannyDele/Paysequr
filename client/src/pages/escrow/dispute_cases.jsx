@@ -1,10 +1,10 @@
 import React from "react";
-import Header from "../components/Header";
-import { Box } from "@mui/material";
+import Header from "../../components/Header";
+import { Box, Button, Stack } from "@mui/material";
 // import DataGridCustomToolbar from "../components/DataGridCustomToolbar";
 import { DataGrid } from "@mui/x-data-grid";
 
-const DisputeHistory = () => {
+const DisputeCases = () => {
   const columns = [
     {
       field: "date",
@@ -32,15 +32,33 @@ const DisputeHistory = () => {
       maxWidth: 100,
     },
     {
-      field: "status",
-      headerName: "Status",
+      field: "action",
+      headerName: "Action",
       minWidth: 100,
+      renderCell: (params) => {
+        return (
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="outlined"
+              color="warning"
+              size="small"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal2"
+              htmlFor="my-modal-3"
+              className="book-buttons  py-1 px-4"
+            >
+              View Dispute
+              {/* Got to a chat box */}
+            </Button>
+          </Stack>
+        );
+      },
     },
   ];
 
   return (
     <Box m="1.5rem 2.5rem">
-      <Header title="Dispute History" subtitle="" />
+      <Header title="Dispute Resolution" subtitle="Dispute cases" />
       <Box mt="40px" height="75vh">
         <DataGrid
           loading={true}
@@ -53,4 +71,4 @@ const DisputeHistory = () => {
   );
 };
 
-export default DisputeHistory;
+export default DisputeCases;
