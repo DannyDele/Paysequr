@@ -3,7 +3,7 @@ import { Box, Button } from "@mui/material";
 import Header from "./Header";
 import { DataGrid } from "@mui/x-data-grid";
 // import DataGridCustomToolbar from "./DataGridCustomToolbar";
-import { rows } from "../RawData/escrow";
+import { rows } from "../../../paysequr-admin/RawData/escrow";
 
 const EscrowTransactions = () => {
 
