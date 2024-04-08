@@ -15,11 +15,15 @@ import {
 
 const DashboardBody = () => {
   const iconStyle = {
-    fontSize: '9rem',
-    color: '#F36C00',
-    marginBottom: '0.5rem',
-  };
+  fontSize: '5rem', // Increased font size to 12rem
+  color: '#F36C00',
+  marginBottom: '0.5rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 
+  
   const paperStyle = {
     padding: '2rem',
     textAlign: 'center',
@@ -35,92 +39,109 @@ const DashboardBody = () => {
     <>
       <Header />
       <Box mt={3} px={4}>
-        <Grid container spacing={3} justifyContent="center" alignItems="stretch">
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              {/* <Link to="/ecommerce" style={{ textDecoration: 'none' }}> */}
-                <ListItemIcon style={iconStyle}>
-                  <StorefrontIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
-                  ECOMMERCE
-                </Typography>
-              {/* </Link> */}
-            </Paper>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              <Link to="/escrow" style={{ textDecoration: 'none' }}>
-                <ListItemIcon style={iconStyle}>
-                  <MonetizationOnIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
-                  PAY ESCROW
-                </Typography>
-              </Link>
-            </Paper>
-          </Grid>
- <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              <Link to="/billpayment" style={{ textDecoration: 'none' }}>
-                <ListItemIcon style={iconStyle}>
-                  <MonetizationOnIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
+      <Grid container spacing={3} justifyContent="center" alignItems="stretch" marginTop="50px">
+      {/* First Row */}
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/ecommerce" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <StorefrontIcon sx={{ fontSize: 50, color: '#F36C00' }}/>
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
+              ECOMMERCE
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/escrow" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <MonetizationOnIcon sx={{ fontSize: 50, color: '#F36C00' }} />
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
+              PAY ESCROW
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/billpayment" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <ReceiptIcon sx={{ fontSize: 50, color: '#F36C00' }} />
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
               BILL PAYMENT
-                </Typography>
-              </Link>
-            </Paper>
-          </Grid>
-           <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              {/* <Link to="/pay-escrow" style={{ textDecoration: 'none' }}> */}
-                <ListItemIcon style={iconStyle}>
-                  <MonetizationOnIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
-                  USER MANAGEMENT
-                </Typography>
-              {/* </Link> */}
-            </Paper>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              {/* <Link to="/pay-escrow" style={{ textDecoration: 'none' }}> */}
-                <ListItemIcon style={iconStyle}>
-                  <MonetizationOnIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
-                  FINANCIAL ANALYTICS
-                </Typography>
-              {/* </Link> */}
-            </Paper>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              {/* <Link to="/pay-escrow" style={{ textDecoration: 'none' }}> */}
-                <ListItemIcon style={iconStyle}>
-                  <MonetizationOnIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
-                  CUSTOMER SUPPORT
-                </Typography>
-              {/* </Link> */}
-            </Paper>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={3}>
-            <Paper elevation={3} sx={paperStyle}>
-              {/* <Link to="/pay-escrow" style={{ textDecoration: 'none' }}> */}
-                <ListItemIcon style={iconStyle}>
-                  <MonetizationOnIcon />
-                </ListItemIcon>
-                <Typography variant="h5" gutterBottom>
-                 SETTINGS
-                </Typography>
-              {/* </Link> */}
-            </Paper>
-          </Grid>
-        </Grid>
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+
+      {/* Second Row */}
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/user-management" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <PeopleAltIcon sx={{ fontSize: 50, color: '#F36C00' }}/>
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
+              USER MANAGEMENT
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/financial-analysis" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <AssessmentIcon sx={{ fontSize: 50, color: '#F36C00' }}/>
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
+              FINANCIAL ANALYTICS
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+
+      {/* Third Row */}
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/customer-support" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <LiveHelpIcon sx={{ fontSize: 50, color: '#F36C00' }} />
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
+              CUSTOMER SUPPORT
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+          <Link to="/report-analytics" style={{ textDecoration: 'none' }}>
+            <ListItemIcon style={iconStyle}>
+              <LiveHelpIcon sx={{ fontSize: 50, color: '#F36C00' }} />
+            </ListItemIcon>
+            <Typography variant="h5" gutterBottom>
+              REPORT ANALYTICS
+            </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3}>
+        <Paper elevation={3} sx={paperStyle}>
+        <Link to="/settings" style={{ textDecoration: 'none' }}>
+          <ListItemIcon style={iconStyle}>
+            <SettingsIcon sx={{ fontSize: 50, color: '#F36C00' }} />
+          </ListItemIcon>
+          <Typography variant="h5" gutterBottom>
+            SETTINGS
+          </Typography>
+          </Link>
+        </Paper>
+      </Grid>
+    </Grid>
       </Box>
     </>
   );

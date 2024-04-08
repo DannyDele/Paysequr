@@ -31,6 +31,7 @@ const CategoriesManagementPage = () => {
       const newCategoryId = categories.length + 1;
       setCategories([...categories, { id: newCategoryId, name: newCategory }]);
       setNewCategory('');
+      setEditMode(false); // Reset edit mode
       setOpenDialog(false);
     }
   };
@@ -45,13 +46,19 @@ const CategoriesManagementPage = () => {
       setNewCategory('');
       setEditMode(false);
       setSelectedCategoryId(null);
+      setOpenDialog(false); // Close the dialog after editing
     }
   };
 
   // Function to delete a category
   const deleteCategory = (categoryId) => {
     const updatedCategories = categories.filter(category => category.id !== categoryId);
-    setCategories(updatedCategories);
+    // Reassign IDs based on the current index of the categories array
+    const updatedCategoriesWithIds = updatedCategories.map((category, index) => ({
+      ...category,
+      id: index + 1,
+    }));
+    setCategories(updatedCategoriesWithIds);
   };
 
   // Columns configuration for DataGrid
@@ -82,12 +89,15 @@ const CategoriesManagementPage = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>Service Categories</Typography>
+      <Typography variant="h4" className='text-gray-700'  style={{marginTop:'20px'}} gutterBottom>Service Categories</Typography>
       <Button
         variant="contained"
         color="primary"
         startIcon={<Add />}
-        onClick={() => setOpenDialog(true)}
+        onClick={() => {
+          setEditMode(false); // Reset edit mode
+          setOpenDialog(true);
+        }}
         style={{alignContent:'left',marginBottom:'20px'}}
       >
         Manage Categories
@@ -123,7 +133,6 @@ const CategoriesManagementPage = () => {
           rowsPerPageOptions={[5, 10, 20]}
         />
       </Paper>
-     
     </Container>
   );
 };

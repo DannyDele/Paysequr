@@ -25,7 +25,7 @@ const TransactionPage = () => {
   // Function to determine status background color
   const getStatusBackgroundColor = (status) => {
     switch (status) {
-      case 'Pending':
+      case 'Not Shipped':
         return 'rgba(255, 0, 0, 0.3)'; // Red with 30% opacity
       case 'On transit':
         return 'rgba(255, 255, 0, 0.3)'; // Yellow with 30% opacity
@@ -103,7 +103,7 @@ const TransactionPage = () => {
       style={{ marginBottom: '0.5rem' }}
     >
       <MenuItem value="">All</MenuItem>
-      <MenuItem value="Pending">Pending</MenuItem>
+      <MenuItem value="Pending">Not Shipped</MenuItem>
       <MenuItem value="On transit">On transit</MenuItem>
       <MenuItem value="Delivered">Delivered</MenuItem>
     </TextField>

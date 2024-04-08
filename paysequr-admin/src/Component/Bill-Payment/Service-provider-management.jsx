@@ -36,17 +36,25 @@ const ServiceProviderPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   // Function to add a new service provider
-  const addProvider = () => {
-    setServiceProviders([...serviceProviders, { ...newProvider, id: serviceProviders.length + 1 }]);
-    setNewProvider({ name: '', category: '', managerUsername: '', plans: [] });
-    setOpenDialog(false);
-  };
+ const addProvider = () => {
+  setServiceProviders([...serviceProviders, { ...newProvider, id: serviceProviders.length + 1 }]);
+  setNewProvider({ name: '', category: '', managerUsername: '', plans: [] });
+  setOpenDialog(false); // Close the dialog after adding the provider
+};
 
   // Function to delete a service provider
-  const deleteProvider = (providerId) => {
-    const updatedProviders = serviceProviders.filter(provider => provider.id !== providerId);
-    setServiceProviders(updatedProviders);
-  };
+ // Function to delete a service provider
+const deleteProvider = (providerId) => {
+  const updatedProviders = serviceProviders.filter(provider => provider.id !== providerId);
+  
+  // Update the IDs of the remaining providers
+  const updatedProvidersWithIds = updatedProviders.map((provider, index) => ({
+    ...provider,
+    id: index + 1,
+  }));
+  
+  setServiceProviders(updatedProvidersWithIds);
+};
 
   // Columns configuration for DataGrid
   const columns = [
@@ -91,6 +99,7 @@ const ServiceProviderPage = () => {
 
   return (
     <Container>
+            <Typography variant="h4" className='text-gray-700'  style={{marginTop:'20px'}} gutterBottom>Service Providers</Typography>
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} sm={6}>
           <TextField
@@ -100,7 +109,7 @@ const ServiceProviderPage = () => {
             onChange={handleChange}
             variant="outlined"
             fullWidth
-            style={{marginTop:'20px'}}
+            // style={{marginTop:'5px'}}
           >
             <MenuItem value="">All</MenuItem>
             <MenuItem value="Category 1">Category 1</MenuItem>
@@ -172,6 +181,7 @@ const ServiceProviderPage = () => {
                   onChange={(e) => handlePlanChange(index, e)}
                   variant="outlined"
                   fullWidth
+                 style={{marginBottom:'20px'}}
                 />
               </Grid>
               <Grid item xs={4}>
@@ -182,6 +192,7 @@ const ServiceProviderPage = () => {
                   onChange={(e) => handlePlanChange(index, e)}
                   variant="outlined"
                   fullWidth
+                  style={{marginBottom:'20px'}}
                 />
               </Grid>
               <Grid item xs={2}>

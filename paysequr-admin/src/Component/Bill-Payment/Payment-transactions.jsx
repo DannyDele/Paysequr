@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Container, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, TextField, Button, MenuItem } from '@mui/material';
+import { Container, TextField, Typography, Paper, Button, MenuItem, Grid, Box } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 
 const PaymentTransactionPage = () => {
   // Dummy data for payment transactions
@@ -20,71 +21,108 @@ const PaymentTransactionPage = () => {
     setSearchDateRange(e.target.value);
   };
 
+  // Function to filter transactions by escrow ID and transaction date
+const handleSearch = () => {
+  let filteredTransactions = [...transactions];
+  
+  // Filter by escrow ID
+  if (escrowId !== '') {
+    filteredTransactions = filteredTransactions.filter(transaction =>
+      transaction.escrowId.toString().toLowerCase().includes(escrowId.toLowerCase())
+    );
+  }
+
+  // Filter by transaction date
+  if (transactionDate !== '') {
+    filteredTransactions = filteredTransactions.filter(transaction =>
+      transaction.date === transactionDate
+    );
+  }
+
+  // Filter by delivery status
+  if (filter !== '') {
+    filteredTransactions = filteredTransactions.filter(transaction =>
+      transaction.deliveryStatus.toLowerCase().includes(filter.toLowerCase())
+    );
+  }
+
+  return filteredTransactions;
+};
+
+  // Function to filter payment transactions based on search criteria
+  const filterTransactions = () => {
+    let filteredTransactions = [...paymentTransactions];
+    if (searchCategory) {
+      filteredTransactions = filteredTransactions.filter(transaction => transaction.serviceCategory === searchCategory);
+    }
+    if (searchDateRange) {
+      filteredTransactions = filteredTransactions.filter(transaction => transaction.date === searchDateRange);
+    }
+    return filteredTransactions;
+  };
+
   // Function to sort payment transactions
   const sortTransactions = (property) => {
     const sortedTransactions = [...paymentTransactions].sort((a, b) => (a[property] > b[property]) ? 1 : -1);
     setPaymentTransactions(sortedTransactions);
   };
 
+  const columns = [
+    { field: 'id', headerName: 'Transaction ID', width: 130 },
+    { field: 'username', headerName: 'Username', width: 150 },
+    { field: 'serviceCategory', headerName: 'Service Category', width: 150 },
+    { field: 'serviceProvider', headerName: 'Service Provider', width: 150 },
+    { field: 'servicePlan', headerName: 'Service Plan', width: 150 },
+    { field: 'amount', headerName: 'Amount', width: 120 },
+    { field: 'date', headerName: 'Date', width: 150 },
+    { field: 'status', headerName: 'Status', width: 150 },
+  ];
+
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>Payment Transactions</Typography>
-      <TextField
-        select
-        label="Service Category"
-        value={searchCategory}
-        onChange={handleCategoryChange}
-        variant="outlined"
-        style={{ marginRight: '1rem' }}
-      >
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="Category 1">Category 1</MenuItem>
-        <MenuItem value="Category 2">Category 2</MenuItem>
-        {/* Add more categories as needed */}
-      </TextField>
-      <TextField
-        label="Date Range"
-        type="date"
-        value={searchDateRange}
-        onChange={handleDateRangeChange}
-        variant="outlined"
-        style={{ marginRight: '1rem' }}
-      />
-      <Button variant="contained" color="primary" style={{ marginBottom: '1rem' }}>Search</Button>
-      <Paper elevation={3}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Transaction ID</TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Service Category</TableCell>
-                <TableCell>Service Provider</TableCell>
-                <TableCell>Service Plan</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paymentTransactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>{transaction.id}</TableCell>
-                  <TableCell>{transaction.username}</TableCell>
-                  <TableCell>{transaction.serviceCategory}</TableCell>
-                  <TableCell>{transaction.serviceProvider}</TableCell>
-                  <TableCell>{transaction.servicePlan}</TableCell>
-                  <TableCell>{transaction.amount}</TableCell>
-                  <TableCell>{transaction.date}</TableCell>
-                  <TableCell>{transaction.status}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      <Typography variant="h4" className='text-gray-700' style={{marginTop:'20px'}} gutterBottom>Payment Transactions</Typography>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            select
+            label="Service Category"
+            value={searchCategory}
+            onChange={handleCategoryChange}
+            variant="outlined"
+            fullWidth
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="Category 1">Category 1</MenuItem>
+            <MenuItem value="Category 2">Category 2</MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            label=""
+            type="date"
+            value={searchDateRange}
+            onChange={handleDateRangeChange}
+            variant="outlined"
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Button variant="contained" color="primary" onClick={() => setPaymentTransactions(filterTransactions())} fullWidth>
+            Search
+          </Button>
+        </Grid>
+      </Grid>
+      <Paper elevation={3} style={{ marginTop: '1rem' }}>
+        <div style={{ height: 400, width: '100%' }}>
+          <DataGrid
+            rows={paymentTransactions}
+            columns={columns}
+            pageSize={5}
+            rowsPerPageOptions={[5, 10, 20]}
+          />
+        </div>
       </Paper>
-      <Button variant="contained" color="primary" onClick={() => sortTransactions('amount')} style={{ marginRight: '1rem' }}>Sort by Amount</Button>
-      <Button variant="contained" color="primary" onClick={() => sortTransactions('date')}>Sort by Date</Button>
+     
     </Container>
   );
 };

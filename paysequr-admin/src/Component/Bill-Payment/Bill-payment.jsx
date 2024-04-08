@@ -1,12 +1,18 @@
-import React from 'react';
+import React,{useState} from 'react';
 import Header from './Header'; // Assuming you have a Header component
 import Headermenu from './Menu'; // Assuming you have a DashboardBody component
 
 const BillPayment = () => {
+  const [currentPage, setCurrentPage] = useState('dashboard');
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div>
       <Header />
-      <Headermenu />
+      <Headermenu onPageChange={handlePageChange}/>
     </div>
   );
 };
