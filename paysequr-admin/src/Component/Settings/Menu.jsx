@@ -1,111 +1,79 @@
 import React, { useState } from 'react';
-import { Drawer, List, ListItem, ListItemText, Toolbar, AppBar, IconButton, Typography, Button } from '@mui/material';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import { SettingsOutlined as SettingsIcon, SecurityOutlined as SecurityIcon, NotificationsOutlined as NotificationsIcon, MenuOutlined as MenuIcon } from '@mui/icons-material'; // Import icons
-import AppSettingsPage from './App-setting';
-import SecuritySettingsPage from './Security-setting';
+import './index.css';
+import { Typography, Button } from '@mui/material';
+import {
+  DashboardOutlined,
+  SettingsOutlined,
+  SecurityOutlined,
+  NotificationsOutlined,
+  Menu,
+  Close,
+} from '@mui/icons-material';
+import AppSetting from './App-setting'; // Import AppSetting component
+import SecuritySetting from './Security-setting';
+import NotificationPreference from './Notification-preference';
 
-const HeaderWithMenu = ({ onPageChange }) => {
-  const [selectedPage, setSelectedPage] = useState('transactions');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const Sidebar = ({ onPageChange }) => {
+  const [show, setShow] = useState(false);
+  const [selectedPage, setSelectedPage] = useState('app-setting'); // Set initial state to 'app-setting'
 
   const handlePageChange = (page) => {
     setSelectedPage(page);
-    onPageChange(page);
   };
 
   const renderPageContent = () => {
     switch (selectedPage) {
       case 'app-setting':
-        return <AppSettingsPage />;
+        return <AppSetting />;
       case 'security-setting':
-        return <SecuritySettingsPage />;
-      //   case 'track-delivery-status':
-      //     return <div>Track Delivery status content goes here</div>;
+        return <SecuritySetting />;
+      case 'notification-preference':
+        return <NotificationPreference />;
       default:
         return null;
     }
   };
 
   return (
-    <div style={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: 240,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: 240,
-            boxSizing: 'border-box',
-            backgroundColor: '#FFF7F7', // Added background color
-            position: 'fixed', // Fixed position
-            height: '100vh', // Full height
-            top: 0, // Align top
-            paddingTop: '64px', // Adjust top padding to fit below header
-          },
-        }}
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      >
-        <Toolbar>
-          {/* <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={() => setSidebarOpen(false)} // Close sidebar on icon click
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton> */}
-          <Typography variant="h6" component="div">
-            PAYSEQUR
-          </Typography>
-        </Toolbar>
-        <List>
-          {/* Use Link component for the Dashboard item */}
-          <ListItem button component={Link} to="/">
-            <ListItemText primary="Dashboard" />
-          </ListItem>
-          <ListItem button onClick={() => handlePageChange('app-setting')}>
-            <SettingsIcon />
-            <ListItemText primary="App Setting" />
-          </ListItem>
-          <ListItem button onClick={() => handlePageChange('security-setting')}>
-            <SecurityIcon />
-            <ListItemText primary="Security Setting" />
-          </ListItem>
-          <ListItem button onClick={() => handlePageChange('track-delivery-status')}>
-            <NotificationsIcon />
-            <ListItemText primary="Notification Preferences" />
-          </ListItem>
-        </List>
-      </Drawer>
-
-      {/* Main content */}
-      <div style={{ flexGrow: 1, marginLeft: '240px' }}>
-        <AppBar position="static" sx={{ backgroundColor: 'white' }}>
-          <Toolbar>
-            {/* <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              onClick={() => setSidebarOpen(true)} // Open sidebar on icon click
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton> */}
-            <Typography variant="h6" component="div">
-              PAYSEQUR
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <div style={{ padding: '20px' }}>
-          {renderPageContent()}
+    <main className={show ? 'space-toggle' : null}>
+      <header className={`header ${show ? 'space-toggle' : null}`}>
+        <div className='header-toggle' onClick={() => setShow(!show)}>
+          {show ? <Close style={{ color: '#F36C00' }} /> : <Menu style={{ color: '#F36C00' }} />}
         </div>
-      </div>
-    </div>
+        <Typography style={{ color: 'white', marginRight: '550px' }}>Settings</Typography>
+      </header>
+
+      <aside className={`sidebar ${show ? 'show' : null}`}>
+        <Typography variant='h6' style={{ color: '#F36C00', textAlign: 'center', marginTop: '60px', marginBottom: '20px' }}>Paysequr</Typography>
+        <nav className='nav'>
+          <div>
+            <div className='nav-list'>
+              <Button onClick={() => handlePageChange('dashboard')} className={`nav-link ${selectedPage === 'dashboard' ? 'active' : ''}`}>
+                <DashboardOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
+                <span className='nav-link-name'>Dashboard</span>
+              </Button>
+              <Button onClick={() => handlePageChange('app-setting')} className={`nav-link ${selectedPage === 'app-setting' ? 'active' : ''}`}>
+                <SettingsOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
+                <span className='nav-link-name'>App Setting</span>
+              </Button>
+              <Button onClick={() => handlePageChange('security-setting')} className={`nav-link ${selectedPage === 'security-setting' ? 'active' : ''}`}>
+                <SecurityOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
+                <span className='nav-link-name'>Security Setting</span>
+              </Button>
+              <Button onClick={() => handlePageChange('notification-preference')} className={`nav-link ${selectedPage === 'notification-preference' ? 'active' : ''}`}>
+                <NotificationsOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
+                <span className='nav-link-name'>Notification Preference</span>
+              </Button>
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      {/* Render the selected page content */}
+      {renderPageContent()}
+
+    </main>
   );
 };
 
-export default HeaderWithMenu;
+export default Sidebar;

@@ -21,17 +21,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const SecuritySettingsPage = () => {
   // State for password policy settings
-  const [passwordComplexity, setPasswordComplexity] = useState(false);
-  const [passwordExpiration, setPasswordExpiration] = useState(false);
-
-  // State for 2FA settings
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
-
-  // Function to handle saving password settings
-  const handleSavePasswordSettings = () => {
-    // Logic to save password settings
-    console.log('Password settings saved');
-  };
 
   // Function to handle saving 2FA settings
   const handleSaveTwoFactorAuthSettings = () => {
@@ -44,11 +34,6 @@ const SecuritySettingsPage = () => {
       <Typography variant="h4" gutterBottom>
         Security Settings
       </Typography>
-      <Box mb={1}>
-        <Accordion>
-         
-        </Accordion>
-      </Box>
       <Box mb={2}>
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -92,27 +77,26 @@ const SecuritySettingsPage = () => {
         <AccordionDetails>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-            <List>
-          <ListItem>
-            <ListItemText
-              primary="Visibility settings for profile or account"
-              secondary="Control who can see your profile or account information."
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText
-              primary="Data sharing preferences"
-              secondary="Manage how your data is shared with others."
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText
-              primary="Permission management for third-party apps"
-              secondary="Review and control the permissions granted to third-party apps."
-            />
-          </ListItem>
-        </List>
-
+              <List>
+                <ListItem>
+                  <ListItemText
+                    primary="Visibility settings for profile or account"
+                    secondary="Control who can see your profile or account information."
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary="Data sharing preferences"
+                    secondary="Manage how your data is shared with others."
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary="Permission management for third-party apps"
+                    secondary="Review and control the permissions granted to third-party apps."
+                  />
+                </ListItem>
+              </List>
             </Grid>
           </Grid>
         </AccordionDetails>
@@ -165,17 +149,17 @@ const SecuritySettingsPage = () => {
         <AccordionDetails>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-            <List>
-          <ListItem>
-            <ListItemText primary="Recent login history" secondary="View the history of recent logins to your account." />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary="Notifications for suspicious activity" secondary="Receive notifications for any suspicious activity detected on your account." />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary="Option to revoke access for connected devices or applications" secondary="Easily revoke access for any devices or applications connected to your account." />
-          </ListItem>
-        </List>
+              <List>
+                <ListItem>
+                  <ListItemText primary="Recent login history" secondary="View the history of recent logins to your account." />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Notifications for suspicious activity" secondary="Receive notifications for any suspicious activity detected on your account." />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="Option to revoke access for connected devices or applications" secondary="Easily revoke access for any devices or applications connected to your account." />
+                </ListItem>
+              </List>
             </Grid>
           </Grid>
         </AccordionDetails>
@@ -198,8 +182,6 @@ const SecuritySettingsPage = () => {
             </Grid>
           </Grid>
         </AccordionDetails>
-     
-
       </Accordion>
       {/* Add other sections for Privacy Settings, Device Management, Security Features, Activity Monitoring, Data and Privacy, Security Tips and Resources, and Help and Support */}
     </Container>

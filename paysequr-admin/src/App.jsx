@@ -38,6 +38,8 @@ import UserActivityLogPage from './Component/Report-analytics/User-activity-log'
 import SettingsPage from './Component/Settings/Settings';
 import AppSettingsPage from './Component/Settings/App-setting';
 import SecuritySettingsPage from './Component/Settings/Security-setting';
+import NotificationPreferencesPage from './Component/Settings/Notification-preference';
+import KYCVerificationPage from './Component/User-Management/KYC-verification';
 const App = () => {
   return (
     <Router>
@@ -78,9 +80,11 @@ const App = () => {
         <Route path="/custom-reports" element={<CustomReports/>}/>
         <Route path="/transaction-logs" element={<TransactionLog/>}/>
         <Route path="/user-activity" elemnt={<UserActivityLogPage/>}/>
-        <Route path="settings" element={<SettingsPage/>}/>
+        <Route path="/settings" element={<SettingsPage/>}/>
         <Route path="/app-setting" element={<AppSettingsPage/>}/>
         <Route path="/security-setting" element={<SecuritySettingsPage/>}/>
+        <Route path="/notification-preference" element={<NotificationPreferencesPage/>}/>
+        <Route path="/kyc-verification" element={<KYCVerificationPage/>}/>
       </Routes>
     </Router>
   );

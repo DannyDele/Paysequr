@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import UserDatabase from './User-database';
 import UserActionPage from './User-actions';
 import UserVerificationPage from './User-verification';
+import KYCVerificationPage from './KYC-verification';
 
 const HeaderWithMenu = ({ onPageChange }) => {
   const [selectedPage, setSelectedPage] = useState('user-database');
@@ -21,6 +22,8 @@ const HeaderWithMenu = ({ onPageChange }) => {
         return <UserActionPage />;
       case 'user-database':
         return <UserDatabase/>;
+        case 'kyc-verification':
+        return <KYCVerificationPage/>;
       default:
         return null;
     }
@@ -38,6 +41,7 @@ const HeaderWithMenu = ({ onPageChange }) => {
             <Button onClick={() => handlePageChange('user-database')} sx={{ color: 'black' }}>User Database</Button>
             <Button onClick={() => handlePageChange('user-actions')} sx={{ color: 'black' }}>User Actions</Button>
             <Button onClick={() => handlePageChange('user-verification')} sx={{ color: 'black' }}>User Verification</Button>
+            <Button onClick={() => handlePageChange('kyc-verification')} sx={{ color: 'black' }}>KYC Verification</Button>
           </ButtonGroup>
         </Toolbar>
       </AppBar>
