@@ -1,64 +1,98 @@
-import React, { useState } from 'react';
-import { Container, Typography, Paper, TextField, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  Container,
+  Typography,
+  Paper,
+  TextField,
+  Button,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress
+} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Edit, Delete, Add } from '@mui/icons-material';
+import { fetchCategories, addCategory, deleteCategory, editCategory } from './../../redux/categoriesSlice'; // Import fetchCategories action
+
 
 const CategoriesManagementPage = () => {
-  // Dummy data for categories
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Airtime' },
-    { id: 2, name: 'Data' },
-    { id: 3, name: 'Electricity' },
-    { id: 4, name: 'TV' },
-    { id: 5, name: 'Education' },
-    { id: 6, name: 'Religion' },
-    { id: 7, name: 'Government' },
-    { id: 8, name: 'Water' },
-    { id: 9, name: 'Travel' },
-    { id: 10, name: 'Hotel' },
-    { id: 11, name: 'Others' },
-  ]);
+  
+ const dispatch = useDispatch();
+  const categories = useSelector((state) => state.categories.categories);
+
+// Assuming categories is an array of objects
+const modifiedCategories = categories.map((category, index) => ({
+  id: index + 1, // Generate a unique identifier for each row
+  name: category.name // Assuming 'name' is the name of your category property
+}));
+
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
 
   // State for new category input and editing
   const [newCategory, setNewCategory] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+    const [loading, setLoading] = useState(false); // State to manage loading
+
+
+
+
 
   // Function to add a new category
-  const addCategory = () => {
+const handleAddCategory = async () => {
+  try {
     if (newCategory.trim() !== '') {
-      const newCategoryId = categories.length + 1;
-      setCategories([...categories, { id: newCategoryId, name: newCategory }]);
-      setNewCategory('');
-      setEditMode(false); // Reset edit mode
-      setOpenDialog(false);
+      setLoading(true); // Set loading to true when button is clicked
+      dispatch(addCategory(newCategory));
+      console.log('New Caterory:', newCategory)
+        // setLoading(false);
+
+     
     }
-  };
+  } catch (error) {
+    setLoading(false); // Set loading to false if an error occurs
+    console.error('Error adding category:', error);
+  }
+};
+
+
 
   // Function to edit a category
-  const editCategory = () => {
-    if (newCategory.trim() !== '') {
-      const updatedCategories = categories.map(category =>
-        category.id === selectedCategoryId ? { ...category, name: newCategory } : category
-      );
-      setCategories(updatedCategories);
-      setNewCategory('');
-      setEditMode(false);
-      setSelectedCategoryId(null);
-      setOpenDialog(false); // Close the dialog after editing
+  const handleEditCategory = async () => {
+    try {
+      if (newCategory.trim() !== '') {
+        setLoading(true); // Set loading to true when button is clicked
+        dispatch(editCategory({ categoryId: selectedCategoryId, categoryName: newCategory }));
+        // setLoading(false);
+        // setNewCategory(''); // Clear the input field
+        // setEditMode(false);
+        // setSelectedCategoryId(null);
+        // setOpenDialog(false); // Close the dialog after editing
+      }
+    } catch (error) {
+      setLoading(false); // Set loading to false if an error occurs
+      console.error('Error editing category:', error);
     }
   };
 
   // Function to delete a category
-  const deleteCategory = (categoryId) => {
-    const updatedCategories = categories.filter(category => category.id !== categoryId);
-    // Reassign IDs based on the current index of the categories array
-    const updatedCategoriesWithIds = updatedCategories.map((category, index) => ({
-      ...category,
-      id: index + 1,
-    }));
-    setCategories(updatedCategoriesWithIds);
+  const onDeleteCategory = async (categoryId) => {
+    try {
+      dispatch(deleteCategory(categoryId));
+      // Refetch categories after deletion
+      dispatch(fetchCategories());
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
   };
 
   // Columns configuration for DataGrid
@@ -70,8 +104,8 @@ const CategoriesManagementPage = () => {
       headerName: 'Actions',
       width: 120,
       renderCell: (params) => (
-        <div>
-          <IconButton onClick={() => {
+        <span>
+          <IconButton style={{color:'blue'}} onClick={() => {
             setNewCategory(params.row.name);
             setEditMode(true);
             setSelectedCategoryId(params.row.id);
@@ -79,13 +113,16 @@ const CategoriesManagementPage = () => {
           }}>
             <Edit />
           </IconButton>
-          <IconButton onClick={() => deleteCategory(params.row.id)}>
+          <IconButton style={{color:'red'}} onClick={() => onDeleteCategory(params.row.id)}>
             <Delete />
           </IconButton>
-        </div>
+        </span>
       ),
     },
   ];
+
+
+  
 
   return (
     <Container>
@@ -117,22 +154,25 @@ const CategoriesManagementPage = () => {
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
           <Button
-            onClick={editMode ? editCategory : addCategory}
+            onClick={editMode ? handleEditCategory : handleAddCategory}
             color="primary"
             variant="contained"
           >
-            {editMode ? 'Save Changes' : 'Add'}
+            {loading ? <CircularProgress size={24} color="inherit" /> : editMode ? 'Save Changes' : 'Add'}
           </Button>
         </DialogActions>
       </Dialog>
       <Paper elevation={3} style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
         <DataGrid
-          rows={categories}
+          rows={modifiedCategories}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
+
+
         />
-      </Paper>
+     
+    </Paper>
     </Container>
   );
 };

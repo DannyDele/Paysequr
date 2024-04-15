@@ -1,26 +1,99 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Grid, Paper, MenuItem } from '@mui/material';
+import { Container, Typography, TextField, Button, Grid, Paper, MenuItem, Box } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import { useDispatch } from 'react-redux';
+import { updateUserStatus } from './../../redux/userStatusSlice'; // Import your updateUserStatus action from userStatusSlice.js
+import { Snackbar, SnackbarContent, IconButton, Slide } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import CloseIcon from '@mui/icons-material/Close';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+
+
+
+
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
+
+
+
+
+
 
 const UserBanning = ({ users }) => {
-  const [selectedUser, setSelectedUser] = useState('');
+  const dispatch = useDispatch();
+    const classes = useStyles();
+
+  const [selectedUserId, setSelectedUserId] = useState(''); // State to store selected user's ID
   const [action, setAction] = useState('');
   const [actionDuration, setActionDuration] = useState('');
   const [actionDurationCustom, setActionDurationCustom] = useState('');
-  const [message, setMessage] = useState('');
 
-  // Handle form submission
-  const handleSubmit = () => {
-    // Implement submission logic here
-    console.log('Form submitted!');
-    console.log('Selected user:', selectedUser);
-    console.log('Action:', action);
-    console.log('Action duration:', actionDuration);
-    console.log('Custom action duration:', actionDurationCustom);
-    console.log('Message:', message);
+  // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [message, setMessage] = useState('');
+
+
+
+ // Handle form submission
+const handleSubmit = async () => {
+  try {
+    // Dispatch updateUserStatus action with selectedUserId and action
+    dispatch(updateUserStatus({ userId: selectedUserId, status: action }));
+    console.log('User status updated successfully.');
+      // Determine the appropriate message based on the action
+    let message = '';
+    if (action === 'disable') {
+      message = 'User with ID ' + selectedUserId + ' is banned.';
+    } else if (action === 'active') {
+      message = 'User with ID ' + selectedUserId + ' is activated.';
+    } else {
+      message = 'User status updated successfully.';
+    }
+    // Show Snackbar with the determined message
+    setSnackbarSeverity('success');
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+    // Reset form fields if needed
+    setSelectedUserId('');
+    setAction('');
+    setActionDuration('');
+    setActionDurationCustom('');
+    setMessage('');
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    // Handle error if necessary
+  }
   };
 
+
+  
+// Function to handle snackbar
+const handleSnackbarClose = () => {
+  setSnackbarOpen(false);
+};
+
+  
+
+
   return (
+    <Box>
     <Paper elevation={3} style={{ marginLeft: '50px', marginTop: '20px', padding: '20px', marginBottom: '20px' }}>
       <Typography variant="h6" gutterBottom>
         User Suspension/Banning
@@ -29,12 +102,16 @@ const UserBanning = ({ users }) => {
         <Grid item xs={12} sm={6}>
           <Autocomplete
             fullWidth
-            value={selectedUser}
-            onChange={(event, newValue) => {
-              setSelectedUser(newValue);
-            }}
-            options={users.map((user) => user.username)}
-            renderInput={(params) => <TextField {...params} label="Select user" variant="outlined" />}
+       value={users.find(user => user.id === selectedUserId) || null}
+         onChange={(event, newValue) => {
+  if (newValue && newValue.id) {
+    setSelectedUserId(newValue.id);
+    console.log('Selected user ID:', newValue.id);
+  }
+}}
+            options={users}
+              getOptionLabel={(user) => user.username} // Customize to display username
+          renderInput={(params) => <TextField {...params} label="Select user" variant="outlined" />}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -46,8 +123,8 @@ const UserBanning = ({ users }) => {
             value={action}
             onChange={(e) => setAction(e.target.value)}
           >
-            <MenuItem value="Ban">Ban</MenuItem>
-            <MenuItem value="Unban">Unban</MenuItem>
+            <MenuItem value="disable">Ban</MenuItem>
+            <MenuItem value="active">Unban</MenuItem>
             <MenuItem value="Suspension">Suspension</MenuItem>
             <MenuItem value="Unsuspend">Unsuspend</MenuItem>
           </TextField>
@@ -95,6 +172,39 @@ const UserBanning = ({ users }) => {
         </Grid>
       </Grid>
     </Paper>
+
+      
+{/* Snackbar component */}
+
+<Snackbar
+  anchorOrigin={{
+    vertical: 'top', // Change to 'top'
+    horizontal: 'right', // Change to 'right'
+  }}
+  open={snackbarOpen}
+  autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+                TransitionComponent={Slide} // Use Slide transition
+
+>
+  <SnackbarContent
+    className={snackbarSeverity === 'success' ? classes.success : classes.error}
+    message={
+      <span className={classes.message}>
+        <CheckCircleIcon className={classes.icon} />
+        {snackbarMessage}
+      </span>
+    }
+    action={[
+      <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+        <CloseIcon className={classes.icon} />
+      </IconButton>,
+    ]}
+  />
+</Snackbar>
+    
+    </Box>
+    
   );
 };
 
