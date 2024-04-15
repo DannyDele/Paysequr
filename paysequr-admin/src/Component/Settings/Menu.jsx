@@ -9,6 +9,7 @@ import {
   Menu,
   Close,
 } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import AppSetting from './App-setting'; // Import AppSetting component
 import SecuritySetting from './Security-setting';
 import NotificationPreference from './Notification-preference';
@@ -48,10 +49,12 @@ const Sidebar = ({ onPageChange }) => {
         <nav className='nav'>
           <div>
             <div className='nav-list'>
-              <Button onClick={() => handlePageChange('dashboard')} className={`nav-link ${selectedPage === 'dashboard' ? 'active' : ''}`}>
-                <DashboardOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
-                <span className='nav-link-name'>Dashboard</span>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Button >
+              <DashboardOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
+              <span className='nav-link-name'  >Dashboard</span>
               </Button>
+            </Link>
               <Button onClick={() => handlePageChange('app-setting')} className={`nav-link ${selectedPage === 'app-setting' ? 'active' : ''}`}>
                 <SettingsOutlined style={{ color: '#F36C00' }} className='nav-link-icon' />
                 <span className='nav-link-name'>App Setting</span>
