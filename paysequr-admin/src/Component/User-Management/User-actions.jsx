@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import { PersonAddDisabled, Chat } from '@mui/icons-material'; // Import icons for User Banning and Communication with Users
 import UserBanning from './User-banning'; // Import UserBanning component
 import CommunicationWithUsers from './Communication'; // Import CommunicationWithUsers component
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers } from './../../redux/userSlice'
 
 const UserActionPage = () => {
   const [showUserBanning, setShowUserBanning] = useState(true); // Set initial state to true
   const [showCommunicationWithUsers, setShowCommunicationWithUsers] = useState(false);
 
-  // Define the users array
-  const users = [
-    { id: 1, username: 'john_doe' },
-    { id: 2, username: 'jane_smith' },
-    // Add more user data as needed
-  ];
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users.users);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
+
 
   const handleViewUserBanning = () => {
     setShowUserBanning(true);

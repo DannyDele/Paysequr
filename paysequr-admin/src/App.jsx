@@ -40,8 +40,23 @@ import AppSettingsPage from './Component/Settings/App-setting';
 import SecuritySettingsPage from './Component/Settings/Security-setting';
 import NotificationPreferencesPage from './Component/Settings/Notification-preference';
 import KYCVerificationPage from './Component/User-Management/KYC-verification';
+import { Provider } from 'react-redux';
+import store from './redux/store'
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import theme from './assets/muiStyles/theme'
+
+
+
+
+
+
+
 const App = () => {
   return (
+    <Provider store={store}> {/* Wrap your App component with Provider and pass store as prop */}
+            <ThemeProvider theme={theme}>
+
+
     <Router>
       <Routes> {/* Wrap Route components inside Routes */}
         <Route exact path="/" element={<DashboardBody />} /> {/* Use 'element' prop to specify the component */}
@@ -86,7 +101,11 @@ const App = () => {
         <Route path="/notification-preference" element={<NotificationPreferencesPage/>}/>
         <Route path="/kyc-verification" element={<KYCVerificationPage/>}/>
       </Routes>
-    </Router>
+        </Router>
+              </ThemeProvider>
+
+          </Provider>
+
   );
 };
 
