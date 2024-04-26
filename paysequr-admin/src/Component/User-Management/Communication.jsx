@@ -32,9 +32,11 @@ const CommunicationWithUsers = ({ users }) => {
                 variant="outlined"
               />
             )}
-            value={selectedUser}
+            value={users.find(user => user.id === selectedUser) || null}
+
             onChange={(event, newValue) => {
-              setSelectedUser(newValue);
+              console.log('User Selected!!', newValue.id)
+              setSelectedUser(newValue.id);
             }}
           />
         </Grid>

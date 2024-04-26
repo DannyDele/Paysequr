@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Edit, Delete, Add } from '@mui/icons-material';
-import { fetchAllItems, addItem, deleteItem, itemDeleted } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
+import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -47,6 +47,8 @@ const ProductManagementPage = () => {
 
   // Redux state for product items
   const productItems = useSelector((state) => state.items.items);
+    const loading = useSelector((state) => state.items.loading); // Access loading state
+
   const dispatch = useDispatch();
   const classes = useStyles();
 
@@ -55,7 +57,6 @@ const ProductManagementPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openProductDialog, setOpenProductDialog] = useState(false);
   const [openAddCategoryDialog, setOpenAddCategoryDialog] = useState(false);
-  const [loading, setLoading] = useState(false); // State to manage loading
   
   
   // Snackbar states
@@ -150,7 +151,6 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   // Function to handle adding a new product category
 const handleAddProduct = () => {
   try {
-    setLoading(true);
     // Gather all the data from the newCategory state
     const newProductData = { ...newCategory };
     // Log all the data being sent
@@ -160,7 +160,6 @@ const handleAddProduct = () => {
     // Close the add category dialog
     handleCloseAddCategoryDialog();
   } catch (error) {
-    setLoading(false);
     console.log('An error occurred', error);
   }
 };
@@ -170,16 +169,13 @@ const handleAddProduct = () => {
   
   const handleDeleteProduct = (productId) => {
     try {
-      setLoading(true);
       dispatch(deleteItem(productId)); // Dispatch the deleteItem action
-      dispatch(itemDeleted(productId)); // Dispatch the itemDeleted action to update the store     
        // setMessage('Product deleted successfuly!')
       // Show Snackbar with the determined message
     setSnackbarSeverity('success');
     setSnackbarMessage('Product deleted successfuly!');
     setSnackbarOpen(true);
     } catch (error) {
-      setLoading(false);
       console.log('An error occurred', error);
     }
   };
@@ -325,13 +321,18 @@ const renderFormFields = (data, parentKey = '') => {
         <Typography variant="h5" className='text-gray-700'style={{marginTop:'20px'}} gutterBottom>Product Categories</Typography>
        
         <Button variant="outlined" color="primary" style={{ marginRight: '1rem',marginTop:'10px' }} onClick={handleOpenAddCategoryDialog}>Add Product Category</Button>
- <div style={{ height: 300, width: '100%' }}>
+        <div style={{ height: 300, width: '100%' }}>
+          
+          { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
+
           <DataGrid
             rows={productItems}
             columns={itemColumns}
             pageSize={5}
             rowsPerPageOptions={[5, 10, 20]}
-          />
+            />
+             )
+            }
         </div>
       </div>
 
@@ -481,7 +482,23 @@ const renderFormFields = (data, parentKey = '') => {
     )}
   </DialogContent>
   <DialogActions>
-    <Button onClick={handleCloseProductDialog} color="primary">Close</Button>
+          
+            <Button
+            startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+                    variant="contained"
+ onClick={handleCloseProductDialog}
+                        style={{ transition: 'background-color 0.3s' }}
+
+            onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+          
+          >
+          Close
+        </Button>
   </DialogActions>
 </Dialog>
 

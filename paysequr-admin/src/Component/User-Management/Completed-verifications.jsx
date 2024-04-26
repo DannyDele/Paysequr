@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
 import { fetchUsers } from './../../redux/userSlice'; // Import the fetchUsers async thunk from userSlice
 import VerifiedIcon from '@mui/icons-material/Verified'; // Import the green check circle icon
+import { CircularProgress } from '@mui/material';
+
 
 
 const columns = [
@@ -31,8 +33,19 @@ const CompletedVerifications = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.users);
 
+ // Loading state
+    const [loading, setLoading] = useState(false); // State to manage loading
+
   useEffect(() => {
-    dispatch(fetchUsers());
+  
+        const fetchAllUsers = async () => {
+      setLoading(true)
+    await dispatch(fetchUsers());
+    setLoading(false)
+    }
+
+    fetchAllUsers()
+
   }, [dispatch]);
 
   // Filter users to display only those with vstatus === 'verified'
@@ -41,13 +54,17 @@ const CompletedVerifications = () => {
 
   return (
     <div style={{ marginLeft: '50px', marginTop: '20px', height: 400, width: '95%' }}>
+                        { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
+
       <DataGrid
         rows={verifiedUsers}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5, 10, 20]}
         checkboxSelection
-      />
+        />
+        )
+            }
     </div>
   );
 };
