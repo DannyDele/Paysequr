@@ -1,12 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'; // Import axios
 
+const API_ENDPOINT = 'https://secure.paysequr.com'
+
 // Thunk function to fetch all items from the API endpoint
 export const fetchAllItems = createAsyncThunk(
   'items/fetchAllItems',
   async () => {
     try {
-      const response = await axios.get('https://secure.paysequr.com/api-escrow/allitems'); // Use axios.get
+      const response = await axios.get(`${API_ENDPOINT}/api-escrow/allitems`); // Use axios.get
+      console.log('All Product Item Added:', response.data)
       return response.data; // Axios response data is already parsed JSON
     } catch (error) {
       throw error;
@@ -19,7 +22,7 @@ export const addItem = createAsyncThunk(
   'items/addItem',
   async (itemData) => {
     try {
-      const response = await axios.post('https://secure.paysequr.com/api-escrow/additem', itemData, {
+      const response = await axios.post(`${API_ENDPOINT}/api-escrow/additem`, itemData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -39,7 +42,8 @@ export const deleteItem = createAsyncThunk(
   'items/deleteItem',
   async (itemId) => {
     try {
-      const response = await axios.delete(`https://secure.paysequr.com/api-escrow/deleteitem/${itemId}`); // Use axios.delete
+      const response = await axios.delete(`${API_ENDPOINT}/api-escrow/deleteitem/${itemId}`); // Use axios.delete
+      console.log('Deleted Item:', response.data)
       return response.data; // Axios response data is already parsed JSON
     } catch (error) {
       throw error;
@@ -55,12 +59,7 @@ const itemsSlice = createSlice({
     loading: false,
     error: null,
   },
-    reducers: {
-       itemDeleted(state, action) {
-      state.items = state.items.filter(item => item.id !== action.payload);
-    }
-
-  },
+    reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllItems.pending, (state) => {
@@ -91,9 +90,11 @@ const itemsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteItem.fulfilled, (state) => {
+      .addCase(deleteItem.fulfilled, (state, action) => {
         state.loading = false;
         // Assuming you want to keep the state items as they are after deletion
+              state.items = state.items.filter(item => item.id !== action.payload.id);
+
       })
       .addCase(deleteItem.rejected, (state, action) => {
         state.loading = false;
@@ -104,5 +105,5 @@ const itemsSlice = createSlice({
 
 // Export the slice reducer
 
-export const { itemDeleted } = itemsSlice.actions;
+// export const { itemDeleted } = itemsSlice.actions;
 export default itemsSlice.reducer;

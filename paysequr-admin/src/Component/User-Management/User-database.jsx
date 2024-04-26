@@ -1,18 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
-import { Container, TextField, Grid, Paper, Typography, Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Avatar } from '@mui/material';
+import {
+  Container,
+  TextField,
+  TextareaAutosize,
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Avatar,
+  CircularProgress,
+  IconButton
+} from '@mui/material';
+import { Edit, Delete, Add } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import VerifiedIcon from '@mui/icons-material/Verified'; // Import the green check circle icon
+import { HourglassEmpty } from '@mui/icons-material'; // Import icons for different verification statuses
 import { fetchUsers } from './../../redux/userSlice';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { HelpOutline } from '@mui/icons-material'; // Import icons for different verification statuses
+
 
 const UserDatabase = () => {
-  const dispatch = useDispatch();
+   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.users);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openQuerryDialog, setOpenQuerryDialog] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [reason, setReason] = useState('');
+
+  
+  // Loading state
+    const [loading, setLoading] = useState(false); // State to manage loading
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    console.log('All Users From Database:', users)
+
+    const fetchAllUsers = async () => {
+      setLoading(true)
+    await dispatch(fetchUsers());
+    setLoading(false)
+    }
+
+    fetchAllUsers()
+
+    
   }, [dispatch]);
 
   // Function to handle search
@@ -22,17 +62,35 @@ const UserDatabase = () => {
     // Filter users based on search query
   };
 
-  // Columns definition for the DataGrid
-  const columns = [
-     { field: 'id', headerName: 'ID', width: 90 },
-  { field: 'username', headerName: 'Username', width: 150 },
-  { field: 'firstname', headerName: 'First Name', width: 150 },
-  { field: 'middlename', headerName: 'Middle Name', width: 150 },
-  { field: 'lastname', headerName: 'Last Name', width: 150 },
-  { field: 'tier', headerName: 'KYC Level', width: 150 },
-  { field: 'vstatus', headerName: 'Status', width: 150 },
-    // Rest of the columns...
-  ];
+
+
+// Function to open Query dialog for user
+ const handleQueryUser =  (userId) => {
+  console.log('Query Button Clicked Here!!');
+  console.log('Users Array:', users); // Log the users array for debugging
+  const user = users.find((user) => user.id === userId);
+  console.log('Found User:', user); // Log the found user for debugging
+  if (user) {
+    console.log('Query Button ALSO Clicked Here!!');
+    setUserName(`${user.firstname} ${user.lastname}`);
+    setOpenQuerryDialog(true);
+  }
+};7
+
+
+  // Function to Query User
+
+  const handleQuery = () => {
+  // Assuming you want to display an alert when the "Query" button is clicked
+  alert('Querying user...');
+};
+
+
+
+
+
+
+
 
   const handleViewUser = (user) => {
     setSelectedUser(user);
@@ -42,6 +100,83 @@ const UserDatabase = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
+
+  const handleCloseQuerryDialog = () => {
+     setOpenQuerryDialog(false)
+  }
+
+
+
+
+
+
+  // Columns definition for the DataGrid
+  const columns = [
+     { field: 'id', headerName: 'ID', width: 90 },
+  { field: 'username', headerName: 'Username', width: 150 },
+  { field: 'firstname', headerName: 'First Name', width: 150 },
+  { field: 'lastname', headerName: 'Last Name', width: 150 },
+  { field: 'tier', headerName: 'KYC Level', width: 150 },
+    {
+      field: 'vstatus',
+      headerName: 'Status',
+      width: 150,
+      renderCell: (params) => (
+        <span>
+          {params.value}
+          {params.value === 'verified' ? <VerifiedIcon style={{ color: 'green', marginRight: 5 }} /> :
+            <HourglassEmpty style={{ color: '#227BD4', marginRight: 5 }} />}
+          </span>
+      )
+    },
+
+
+    {
+    field: 'actions',
+    headerName: 'Actions',
+    width: 200,
+    renderCell: (params) => (
+      <Button
+        startIcon={<HelpOutline style={{ transition: 'transform 0.3s' }} />}
+  variant="contained"
+  color="error" // Change color to red
+  size="small" // Reduce the size
+  style={{
+    transition: 'background-color 0.3s',
+    color: 'white', // Change text color to white
+    backgroundColor: '#f44336', // Set background color to red
+    minWidth: 'unset', // Reset minimum width
+    width: 'auto', // Make width auto to fit content
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+  }}
+  onClick={(e) => {
+    e.stopPropagation();
+        console.log('Clicked User ID:', params.row.id)
+
+     handleQueryUser(params.row.id); // Call handleApproveKYC from component's scope
+  }}
+>
+  Query
+</Button>
+
+    ),
+    
+  },
+    // Rest of the columns...
+  ];
+
+
+
+
+
 
   return (
     <Container>
@@ -62,6 +197,8 @@ const UserDatabase = () => {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <div style={{ height: 500, width: '100%' }}>
+
+            { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
             <DataGrid
               rows={users}
               columns={columns}
@@ -70,19 +207,147 @@ const UserDatabase = () => {
               checkboxSelection
               disableSelectionOnClick
               onRowClick={(params) => handleViewUser(params.row)}
-            />
+              />
+              )
+            }
           </div>
         </Grid>
       </Grid>
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>User Profile</DialogTitle>
-        <DialogContent>
-          {/* Dialog content */}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-        </DialogActions>
-      </Dialog>
+
+      {/* Dynamically Populate the users information */}
+<Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+      <DialogTitle style={{ textAlign: 'center', fontSize: '24px', color: '#333' }}>User Profile</DialogTitle>
+      <DialogContent dividers>
+    {selectedUser && (
+  <div>
+    {Object.entries(selectedUser)
+      .filter(([key]) => key !== 'password') // Filter out 'password' field
+      .reduce((pairs, [key, value], index, array) => {
+        if (index % 2 === 0) {
+          pairs.push(array.slice(index, index + 2));
+        }
+        return pairs;
+      }, [])
+      .map((pair, index) => (
+        <div key={index} style={{ display: 'flex', gap: '16px' }}>
+          {pair.map(([key, value]) => (
+            <TextField
+              key={key}
+              label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the label
+              value={value}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+          ))}
+        </div>
+      ))}
+  </div>
+)}
+
+      </DialogContent>
+      <DialogActions>
+          <Button
+            startIcon={<Delete style={{ transition: 'transform 0.3s' }} />}
+            variant="contained" color="error" onClick={() => { }}
+                            style={{ transition: 'background-color 0.3s' }}
+
+            onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+          >
+          Delete
+        </Button>
+          <Button
+            startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+                    variant="contained"
+ onClick={handleCloseDialog}
+                        style={{ transition: 'background-color 0.3s' }}
+
+            onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+          
+          >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+      
+
+      {/* Open Querry Dialog */}
+  <Dialog open={openQuerryDialog} onClose={handleCloseQuerryDialog} maxWidth="sm" fullWidth>
+    <DialogTitle style={{ textAlign: 'center', fontSize: '24px', color: '#333' }}>Querry User</DialogTitle>
+<DialogContent style={{ paddingTop: '1rem' }}>
+      <TextField
+        label="User Name"
+        value={userName}
+        variant="outlined"
+        fullWidth
+        style={{ marginBottom: '1rem' }}
+      />
+        <TextField
+  label="Reason for query"
+  multiline
+  rows={5}
+  placeholder="Reason for query"
+  value={reason}
+  onChange={(e) => setReason(e.target.value)}
+  variant="outlined"
+  fullWidth
+  style={{
+    resize: 'none', // Disable resizing
+    marginBottom: '1rem', // Match marginBottom of TextField
+  }}
+/>
+
+    </DialogContent>
+    <DialogActions>
+      <Button
+        startIcon={<HelpOutline style={{ transition: 'transform 0.3s' }} />}
+        variant="contained"
+        color="error"
+              onClick={() => { 
+              handleQuery();
+
+        }}
+        style={{ transition: 'background-color 0.3s' }}
+        onMouseEnter={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+        }}
+      >
+        Query
+      </Button>
+      <Button
+        startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+        variant="contained"
+        onClick={handleCloseQuerryDialog}
+        style={{ transition: 'background-color 0.3s' }}
+        onMouseEnter={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+        }}
+      >
+        Close
+      </Button>
+    </DialogActions>
+  </Dialog>
+
     </Container>
   );
 };
@@ -93,75 +358,3 @@ export default UserDatabase;
 
 
 
-
-
-//   <DialogContent>
-//   <div style={{ textAlign: 'left' }}>
-//     <div style={{ marginBottom: '20px' }}>
-//     <Avatar
-//   alt="Profile"
-//   src={selectedUser ? selectedUser.profilePhoto : ''}
-//   style={{
-//     marginLeft: 'auto',
-//     marginRight: 'auto',
-//     display: 'block',
-//     width: '100px',
-//     height: '100px',
-//   }}
-// />
-//     </div>
-//     <div style={{ width:'300px',marginBottom: '20px', paddingLeft: '10px', paddingRight: '10px' }}>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Verified Status:</strong> {selectedUser ? selectedUser.verifiedStatus : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>KYC Tier Level:</strong> {selectedUser ? selectedUser.kycTierLevel : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>User ID:</strong> {selectedUser ? selectedUser.userId : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Username:</strong> {selectedUser ? selectedUser.username : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Name:</strong> {selectedUser ? `${selectedUser.firstName} ${selectedUser.middleName} ${selectedUser.lastName}` : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Email:</strong> {selectedUser ? selectedUser.email : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Phone Number:</strong> {selectedUser ? selectedUser.phoneNumber : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Role:</strong> {selectedUser ? selectedUser.role : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Date Verified:</strong> {selectedUser ? selectedUser.dateVerified : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Date Joined:</strong> {selectedUser ? selectedUser.dateJoined : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Account no 1:</strong> {selectedUser ? selectedUser.accountNo1 : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Account no 2:</strong> {selectedUser ? selectedUser.accountNo2 : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>BVN:</strong> {selectedUser ? selectedUser.bvn : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Address:</strong> {selectedUser ? selectedUser.address : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Identity Card Number:</strong> {selectedUser ? selectedUser.identityCardNo : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Identity Card Preview:</strong> {selectedUser ? selectedUser.identityCardPreview : ''}
-//       </Typography>
-//       <Typography variant="body1" gutterBottom>
-//         <strong>Activity Log:</strong> {selectedUser ? selectedUser.activityLog : ''}
-//       </Typography>
-//     </div>
-//   </div>
-// </DialogContent>

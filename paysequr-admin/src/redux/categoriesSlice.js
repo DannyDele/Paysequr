@@ -52,20 +52,29 @@ export const editCategory = createAsyncThunk(
 );
 
 
+
 // Create an asynchronous action creator to delete a category
 export const deleteCategory = createAsyncThunk(
   'categories/deleteCategory',
   async (categoryId) => {
     try {
-      const response = await axios.delete(`${CATEGORIES_ENDPOINT}/${categoryId}`);
-      console.log('Deleted category:', response.data); // Log deleted category
-      return { deletedCategoryId: categoryId };
+      const bodyData = {
+        escrow_id: categoryId // Additional data to send along with the DELETE request
+      };
+              console.log('Body Data:', bodyData)
+
+      const response = await axios.delete(`${CATEGORIES_ENDPOINT}/${categoryId}`, {
+        data: JSON.stringify(bodyData)
+      });
+      console.log('Delete Categories from the slice store:', response)
+      return response.data;
     } catch (error) {
-      console.error('Error deleting category:', error.message); // Log error
+      console.error('Error deleting category:', error.message);
       throw error;
     }
   }
 );
+
 
 
 // Define the categories slice
@@ -93,10 +102,11 @@ const categoriesSlice = createSlice({
       .addCase(addCategory.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(addCategory.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.categories.push(action.payload); // Add the newly added category to the state
-      })
+     .addCase(addCategory.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.categories = [...state.categories, action.payload]; // Create a copy of the categories array and add the newly added category
+})
+
       .addCase(addCategory.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
@@ -123,7 +133,7 @@ const categoriesSlice = createSlice({
       .addCase(deleteCategory.fulfilled, (state, action) => {
         state.status = 'succeeded';
         // Remove the deleted category from the state
-        state.categories = state.categories.filter(category => category.id !== action.payload.deletedCategoryId);
+        state.categories = state.categories.filter(category => category.id !== action.payload.arg);
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.status = 'failed';

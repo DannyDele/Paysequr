@@ -15,13 +15,45 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Edit, Delete, Add } from '@mui/icons-material';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
 import { fetchCategories, addCategory, deleteCategory, editCategory } from './../../redux/categoriesSlice'; // Import fetchCategories action
+import { Snackbar, SnackbarContent, Slide } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+
+
+
+
+
+
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
+
+
 
 
 const CategoriesManagementPage = () => {
   
  const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.categories);
+      const classes = useStyles();
+
 
 // Assuming categories is an array of objects
 const modifiedCategories = categories.map((category, index) => ({
@@ -43,6 +75,13 @@ const modifiedCategories = categories.map((category, index) => ({
   const [openDialog, setOpenDialog] = useState(false);
     const [loading, setLoading] = useState(false); // State to manage loading
 
+  
+  
+  // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+      const [message, setMessage] = useState('');
 
 
 
@@ -52,17 +91,26 @@ const handleAddCategory = async () => {
   try {
     if (newCategory.trim() !== '') {
       setLoading(true); // Set loading to true when button is clicked
-      dispatch(addCategory(newCategory));
-      console.log('New Caterory:', newCategory)
-        // setLoading(false);
+      const msg = await dispatch(addCategory(newCategory));
+      console.log('New Category:', newCategory);
 
-     
+      // Update local state with the new category
+      setNewCategory(''); // Clear the input field
+      setLoading(false); // Set loading to false
+      setOpenDialog(false); // Close the dialog
+      setSnackbarSeverity('success');
+      setSnackbarMessage(msg.payload.msg); // Set the snackbar message
+      setSnackbarOpen(true); // Show the snackbar
+
+      // Fetch categories again to update the DataGrid
+      dispatch(fetchCategories());
     }
   } catch (error) {
     setLoading(false); // Set loading to false if an error occurs
     console.error('Error adding category:', error);
   }
 };
+
 
 
 
@@ -85,15 +133,36 @@ const handleAddCategory = async () => {
   };
 
   // Function to delete a category
-  const onDeleteCategory = async (categoryId) => {
-    try {
-      dispatch(deleteCategory(categoryId));
-      // Refetch categories after deletion
-      dispatch(fetchCategories());
-    } catch (error) {
-      console.error('Error deleting category:', error);
-    }
-  };
+ const onDeleteCategory = async (categoryId) => {
+  try {
+    const category = await dispatch(deleteCategory(categoryId)); // Wait for the delete operation to complete
+    // Refetch categories after deletion
+    dispatch(fetchCategories());
+
+    // console.log('Category Response:', category);
+    const message = category.payload.msg;
+    setSnackbarSeverity('success');
+    setSnackbarMessage(message); // Set the error message from the server response
+    setSnackbarOpen(true);
+
+    console.log('Deleted category:', category); // Log deleted category
+  } catch (error) {
+    console.error('Error deleting category:', error);
+  }
+};
+
+
+
+  // Function to handle snackbar
+// Function to handle snackbar
+const handleSnackbarClose = () => {
+  setSnackbarOpen(false);
+  setOpenDialog(false); // Close the dialog after the snackbar message has been shown
+};
+
+  
+
+
 
   // Columns configuration for DataGrid
   const columns = [
@@ -126,6 +195,37 @@ const handleAddCategory = async () => {
 
   return (
     <Container>
+
+
+<Snackbar
+  anchorOrigin={{
+    vertical: 'top', // Change to 'top'
+    horizontal: 'right', // Change to 'right'
+  }}
+  open={snackbarOpen}
+  autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+                TransitionComponent={Slide} // Use Slide transition
+
+>
+  <SnackbarContent
+    className={snackbarSeverity === 'success' ? classes.success : classes.error}
+    message={
+      <span className={classes.message}>
+        <CheckCircleIcon className={classes.icon} />
+        {snackbarMessage}
+      </span>
+    }
+    action={[
+      <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+        <CloseIcon className={classes.icon} />
+      </IconButton>,
+    ]}
+  />
+</Snackbar>
+
+
+
       <Typography variant="h4" className='text-gray-700'  style={{marginTop:'20px'}} gutterBottom>Service Categories</Typography>
       <Button
         variant="contained"

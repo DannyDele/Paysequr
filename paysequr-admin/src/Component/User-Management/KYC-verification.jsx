@@ -1,47 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { Typography, Grid } from '@mui/material';
+import { Typography, TextField, Grid, CircularProgress, IconButton } from '@mui/material';
+import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAddress } from './../../redux/userKycSlice';
+import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import CloseIcon from '@mui/icons-material/Close';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
-const columns = [
-  { field: 'id', headerName: 'ID', width: 100 },
-  { field: 'username', headerName: 'Username', width: 200 },
-  { field: 'birthdate', headerName: 'Birthdate', width: 200 },
-  { field: 'country', headerName: 'Country', width: 200 },
-  {
-    field: 'actions',
-    headerName: 'Actions',
-    width: 200,
-    renderCell: (params) => (
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={(e) => {
-          e.stopPropagation();
-          params.row.handleKYCVerification(params.row.id);
-        }}
-      >
-        KYC Verification
-      </Button>
-    ),
-    
+
+
+
+
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
   },
-];
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
 
-const rows = [
-  { id: 1, username: 'John Doe', birthdate: '1990-01-01', country: 'USA', city: 'New York', firstName: 'John', middleName: '', lastName: 'Doe', postalCode: '10001', street: '123 Main St', gender: 'Male', phone: '123-456-7890', addressImage: 'address.jpg', status:'completed', image: 'status.jpg', bvn: '1234567890', documentType: 'Passport', documentStatus: 'Approved', addressStatus: 'Verified', documentImage: 'document.jpg' },
-  { id: 2, username: 'Jane Smith', birthdate: '1985-05-15', country: 'Canada', city: 'Toronto', firstName: 'Jane', middleName: 'Ann', lastName: 'Smith', postalCode: 'M5V 2L9', street: '456 Maple Ave', gender: 'Female', phone: '987-654-3210', addressImage: 'address.jpg', status:'pending', image: 'status.jpg', bvn: '0987654321', documentType: 'ID Card', documentStatus: 'Pending', addressStatus: 'Not Verified', documentImage: 'document.jpg' },
-  // Add more rows as needed
-];
+
+
+
+
+
 
 const KYCVerificationPage = () => {
+
+  const dispatch = useDispatch();
+  const userKyc = useSelector((state) => state.userKyc.userKyc);
+    const classes = useStyles();
+
+  
+
+  // Loading state
+    const [loading, setLoading] = useState(false); // State to manage loading
+
+
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const fetchUser = await dispatch(fetchUserKyc()); // Wait for the fetchUserKyc action to complete
+      console.log('All Users Gotten:', fetchUser)
+      setLoading(false); // Set loading to false after successful data fetch
+    } catch (e) {
+      setLoading(false);
+      console.log('An Error Occurred', e);
+    }
+  };
+
+  fetchData(); // Call the fetchData function
+
+}, [dispatch]);
+
+
+
   const [open, setOpen] = useState(false);
   const [kycSuccess, setKycSuccess] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
+
+
+  
+  // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+      const [message, setMessage] = useState('');
+
 
   const handleRowClick = (params) => {
     if (params.field !== 'actions') {
@@ -54,131 +97,274 @@ const KYCVerificationPage = () => {
     setOpen(false);
   };
 
-  const handleKYCAddress = () => {
-    console.log('KYC Address button clicked');
-    // Implement KYC address logic here
-  };
-
-  const handleKYCDocument = () => {
-    console.log('KYC Document button clicked');
-    // Implement KYC document logic here
-  };
 
   const handleView = (userId) => {
     console.log(`View button clicked for user ID ${userId}`);
     // Implement logic to handle viewing
   };
 
-  const handleKYCVerification = (userId) => {
+
+  // Function to handle User Kyc verification
+const handleApproveKYC = async (userId) => {
+  try {
+    
+    const response = await dispatch(approveUserKyc(userId)); // Dispatch the action and await the response
     console.log(`KYC Verification button clicked for user ID ${userId}`);
-    // Implement logic to handle KYC verification
-    setKycSuccess(true);
+
+    
+      const errorMessage = response.data?.Error?.message || 'User already approved';
+      setSnackbarSeverity('success');
+      setSnackbarMessage(errorMessage); // Set the error message from the server response
+      setSnackbarOpen(true);
+      console.error('User already approved:', response);
+   
+    // setSnackbarSeverity('success');
+    // setSnackbarMessage('User KYC Approved successfully!');
+    // setSnackbarOpen(true);
+    //   console.log('Approved Response:', response); // Log the response data
+    
+    
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      const errorMessage = error.response.data?.Error?.message || 'User already approved';
+      setSnackbarSeverity('error');
+      setSnackbarMessage(errorMessage); // Set the error message from the server response
+      setSnackbarOpen(true);
+      console.error('User already approved:', error);
+    } else {
+      setSnackbarSeverity('error');
+      setSnackbarMessage(error.message || 'An unknown error occurred'); // Fallback to a generic error message
+      setSnackbarOpen(true);
+      console.error('An error occurred while approving KYC:', error);
+    }
+  }
   };
+  
+
+
+
+      // Function to handle User Kyc document verification
+   const handleKYCDocument = async () => {
+    try {
+      console.log('KYC Document button clicked');
+      const response = await dispatch(approveUserKycDocument(selectedRowData.userId)); // Dispatch the action to approve KYC document
+      const errorMessage = response.payload.msg || 'KYC Document already approved';
+      setSnackbarSeverity('success');
+      setSnackbarMessage(errorMessage);
+      setSnackbarOpen(true);
+      console.log('KYC Document approved:', response);
+    } catch (error) {
+      const errorMessage = error.response?.data || 'An unknown error occurred';
+      setSnackbarSeverity('error');
+      setSnackbarMessage(errorMessage);
+      setSnackbarOpen(true);
+      console.error('An error occurred while approving KYC Document:', error);
+    }
+  };
+
+
+        // Function to handle User Kyc address verification
+   const handleKYCAddress = async () => {
+     try {
+      console.log('KYC Address button clicked');
+      const response = await dispatch(approveUserKycAddress(selectedRowData.userId)); // Dispatch the action to approve KYC address
+      const errorMessage = response.payload.msg || 'KYC Address already approved';
+      setSnackbarSeverity('success');
+      setSnackbarMessage(errorMessage);
+      setSnackbarOpen(true);
+      console.log('KYC Address approved:', response);
+    } catch (error) {
+      const errorMessage = error.response?.data || 'An unknown error occurred';
+      setSnackbarSeverity('error');
+      setSnackbarMessage(errorMessage);
+      setSnackbarOpen(true);
+      console.error('An error occurred while approving KYC Address:', error);
+    }
+  };
+
+
+
+
+  // Function to handle snackbar
+const handleSnackbarClose = () => {
+  setSnackbarOpen(false);
+};
+  
+
+
+
+
+const columns = [
+  { field: 'id', headerName: 'ID', width: 100 },
+  { field: 'firstname', headerName: 'First Name', width: 200 },
+  { field: 'lastname', headerName: 'Last Name', width: 200 },
+  { field: 'bvn', headerName: 'Bvn', width: 200 },
+  { field: 'status', headerName: 'Status', width: 200 },
+
+  {
+    field: 'actions',
+    headerName: 'Actions',
+    width: 200,
+    renderCell: (params) => (
+      <Button
+    startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
+        variant="contained"
+        color="primary"
+                 style={{ transition: 'background-color 0.3s' }}
+            onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+        onClick={(e) => {
+          e.stopPropagation();
+         handleApproveKYC(params.row.userid); // Call handleApproveKYC from component's scope
+        }}
+      >
+        Approve KYC
+      </Button>
+    ),
+    
+  },
+];
+
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-        <DataGrid
-      rows={rows.map(row => ({ ...row, handleView, handleKYCVerification }))}
-      columns={columns}
-      pageSize={5}
-      rowsPerPageOptions={[5, 10, 20]}
-      checkboxSelection
-      onRowClick={handleRowClick}
-    />
-      <Dialog open={open} onClose={handleCloseForm}>
-        <DialogTitle>KYC Verification Form</DialogTitle>
-        <DialogContent dividers>
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
-              <Typography variant="body1" gutterBottom>
-                User ID: {selectedRowData?.id}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Birthdate: {selectedRowData?.birthdate}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Country: {selectedRowData?.country}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                City: {selectedRowData?.city}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                First Name: {selectedRowData?.firstName}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Middle Name: {selectedRowData?.middleName}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Last Name: {selectedRowData?.lastName}
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body1" gutterBottom>
-                Postal Code: {selectedRowData?.postalCode}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Street: {selectedRowData?.street}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Gender: {selectedRowData?.gender}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Phone: {selectedRowData?.phone}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                BVN: {selectedRowData?.bvn}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Document Type: {selectedRowData?.documentType}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Document Status: {selectedRowData?.documentStatus}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" gutterBottom>
-                Address Status: {selectedRowData?.addressStatus}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Document Image: {selectedRowData?.documentImage}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Address Image: {selectedRowData?.addressImage}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Status: {selectedRowData?.status}
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                Image: {selectedRowData?.image}
-              </Typography>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleKYCAddress} color="primary">
-            KYC Address
-          </Button>
-          <Button onClick={handleKYCDocument} color="primary">
-            KYC Document
-          </Button>
-          <Button onClick={handleCloseForm} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={kycSuccess} onClose={() => setKycSuccess(false)}>
-      <DialogTitle>KYC Verification Successful</DialogTitle>
-      <DialogContent dividers>
-        <Typography variant="body1">
-          The KYC verification process has been successfully completed.
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setKycSuccess(false)} color="primary">
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+
+
+
+  {/* Snackbar component */}
+
+<Snackbar
+  anchorOrigin={{
+    vertical: 'top', // Change to 'top'
+    horizontal: 'right', // Change to 'right'
+  }}
+  open={snackbarOpen}
+  autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+                TransitionComponent={Slide} // Use Slide transition
+
+>
+  <SnackbarContent
+    className={snackbarSeverity === 'success' ? classes.success : classes.error}
+    message={
+      <span className={classes.message}>
+        <CheckCircleIcon className={classes.icon} />
+        {snackbarMessage}
+      </span>
+    }
+    action={[
+      <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+        <CloseIcon className={classes.icon} />
+      </IconButton>,
+    ]}
+  />
+</Snackbar>
+
+
+
+
+
+
+
+      {loading ? <CircularProgress style={{ margin: '50vh 0 0 50vw'}}/> : (
+     <DataGrid
+  rows={userKyc || []} // Ensure userKyc is an array or use an empty array as fallback
+  columns={columns}
+  pageSize={5}
+  rowsPerPageOptions={[5, 10, 20]}
+  checkboxSelection
+  onRowClick={handleRowClick}
+/>
+
+        )
+        }
+<Dialog open={open} onClose={handleCloseForm} maxWidth="lg" fullWidth>
+  <DialogTitle style={{ textAlign: 'center', fontSize: '24px', color: '#333' }}>KYC Verification Form</DialogTitle>
+  <DialogContent dividers>
+    {selectedRowData && (
+      <div>
+        {Object.entries(selectedRowData)
+          .filter(([key]) => key !== 'password') // Filter out 'password' field
+          .reduce((pairs, [key, value], index, array) => {
+            if (index % 2 === 0) {
+              pairs.push(array.slice(index, index + 2));
+            }
+            return pairs;
+          }, [])
+          .map((pair, index) => (
+            <div key={index} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+              {pair.map(([key, value]) => (
+                <TextField
+                  key={key}
+                  fullWidth
+                  label={key}
+                  value={value}
+                  variant="outlined"
+                  InputProps={{
+                    readOnly: true, // Make the text field read-only
+                  }}
+                />
+              ))}
+            </div>
+          ))}
+      </div>
+    )}
+  </DialogContent>
+ <DialogActions style={{ display: 'flex', justifyContent: 'center' }}>
+  <Button
+    startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
+    onClick={handleKYCAddress}
+    color="primary"
+    variant="contained"
+    style={{ transition: 'background-color 0.3s' }}
+    onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+  >
+    Approve KYC Address
+  </Button>
+  <Button
+    startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
+    onClick={handleKYCDocument}
+    color="primary"
+    variant="contained"
+    style={{ transition: 'background-color 0.3s' }}
+    onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+  >
+    Approve KYC Document
+  </Button>
+  <Button
+    startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }}  />}
+    onClick={handleCloseForm}
+    color="primary"
+    variant="contained"
+            style={{ transition: 'background-color 0.3s' }}
+            onMouseEnter={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+    }}
+  >
+    Close
+  </Button>
+</DialogActions>
+
+</Dialog>
+
+
     </div>
   );
 };
