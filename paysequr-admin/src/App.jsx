@@ -44,13 +44,8 @@ import { Provider } from 'react-redux';
 import store from './redux/store'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import theme from './assets/muiStyles/theme'
-
-
-
-
-
-
-
+import TrackDeliveryStatusPage from './Component/Escrow/Delivery-status';
+import MessagingSystem from './Component/Customer-support/Messaging';
 const App = () => {
   return (
     <Provider store={store}> {/* Wrap your App component with Provider and pass store as prop */}
@@ -100,6 +95,8 @@ const App = () => {
         <Route path="/security-setting" element={<SecuritySettingsPage/>}/>
         <Route path="/notification-preference" element={<NotificationPreferencesPage/>}/>
         <Route path="/kyc-verification" element={<KYCVerificationPage/>}/>
+        <Route path="/track-delivery-status" element={<TrackDeliveryStatusPage/>}/>
+        <Route path="/messaging-system" element={<MessagingSystem/>}/>
       </Routes>
         </Router>
               </ThemeProvider>

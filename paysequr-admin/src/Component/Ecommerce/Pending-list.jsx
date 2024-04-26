@@ -36,7 +36,7 @@ const PendingListPage = () => {
 
   return (
     <Container>
-      <Typography variant="h4" className='text-gray-700'style={{marginTop:'20px'}} gutterBottom>Pending List</Typography>
+      <Typography variant="h4" className='text-gray-700'style={{marginTop:'0'}} gutterBottom>Pending List</Typography>
       <div style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
         <DataGrid
           rows={pendingList}
