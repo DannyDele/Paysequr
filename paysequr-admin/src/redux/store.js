@@ -3,12 +3,14 @@ import userReducer from './userSlice';
 import categoriesReducer from './categoriesSlice';
 import itemsReducer from './itemsSlice'; // Import items reducer
 import userKycReducer from './userKycSlice'
+import subCategoriesReducer from './subCategoriesSlice'
 
 export default configureStore({
   reducer: {
     users: userReducer,
     categories: categoriesReducer,
     items: itemsReducer, // Include items reducer,
-    userKyc: userKycReducer
+    userKyc: userKycReducer,
+    subcategories: subCategoriesReducer
   },
 });

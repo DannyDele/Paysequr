@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';import {
+import { useDispatch, useSelector } from 'react-redux';
+import {
   Container,
   Typography,
   Button,
@@ -10,15 +11,22 @@ import { useDispatch, useSelector } from 'react-redux';import {
   Input,
   MenuItem,
   CircularProgress,
-  IconButton
+  IconButton,
+  Box,
+  Grid
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { Edit, Delete, Add } from '@mui/icons-material';
 import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
+import { fetchAllSubCategories} from './../../redux/subCategoriesSlice'; // Import fetchCategories action
+
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import '../../assets/styles/DialogHeader.css'
+import Autocomplete from '@mui/material/Autocomplete';
+
 
 
 
@@ -47,6 +55,7 @@ const ProductManagementPage = () => {
 
   // Redux state for product items
   const productItems = useSelector((state) => state.items.items);
+  const subcategories = useSelector((state) => state.subcategories.subcategories);
     const loading = useSelector((state) => state.items.loading); // Access loading state
 
   const dispatch = useDispatch();
@@ -70,13 +79,18 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   // Fetch all items from the API when component mounts
   useEffect(() => {
-    dispatch(fetchAllItems());
+    const fetch = async () => {
+      dispatch(fetchAllItems());
+      dispatch(fetchAllSubCategories())
+
+    }
+    fetch()
+    
   }, [dispatch]);
 
 
 
 
-  // State for managing the input value of the new category name
 // State for managing the input values of the new category
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -167,11 +181,12 @@ const handleAddProduct = () => {
   
     // Function to handle delete  new product category
   
-  const handleDeleteProduct = (productId) => {
+  const handleDeleteProduct = async(productId) => {
     try {
-      dispatch(deleteItem(productId)); // Dispatch the deleteItem action
+      const deletedItem = await dispatch(deleteItem(productId)); // Dispatch the deleteItem action
        // setMessage('Product deleted successfuly!')
       // Show Snackbar with the determined message
+      console.log('This is is the item deleted:', deletedItem)
     setSnackbarSeverity('success');
     setSnackbarMessage('Product deleted successfuly!');
     setSnackbarOpen(true);
@@ -192,7 +207,7 @@ const handleSnackbarClose = () => {
 const itemColumns = [
     {
       field: 'id',
-      headerName: 'ID',
+      headerName: 'Product Id',
       flex: 1,
     },
     {
@@ -219,11 +234,6 @@ const itemColumns = [
     },
   ];
 
-
-
-
-
-
 // Recursive function to render form fields with custom labels
 const renderFormFields = (data, parentKey = '') => {
   // Mapping object for custom labels
@@ -242,8 +252,6 @@ const renderFormFields = (data, parentKey = '') => {
     color: 'Color',
     key_features: 'Key Features',
     reason_for_modification: 'Reason for Modification',
-    image: 'Image',
-    images: 'Images',
     video: 'Video',
     location: 'Location',
     stationid: 'Station ID',
@@ -252,12 +260,57 @@ const renderFormFields = (data, parentKey = '') => {
     // Add more custom labels as needed
   };
 
-  return Object.keys(data).map((key) => {
+  // Move image and images labels to the end
+  const orderedLabels = Object.keys(data)
+    .filter(key => key !== 'image' && key !== 'images')
+    .concat(['image', 'images']);
+
+  return orderedLabels.map((key) => {
     const label = customLabels[key] || key.replace(/_/g, ' ').toUpperCase();
     const value = data[key];
 
     if (typeof value === 'object' && value !== null) {
       return renderFormFields(value, key);
+    }
+
+    if (key === 'image') {
+      return (
+
+    <div key={parentKey ? `${parentKey}-${key}` : key}> {/* Add key prop here */}
+  {/* Typography header for product images */}
+      <Typography  className='Dialog-title-header' style={{ marginTop:'1rem' }} variant="h6" gutterBottom>
+        Product Images
+          </Typography>
+      
+          <div key={parentKey ? `${parentKey}-${key}` : key}>
+          <label>{label}</label>
+          <img src={value} alt="Product Image" />
+          </div>
+          </div>
+      );
+    }
+
+    if (key === 'images' && Array.isArray(value)) { // Check if value is an array
+      return (
+          
+        <div key={parentKey ? `${parentKey}-${key}` : key}>
+          <label>{label}</label>
+          {value.map((image, index) => (
+            <img key={index} src={image} alt={`Product Image ${index + 1}`} />
+          ))}
+        </div>
+      );
+    }
+
+    if (key === 'images') { // Handle non-array case
+      return (
+
+        
+        <div key={parentKey ? `${parentKey}-${key}` : key}>
+          <label>{label}</label>
+          <img src={value} alt={`Product Image`} />
+        </div>
+      );
     }
 
     return (
@@ -318,9 +371,32 @@ const renderFormFields = (data, parentKey = '') => {
 
 
       <div style={{ marginBottom: '2rem' }}>
-        <Typography variant="h5" className='text-gray-700'style={{marginTop:'20px'}} gutterBottom>Product Categories</Typography>
+         <div className="flex mb-3 items-center justify-between mt-5">
+      <Typography variant="h5" className='text-gray-700' gutterBottom>
+        Product Management
+      </Typography>
+      <div className="flex" style={{ width: '20%' }}>
+        <Autocomplete
+          options={subcategories}
+          getOptionLabel={(option) => option.name}
+          fullWidth
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search by categories"
+              variant="outlined"
+              fullWidth
+            />
+          )}
+          value={subcategories.find(subcategory => subcategory.id === selectedProduct) || null}
+          onChange={(event, newValue) => {
+            console.log('Category Selected!!', newValue.id)
+            setSelectedProduct(newValue.id);
+          }}
+        />
+      </div>
+    </div>
        
-        <Button variant="outlined" color="primary" style={{ marginRight: '1rem',marginTop:'10px' }} onClick={handleOpenAddCategoryDialog}>Add Product Category</Button>
         <div style={{ height: 300, width: '100%' }}>
           
           { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
@@ -336,143 +412,11 @@ const renderFormFields = (data, parentKey = '') => {
         </div>
       </div>
 
-      {/* Add Category Dialog */}
-      <Dialog open={openAddCategoryDialog} onClose={handleCloseAddCategoryDialog}>
-        <DialogTitle>Add Product Category</DialogTitle>
-          <DialogContent>
-          {/* Input fields for each property */}
-          <TextField
-            label="Name"
-            value={newCategory.name || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Price"
-            value={newCategory.price || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, price: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Weight"
-            value={newCategory.weight || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, weight: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Description"
-            value={newCategory.description || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Inspection Period"
-            value={newCategory.inspection_period || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, inspection_period: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Referred From"
-            value={newCategory.referred_from || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, referred_from: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Delivery"
-            value={newCategory.delivery || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, delivery: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Seller ID"
-            value={newCategory.sellerid || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, sellerid: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Brand"
-            value={newCategory.brand || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, brand: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Size"
-            value={newCategory.size || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, size: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Color"
-            value={newCategory.color || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, color: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <TextField
-            label="Key Features"
-            value={newCategory.key_features || ''}
-            onChange={(e) => setNewCategory({ ...newCategory, key_features: e.target.value })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <Input
-            type="file"
-            onChange={(e) => setNewCategory({ ...newCategory, image: e.target.files[0] })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-          />
-          <Input
-            type="file"
-            onChange={(e) => setNewCategory({ ...newCategory, images: e.target.files })}
-            fullWidth
-  margin="dense" // Change "normal" to "dense"
-            multiple
-          />
-         <TextField
-  select
-  label="Category"
-  value={newCategory.category || ''}
-  onChange={(e) => setNewCategory({ ...newCategory, category: e.target.value })}
-  fullWidth
-  margin="dense"
->
-  <MenuItem value="Category 1">Category 1</MenuItem>
-  <MenuItem value="Category 2">Category 2</MenuItem>
-</TextField>
-<TextField
-  select
-  label="Subcategory"
-  value={newCategory.subcategory || ''}
-  onChange={(e) => setNewCategory({ ...newCategory, subcategory: e.target.value })}
-  fullWidth
-  margin="dense"
->
-  <MenuItem value="Subcategory 1">Subcategory 1</MenuItem>
-  <MenuItem value="Subcategory 2">Subcategory 2</MenuItem>
-</TextField>
-
-          {/* Add more input fields for other properties as needed */}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddCategoryDialog} color="primary">Cancel</Button>
-          <Button onClick={handleAddProduct} color="primary">{loading ? <CircularProgress size={24} color="inherit" /> : 'Add'}</Button>
-        </DialogActions>
-      </Dialog>
-
+    
       {/* Product Dialog for viewing/editing */}
 
 <Dialog open={openProductDialog} onClose={handleCloseProductDialog}>
-  <DialogTitle>View Product</DialogTitle>
+  <DialogTitle  className='Dialog-title-header'>View Product</DialogTitle>
   <DialogContent>
     {selectedProduct && (
       <>

@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import OrderPage from './Order-and-transactions';
 import PendingListPage from './Pending-list';
 import ProductManagementPage from './Product-management';
+import Product from './Product'
 import Avatar from '@mui/material/Avatar';
 
 const Sidebar = ({ onPageChange }) => {
@@ -28,7 +29,7 @@ const Sidebar = ({ onPageChange }) => {
   const renderPageContent = () => {
     switch (selectedPage) {
       case 'product-management':
-        return <ProductManagementPage />;
+        return <Product />;
       case 'pending-list':
         return <PendingListPage />;
       case 'order-and-transactions':

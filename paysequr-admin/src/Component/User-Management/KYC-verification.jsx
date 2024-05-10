@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
+import '../../assets/styles/DialogHeader.css'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -11,8 +12,10 @@ import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAdd
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { CheckCircle as CheckCircleIcon, Done } from '@mui/icons-material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 
 
 
@@ -104,26 +107,25 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   };
 
 
-  // Function to handle User Kyc verification
+ // Function to handle User Kyc verification
 const handleApproveKYC = async (userId) => {
   try {
-    
     const response = await dispatch(approveUserKyc(userId)); // Dispatch the action and await the response
     console.log(`KYC Verification button clicked for user ID ${userId}`);
 
-    
-      const errorMessage = response.data?.Error?.message || 'User already approved';
+    if (response.payload?.Error?.message) {
+      const message = 'User already approved';
       setSnackbarSeverity('success');
-      setSnackbarMessage(errorMessage); // Set the error message from the server response
+      setSnackbarMessage(message); // Set the message
       setSnackbarOpen(true);
       console.error('User already approved:', response);
-   
-    // setSnackbarSeverity('success');
-    // setSnackbarMessage('User KYC Approved successfully!');
-    // setSnackbarOpen(true);
-    //   console.log('Approved Response:', response); // Log the response data
-    
-    
+    } else {
+      const message = 'User approved successfully';
+      setSnackbarSeverity('success');
+      setSnackbarMessage(message); // Set the message
+      setSnackbarOpen(true);
+      console.error('User approved successfully:', response);
+    }
   } catch (error) {
     if (error.response && error.response.status === 401) {
       const errorMessage = error.response.data?.Error?.message || 'User already approved';
@@ -138,8 +140,8 @@ const handleApproveKYC = async (userId) => {
       console.error('An error occurred while approving KYC:', error);
     }
   }
-  };
-  
+};
+
 
 
 
@@ -199,7 +201,19 @@ const columns = [
   { field: 'firstname', headerName: 'First Name', width: 200 },
   { field: 'lastname', headerName: 'Last Name', width: 200 },
   { field: 'bvn', headerName: 'Bvn', width: 200 },
-  { field: 'status', headerName: 'Status', width: 200 },
+{ 
+  field: 'status', 
+  headerName: 'Status', 
+  width: 200,
+  renderCell: (params) => (
+     <span>
+          {params.value}
+          {params.value === 'Approved' ? <VerifiedUserIcon style={{ color: 'green', marginRight: 5 }} /> :
+            <DoneAllIcon style={{ color: '#227BD4', marginRight: 5 }} />}
+          </span>
+  )
+},
+
 
   {
     field: 'actions',
@@ -283,7 +297,7 @@ const columns = [
         )
         }
 <Dialog open={open} onClose={handleCloseForm} maxWidth="lg" fullWidth>
-  <DialogTitle style={{ textAlign: 'center', fontSize: '24px', color: '#333' }}>KYC Verification Form</DialogTitle>
+  <DialogTitle  className='Dialog-title-header' >KYC Verification Form</DialogTitle>
   <DialogContent dividers>
     {selectedRowData && (
       <div>
