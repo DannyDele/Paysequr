@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
+import '../../assets/styles/DialogHeader.css'
 import {
   Container,
   TextField,
@@ -22,13 +23,43 @@ import { Edit, Delete, Add } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import VerifiedIcon from '@mui/icons-material/Verified'; // Import the green check circle icon
 import { HourglassEmpty } from '@mui/icons-material'; // Import icons for different verification statuses
-import { fetchUsers } from './../../redux/userSlice';
+import { fetchUsers, deleteUsers  } from './../../redux/userSlice';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { HelpOutline } from '@mui/icons-material'; // Import icons for different verification statuses
+import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+
+
+
+
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
+
+
+
+
 
 
 const UserDatabase = () => {
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
+    const classes = useStyles();
+
   const users = useSelector((state) => state.users.users);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
@@ -39,7 +70,20 @@ const UserDatabase = () => {
 
   
   // Loading state
-    const [loading, setLoading] = useState(false); // State to manage loading
+  const [loading, setLoading] = useState(false); // State to manage loading
+  const [selectedUserId, setSelectedUserId] = useState('')
+
+
+
+
+   // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+      const [message, setMessage] = useState('');
+
+  
+  
 
   useEffect(() => {
     console.log('All Users From Database:', users)
@@ -86,16 +130,44 @@ const UserDatabase = () => {
 };
 
 
+  
+  
+  
+// Function to view a user
+ const handleViewUser = (user) => {
+  setSelectedUser(user);
+  setSelectedUserId(user.id); // Store the id of the selected user
+  setOpenDialog(true);
+};
+
+
+  
+  
+  
+  // Function to Delete a User
+  const handleDeleteUser = async (userId) => {
+  try {
+    setLoading(true);
+    const deletedUser = await dispatch(deleteUsers(userId));
+    setLoading(false);
+    console.log('Selected users ID:', selectedUserId)
+    console.log('User Deleted Successully:', deletedUser)
+       setSnackbarSeverity('success');
+    setSnackbarMessage('User deleted successfuly!');
+    setSnackbarOpen(true);
+      setOpenDialog(false);
+
+  } catch (error) {
+    setLoading(false);
+          setOpenDialog(false);
+
+    console.error('Error deleting user:', error);
+  }
+};
 
 
 
 
-
-
-  const handleViewUser = (user) => {
-    setSelectedUser(user);
-    setOpenDialog(true);
-  };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -106,7 +178,11 @@ const UserDatabase = () => {
   }
 
 
-
+ // Function to handle snackbar
+const handleSnackbarClose = () => {
+  setSnackbarOpen(false);
+};
+  
 
 
 
@@ -180,6 +256,42 @@ const UserDatabase = () => {
 
   return (
     <Container>
+
+
+ {/* Snackbar component */}
+
+<Snackbar
+  anchorOrigin={{
+    vertical: 'top', // Change to 'top'
+    horizontal: 'right', // Change to 'right'
+  }}
+  open={snackbarOpen}
+  autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+                TransitionComponent={Slide} // Use Slide transition
+
+>
+  <SnackbarContent
+    className={snackbarSeverity === 'success' ? classes.success : classes.error}
+    message={
+      <span className={classes.message}>
+        <CheckCircleIcon className={classes.icon} />
+        {snackbarMessage}
+      </span>
+    }
+    action={[
+      <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+        <CloseIcon className={classes.icon} />
+      </IconButton>,
+    ]}
+  />
+</Snackbar>
+
+
+
+
+
+
       <Box mt={4}>
         <Paper elevation={3} sx={{ padding: '20px', marginBottom: '20px' }}>
           <Typography variant="h6" gutterBottom>
@@ -194,8 +306,6 @@ const UserDatabase = () => {
           />
         </Paper>
       </Box>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
           <div style={{ height: 500, width: '100%' }}>
 
             { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
@@ -211,12 +321,10 @@ const UserDatabase = () => {
               )
             }
           </div>
-        </Grid>
-      </Grid>
-
+      
       {/* Dynamically Populate the users information */}
 <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-      <DialogTitle style={{ textAlign: 'center', fontSize: '24px', color: '#333' }}>User Profile</DialogTitle>
+      <DialogTitle  className='Dialog-title-header'>User Profile</DialogTitle>
       <DialogContent dividers>
     {selectedUser && (
   <div>
@@ -250,20 +358,25 @@ const UserDatabase = () => {
 
       </DialogContent>
       <DialogActions>
-          <Button
-            startIcon={<Delete style={{ transition: 'transform 0.3s' }} />}
-            variant="contained" color="error" onClick={() => { }}
-                            style={{ transition: 'background-color 0.3s' }}
+      <Button
+  startIcon={<Delete style={{ transition: 'transform 0.3s' }} />}
+  variant="contained"
+  color="error" 
+  onClick={(e) => {
+    e.stopPropagation();
+    handleDeleteUser(selectedUserId); // Pass the selectedUserId to the function
+  }}
+  style={{ transition: 'background-color 0.3s' }}
+  onMouseEnter={(e) => {
+    e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+  }}
+>
+  {loading ? (<CircularProgress style={{width:'20px', color:'inherit'}} />) : 'Delete'}
+</Button>
 
-            onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-          >
-          Delete
-        </Button>
           <Button
             startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
                     variant="contained"
@@ -287,7 +400,7 @@ const UserDatabase = () => {
 
       {/* Open Querry Dialog */}
   <Dialog open={openQuerryDialog} onClose={handleCloseQuerryDialog} maxWidth="sm" fullWidth>
-    <DialogTitle style={{ textAlign: 'center', fontSize: '24px', color: '#333' }}>Querry User</DialogTitle>
+    <DialogTitle  className='Dialog-title-header'>Querry User</DialogTitle>
 <DialogContent style={{ paddingTop: '1rem' }}>
       <TextField
         label="User Name"

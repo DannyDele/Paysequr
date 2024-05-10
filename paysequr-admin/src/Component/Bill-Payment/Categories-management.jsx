@@ -55,11 +55,7 @@ const CategoriesManagementPage = () => {
       const classes = useStyles();
 
 
-// Assuming categories is an array of objects
-const modifiedCategories = categories.map((category, index) => ({
-  id: index + 1, // Generate a unique identifier for each row
-  name: category.name // Assuming 'name' is the name of your category property
-}));
+
 
 
   // Fetch categories on component mount
@@ -102,8 +98,8 @@ const handleAddCategory = async () => {
       setSnackbarMessage(msg.payload.msg); // Set the snackbar message
       setSnackbarOpen(true); // Show the snackbar
 
-      // Fetch categories again to update the DataGrid
-      dispatch(fetchCategories());
+      // // Fetch categories again to update the DataGrid
+      // dispatch(fetchCategories());
     }
   } catch (error) {
     setLoading(false); // Set loading to false if an error occurs
@@ -119,12 +115,17 @@ const handleAddCategory = async () => {
     try {
       if (newCategory.trim() !== '') {
         setLoading(true); // Set loading to true when button is clicked
-        dispatch(editCategory({ categoryId: selectedCategoryId, categoryName: newCategory }));
-        // setLoading(false);
-        // setNewCategory(''); // Clear the input field
-        // setEditMode(false);
-        // setSelectedCategoryId(null);
-        // setOpenDialog(false); // Close the dialog after editing
+       const editedCategory =  await dispatch(editCategory({ categoryId: selectedCategoryId, categoryName: newCategory }));
+        setLoading(false);
+        setNewCategory(''); // Clear the input field
+        setEditMode(false);
+        setSelectedCategoryId(null);
+        setOpenDialog(false); // Close the dialog after editing
+        setSnackbarSeverity('success');
+      setSnackbarMessage(editedCategory.payload.msg); // Set the snackbar message
+      setSnackbarOpen(true); // Show the snackbar
+              console.log('Edited Category:', editedCategory);
+
       }
     } catch (error) {
       setLoading(false); // Set loading to false if an error occurs
@@ -137,7 +138,7 @@ const handleAddCategory = async () => {
   try {
     const category = await dispatch(deleteCategory(categoryId)); // Wait for the delete operation to complete
     // Refetch categories after deletion
-    dispatch(fetchCategories());
+    // dispatch(fetchCategories());
 
     // console.log('Category Response:', category);
     const message = category.payload.msg;
@@ -153,7 +154,6 @@ const handleAddCategory = async () => {
 
 
 
-  // Function to handle snackbar
 // Function to handle snackbar
 const handleSnackbarClose = () => {
   setSnackbarOpen(false);
@@ -177,12 +177,17 @@ const handleSnackbarClose = () => {
           <IconButton style={{color:'blue'}} onClick={() => {
             setNewCategory(params.row.name);
             setEditMode(true);
+            console.log('Selected Category Id for Editing:', params.row.id)
             setSelectedCategoryId(params.row.id);
             setOpenDialog(true);
           }}>
             <Edit />
           </IconButton>
-          <IconButton style={{color:'red'}} onClick={() => onDeleteCategory(params.row.id)}>
+          <IconButton style={{ color: 'red' }} onClick={() => {
+            console.log('ID Selceted is:', params.row.id)
+            onDeleteCategory(params.row.id)
+          }
+            }>
             <Delete />
           </IconButton>
         </span>
@@ -241,7 +246,7 @@ const handleSnackbarClose = () => {
       </Button>
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>{editMode ? 'Edit Category' : 'Add Category'}</DialogTitle>
-        <DialogContent>
+        <DialogContent style={{paddingTop:'1rem'}}>
           <TextField
             label="Category Name"
             value={newCategory}
@@ -264,7 +269,7 @@ const handleSnackbarClose = () => {
       </Dialog>
       <Paper elevation={3} style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
         <DataGrid
-          rows={modifiedCategories}
+          rows={categories}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}

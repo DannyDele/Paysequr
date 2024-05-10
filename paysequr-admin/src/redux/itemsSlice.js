@@ -7,49 +7,34 @@ const API_ENDPOINT = 'https://secure.paysequr.com'
 export const fetchAllItems = createAsyncThunk(
   'items/fetchAllItems',
   async () => {
-    try {
-      const response = await axios.get(`${API_ENDPOINT}/api-escrow/allitems`); // Use axios.get
-      console.log('All Product Item Added:', response.data)
-      return response.data; // Axios response data is already parsed JSON
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.get(`${API_ENDPOINT}/api-escrow/allitems`);
+    console.log('All Product Item Added:', response.data)
+    return response.data;
   }
 );
 
-// Thunk function to add a new item
 export const addItem = createAsyncThunk(
   'items/addItem',
   async (itemData) => {
-    try {
-      const response = await axios.post(`${API_ENDPOINT}/api-escrow/additem`, itemData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }); // Use axios.post
-        console.log('New Product Item Added:', response.data)
-      return response.data; // Axios response data is already parsed JSON
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.post(`${API_ENDPOINT}/api-escrow/additem`, itemData, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log('New Product Item Added:', response.data)
+    return response.data;
   }
 );
 
-
-
-// Thunk function to delete an item
 export const deleteItem = createAsyncThunk(
   'items/deleteItem',
   async (itemId) => {
-    try {
-      const response = await axios.delete(`${API_ENDPOINT}/api-escrow/deleteitem/${itemId}`); // Use axios.delete
-      console.log('Deleted Item:', response.data)
-      return response.data; // Axios response data is already parsed JSON
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.delete(`${API_ENDPOINT}/api-escrow/deleteitems/${itemId}`);
+    console.log('Deleted Item:', response.data)
+    return response.data;
   }
 );
+
 
 // Slice for handling items state
 const itemsSlice = createSlice({
@@ -80,7 +65,7 @@ const itemsSlice = createSlice({
       })
       .addCase(addItem.fulfilled, (state, action) => {
         state.loading = false;
-        state.items.push(action.payload.item); // Assuming the API returns the newly added item
+        state.items = [...state.items, action.payload.data]; // Assuming the API returns the newly added item
       })
       .addCase(addItem.rejected, (state, action) => {
         state.loading = false;
@@ -93,7 +78,7 @@ const itemsSlice = createSlice({
       .addCase(deleteItem.fulfilled, (state, action) => {
         state.loading = false;
         // Assuming you want to keep the state items as they are after deletion
-              state.items = state.items.filter(item => item.id !== action.payload.id);
+              state.items = state.items.filter(item => item.id !== action.meta.arg);
 
       })
       .addCase(deleteItem.rejected, (state, action) => {

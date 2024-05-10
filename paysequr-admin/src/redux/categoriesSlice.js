@@ -43,7 +43,7 @@ export const editCategory = createAsyncThunk(
     try {
       const response = await axios.post(`${CATEGORIES_ENDPOINT}/${categoryId}`, { name: categoryName });
       console.log('Edited category:', response.data); // Log edited category
-      return { editedCategoryId: categoryId, updatedCategory: response.data };
+      return response.data;
     } catch (error) {
       console.error('Error editing category:', error.message); // Log error
       throw error;
@@ -66,7 +66,7 @@ export const deleteCategory = createAsyncThunk(
       const response = await axios.delete(`${CATEGORIES_ENDPOINT}/${categoryId}`, {
         data: JSON.stringify(bodyData)
       });
-      console.log('Delete Categories from the slice store:', response)
+      console.log('Delete Categories from the slice store:', response.data)
       return response.data;
     } catch (error) {
       console.error('Error deleting category:', error.message);
@@ -104,7 +104,7 @@ const categoriesSlice = createSlice({
       })
      .addCase(addCategory.fulfilled, (state, action) => {
   state.status = 'succeeded';
-  state.categories = [...state.categories, action.payload]; // Create a copy of the categories array and add the newly added category
+  state.categories = [...state.categories, action.payload.data]; // Create a copy of the categories array and add the newly added category
 })
 
       .addCase(addCategory.rejected, (state, action) => {
@@ -114,16 +114,15 @@ const categoriesSlice = createSlice({
       .addCase(editCategory.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(editCategory.fulfilled, (state, action) => {
+  .addCase(editCategory.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        // Find the index of the edited category in the state
-        const index = state.categories.findIndex(category => category.id === action.payload.editedCategoryId);
-        if (index !== -1) {
-          // Replace the old category with the updated category
-          state.categories[index] = action.payload.updatedCategory;
-        }
+        // Update the category in the state with the edited category data
+        const editedCategory = action.payload;
+        state.categories = state.categories.map(category =>
+          category.id === editedCategory.id ? editedCategory : category
+        );
       })
-      .addCase(editCategory.rejected, (state, action) => {
+ .addCase(editCategory.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
       })
