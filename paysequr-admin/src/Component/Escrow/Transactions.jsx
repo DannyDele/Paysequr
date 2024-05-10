@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Container, Grid, Paper, Typography, TextField, MenuItem } from '@mui/material';
-import { ShoppingCartOutlined, ScheduleOutlined, DoneAllOutlined, Search } from '@mui/icons-material'; // Import icons
-import { DataGrid } from '@mui/x-data-grid'; // Import DataGrid component
+import { ShoppingCartOutlined, ScheduleOutlined, DoneAllOutlined, Search } from '@mui/icons-material';
+import { DataGrid } from '@mui/x-data-grid';
+import { useSpring, animated } from 'react-spring'; // Import from react-spring
 
 // TransactionPage component
 const TransactionPage = () => {
@@ -66,70 +66,102 @@ const TransactionPage = () => {
     setPage(0);
   };
 
+  // React Spring animations for dynamic icons
+  const iconSpringProps = useSpring({
+    from: { opacity: 0, transform: 'translateY(-50px)' },
+    to: { opacity: 1, transform: 'translateY(0)' },
+  });
+
+  const cartSpringProps = useSpring({
+    from: { transform: 'translateX(0)' },
+    to: { transform: 'translateX(10px)' },
+    loop: { reverse: true },
+  });
+
+  const tickSpringProps = useSpring({
+    from: { transform: 'rotate(0deg)' },
+    to: { transform: 'rotate(360deg)' },
+    loop: { reverse: true },
+  });
+
+  const checkSpringProps = useSpring({
+    from: { transform: 'scale(1)' },
+    to: { transform: 'scale(1.2)' },
+    loop: { reverse: true },
+  });
+
   return (
     <Container style={{ marginTop: '30px' }}>
       <Grid container spacing={2} justifyContent="flex-start">
-      <Grid item xs={6} sm={3}>
-  <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
-  <ShoppingCartOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
+        <Grid item xs={6} sm={3}>
+          <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
+            <animated.div style={{ ...iconSpringProps, ...cartSpringProps }}>
+              <ShoppingCartOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
+            </animated.div>
             <Typography variant="h6" gutterBottom>Total Ongoing</Typography>
             <Typography variant="h4" component="div">5</Typography>
-  </Paper>
-</Grid>
+          </Paper>
+        </Grid>
 
-<Grid item xs={6} sm={3}>
-  <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
-  <ScheduleOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
+        <Grid item xs={6} sm={3}>
+          <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
+            <animated.div style={{ ...iconSpringProps, ...tickSpringProps }}>
+              <ScheduleOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
+            </animated.div>
             <Typography variant="h6" gutterBottom>Total Pending</Typography>
             <Typography variant="h4" component="div">3</Typography>
-  </Paper>
-</Grid>
-<Grid item xs={6} sm={3}>
-  <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
-  <DoneAllOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
+          </Paper>
+        </Grid>
+
+        <Grid item xs={6} sm={3}>
+          <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
+            <animated.div style={{ ...iconSpringProps, ...checkSpringProps }}>
+              <DoneAllOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
+            </animated.div>
             <Typography variant="h6" gutterBottom>Total Completed</Typography>
             <Typography variant="h4" component="div">10</Typography>
-  </Paper>
-</Grid>
-<Grid item xs={6} sm={3}>
-  {/* Filter by Status */}
-  <Paper sx={{ padding: '0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '180px', backgroundColor: 'inherit', boxShadow: 'none' }}>
-    <TextField
-      select
-      label="Filter by Status"
-      value={filter}
-      onChange={(e) => setFilter(e.target.value)}
-      fullWidth
-      style={{ marginBottom: '0.5rem' }}
-    >
-      <MenuItem value="">All</MenuItem>
-      <MenuItem value="Pending">Not Shipped</MenuItem>
-      <MenuItem value="On transit">On transit</MenuItem>
-      <MenuItem value="Delivered">Delivered</MenuItem>
-    </TextField>
-    <TextField
-      label="Trans. Date"
-      fullWidth
-      type="date"
-      InputLabelProps={{ shrink: true }}
-      size="small"
-      value={transactionDate}
-      onChange={(e) => setTransactionDate(e.target.value)}
-      style={{ marginBottom: '0.5rem' }}
-    />
-    <TextField
-      label="Escrow ID"
-      fullWidth
-      size="small"
-      value={escrowId}
-      onChange={(e) => setEscrowId(e.target.value)}
-    />
-  </Paper>
-</Grid>
+          </Paper>
+        </Grid>
 
-
+        <Grid item xs={6} sm={3}>
+          {/* Filter by Status */}
+          <Paper sx={{ padding: '0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '180px', backgroundColor: 'inherit', boxShadow: 'none' }}>
+            <TextField
+              select
+              label="Filter by Status"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              fullWidth
+              style={{ marginBottom: '0.5rem' }}
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="Pending">Not Shipped</MenuItem>
+              <MenuItem value="On transit">On transit</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+            </TextField>
+            <TextField
+              label="Trans. Date"
+              fullWidth
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              value={transactionDate}
+              onChange={(e) => setTransactionDate(e.target.value)}
+              style={{ marginBottom: '0.5rem' }}
+            />
+            <TextField
+              label="Escrow ID"
+              fullWidth
+              size="small"
+              value={escrowId}
+              onChange={(e) => setEscrowId(e.target.value)}
+            />
+          </Paper>
+        </Grid>
       </Grid>
-
+      <Typography variant="h5" gutterBottom style={{ textAlign: 'left', marginTop: '20px', color:   '#222' }}>
+        Escrow Transactions
+      </Typography>
       {/* DataGrid */}
       <div style={{ height: 400, width: '100%', marginTop: '1rem' }}>
         <DataGrid

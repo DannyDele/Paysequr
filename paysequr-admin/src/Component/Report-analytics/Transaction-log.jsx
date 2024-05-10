@@ -5,20 +5,21 @@ import { DataGrid } from '@mui/x-data-grid';
 const TransactionLog = () => {
   // Sample transaction data
   const [transactions] = useState([
-    { id: 1, date: '2024-03-01', description: 'Payment from User A', amount: 100.0, status: 'Completed' },
-    { id: 2, date: '2024-03-02', description: 'Payment to User B', amount: -50.0, status: 'Completed' },
-    { id: 3, date: '2024-03-03', description: 'Payment from User C', amount: 75.0, status: 'Pending' },
-    { id: 4, date: '2024-03-04', description: 'Payment to User D', amount: -30.0, status: 'Completed' },
-    { id: 5, date: '2024-03-05', description: 'Payment from User E', amount: 120.0, status: 'Completed' },
+    { id: 1, date: '2024-03-01', description: 'Payment from User A', amount: 100.0, status: 'Completed', username: 'User A' },
+    { id: 2, date: '2024-03-02', description: 'Payment to User B', amount: -50.0, status: 'Completed', username: 'User B' },
+    { id: 3, date: '2024-03-03', description: 'Payment from User C', amount: 75.0, status: 'Pending', username: 'User C' },
+    { id: 4, date: '2024-03-04', description: 'Payment to User D', amount: -30.0, status: 'Completed', username: 'User D' },
+    { id: 5, date: '2024-03-05', description: 'Payment from User E', amount: 120.0, status: 'Completed', username: 'User E' },
   ]);
 
   // Columns configuration for the data grid
   const columns = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'date', headerName: 'Date', width: 150 },
-    { field: 'description', headerName: 'Description', width: 300 },
-    { field: 'amount', headerName: 'Amount', type: 'number', width: 150 },
-    { field: 'status', headerName: 'Status', width: 150 },
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'username', headerName: 'Username', width: 130 },
+    { field: 'date', headerName: 'Date', width: 130 },
+    { field: 'amount', headerName: 'Amount', type: 'number', width: 100 },
+    { field: 'description', headerName: 'Description', width: 250 },
+    { field: 'status', headerName: 'Status', width: 100 },
   ];
 
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -26,7 +27,7 @@ const TransactionLog = () => {
 
   const handleSearch = () => {
     const filtered = transactions.filter(transaction =>
-      transaction.description.toLowerCase().includes(searchKeyword.toLowerCase())
+      transaction.username.toLowerCase().includes(searchKeyword.toLowerCase())
     );
     setFilteredTransactions(filtered);
   };
@@ -42,7 +43,7 @@ const TransactionLog = () => {
             label="Search Transactions"
             variant="outlined"
             value={searchKeyword}
-            style={{width:'95%'}}
+            style={{width:'100%'}}
             onChange={(e) => setSearchKeyword(e.target.value)}
             InputProps={{
               endAdornment: (
@@ -51,7 +52,7 @@ const TransactionLog = () => {
             }}
           />
         </Box>
-        <div style={{ height: 400, width: '1000px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <div style={{ height: 400, width: '850px', margin: '0 auto 0 0' }}>
           <DataGrid
             rows={filteredTransactions}
             columns={columns}

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField } from '@mui/material';
+import { Container, Typography, TextField, DialogActions,Dialog,DialogContent,DialogTitle,Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import Carousel from 'react-elastic-carousel';
 
 const OrderPage = () => {
   // Dummy data for orders
   const [orders, setOrders] = useState([
-    { id: 1, date: '01/03/2024', transactionId: '123456', productName: 'Product A', price: 100, buyerUsername: 'buyer1', sellerUsername: 'seller1', status: 'Pending' },
-    { id: 2, date: '02/03/2024', transactionId: '123457', productName: 'Product B', price: 200, buyerUsername: 'buyer2', sellerUsername: 'seller2', status: 'Completed' },
-    { id: 3, date: '03/03/2024', transactionId: '123458', productName: 'Product C', price: 150, buyerUsername: 'buyer3', sellerUsername: 'seller3', status: 'Pending' },
+    { id: 1, date: '01/03/2024', transactionId: '123456', productName: 'Product A', price: 100, buyerUsername: 'buyer1', sellerUsername: 'seller1', status: 'Pending' , productCategory: 'Category 1',  discount: 10, images: ['https://via.placeholder.com/150'], description: 'Product A Description', availability: 'In stock', specifications: 'Product A Specifications', shippingInfo: 'Shipping Information for Product A'  },
+    { id: 2, date: '02/03/2024', transactionId: '123457', productName: 'Product B', price: 200, buyerUsername: 'buyer2', sellerUsername: 'seller2', status: 'Completed' , productCategory: 'Category 1',  discount: 10, images: ['https://via.placeholder.com/150'], description: 'Product A Description', availability: 'In stock', specifications: 'Product A Specifications', shippingInfo: 'Shipping Information for Product A' },
+    { id: 3, date: '03/03/2024', transactionId: '123458', productName: 'Product C', price: 150, buyerUsername: 'buyer3', sellerUsername: 'seller3', status: 'Pending', productCategory: 'Category 1',  discount: 10, images: ['https://via.placeholder.com/150'], description: 'Product A Description', availability: 'In stock', specifications: 'Product A Specifications', shippingInfo: 'Shipping Information for Product A'  },
   ]);
 
   const getStatusBackgroundColor = (status) => {
@@ -24,7 +25,8 @@ const OrderPage = () => {
   // State variables for search criteria
   const [searchTransactionIdOrUsername, setSearchTransactionIdOrUsername] = useState('');
   const [searchTransactionDate, setSearchTransactionDate] = useState('');
-
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   // Function to handle changes in search criteria
   const handleTransactionIdOrUsernameChange = (e) => {
     setSearchTransactionIdOrUsername(e.target.value);
@@ -51,13 +53,21 @@ const OrderPage = () => {
 
     return filteredOrders;
   };
+  const handleViewProduct = (product) => {
+    setSelectedProduct(product);
+    setOpenDialog(true);
+  };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedProduct(null);
+  };
   // Columns configuration for DataGrid
   const columns = [
-    { field: 'date', headerName: 'Date', width: 150 },
-    { field: 'transactionId', headerName: 'Transaction ID', width: 180 },
+    { field: 'date', headerName: 'Date', width: 130 },
+    { field: 'transactionId', headerName: 'Transaction ID', width: 140 },
     { field: 'productName', headerName: 'Product Name', flex: 1 },
-    { field: 'price', headerName: 'Price', width: 120 },
+    { field: 'price', headerName: 'Price', width: 100 },
     { field: 'buyerUsername', headerName: 'Buyer Username', width: 180 },
     { field: 'sellerUsername', headerName: 'Seller Username', width: 180 },
     {
@@ -68,8 +78,49 @@ const OrderPage = () => {
         <span style={{ backgroundColor: getStatusBackgroundColor(params.value), borderRadius: '8px', padding: '4px 8px' }}>{params.value}</span>
       )
     },
+    {
+      field: 'view',
+      headerName: 'View',
+      width: 100,
+      renderCell: (params) => (
+        <Button variant="outlined" color="primary" onClick={() => handleView(params.row.id)}>View</Button>
+      )
+    },
   ];
 
+  // Function to handle view button click
+  const handleView = (orderId) => {
+    // Handle view button click logic here
+    console.log(`View button clicked for order with ID: ${orderId}`);
+  };
+  const renderProductImages = () => {
+   
+    return (
+      <Carousel showArrows={false}>
+        {selectedProduct.images.map((image, index) => (
+          <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '60%', borderRadius: '5px' }} />
+        ))}
+
+<style >{`
+    .rec-dot {
+      width: 5px;
+      height: 5px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      margin: 0 7px;
+    }
+
+    .rec-dot_active {
+      background-color: grey;
+    }
+
+    .rec-dot:nth-child(4) {
+      display: none;
+    }
+  `}</style>
+      </Carousel>
+    );
+  };
   return (
     <Container>
       <Typography variant="h4" className='text-gray-700' style={{marginTop:'20px'}} gutterBottom>Orders</Typography>
@@ -98,6 +149,27 @@ const OrderPage = () => {
           rowsPerPageOptions={[5, 10, 20]}
         />
       </div>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle style={{ backgroundColor: '#f0f0f0', padding: '0.5rem',marginBottom:'20px', borderBottom: '1px solid #ccc' }}>{selectedProduct && selectedProduct.productName}</DialogTitle>
+        <DialogContent>
+          {selectedProduct && (
+            <>
+              {renderProductImages()}
+              <Typography variant="body1" gutterBottom style={{ marginTop: '1rem' }}>{selectedProduct.description}</Typography>
+              <Typography variant="body2" gutterBottom><strong>Price:</strong> ₦{selectedProduct.price}</Typography>
+              <Typography variant="body2" gutterBottom><strong>Availability:</strong> {selectedProduct.availability}</Typography>
+              <Typography variant="body2" gutterBottom><strong>Category:</strong> {selectedProduct.productCategory}</Typography>
+              <Typography variant="body2" gutterBottom><strong>Discount:</strong> {selectedProduct.discount}%</Typography>
+              <Typography variant="body2" gutterBottom><strong>Specifications:</strong> {selectedProduct.specifications}</Typography>
+              <Typography variant="body2" gutterBottom><strong>Shipping Information:</strong> {selectedProduct.shippingInfo}</Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
+          <Button onClick={handleCloseDialog}>Close</Button>
+          
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

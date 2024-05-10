@@ -17,7 +17,7 @@ import DisputeResolutionPage from './Dispute-resolution';
 import TrackDeliveryStatusPage from './Delivery-status';
 
 import Avatar from '@mui/material/Avatar';
-
+import { useSpring, animated } from 'react-spring'; // Import from react-spring
 
 const Sidebar = ({ onPageChange }) => {
   const [show, setShow] = useState(false);
@@ -39,6 +39,13 @@ const Sidebar = ({ onPageChange }) => {
         return null;
     }
   };
+
+  // React Spring animation for dynamic icons
+  const iconSpringProps = useSpring({
+    from: { transform: 'translateX(-20px)', opacity: 0 },
+    to: { transform: 'translateX(0)', opacity: 1 },
+    delay: 200,
+  });
 
   return (
     <main className={show ? 'space-toggle' : null}>
@@ -63,20 +70,28 @@ const Sidebar = ({ onPageChange }) => {
             <div className='nav-list'>
               <Link to="/" style={{ textDecoration: 'none' }}>
                 <Button className='nav-link' style={{ marginBottom: '10px' }}>
-                  <DashboardOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                  <animated.div style={iconSpringProps}>
+                    <DashboardOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                  </animated.div>
                   <span className='nav-link-name' style={{ color: 'white' }}>Dashboard</span>
                 </Button>
               </Link>
               <Button onClick={() => handlePageChange('transactions')} className={`nav-link ${selectedPage === 'transactions' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
-                <MonetizationOnOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' /> 
+                <animated.div style={iconSpringProps}>
+                  <MonetizationOnOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                </animated.div>
                 <span className='nav-link-name' style={{ color: 'white' }}>Transaction</span>
               </Button>
               <Button onClick={() => handlePageChange('dispute-resolution')} className={`nav-link ${selectedPage === 'dispute-resolution' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
-                <GavelOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                <animated.div style={iconSpringProps}>
+                  <GavelOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                </animated.div>
                 <span className='nav-link-name' style={{ color: 'white' }}>Dispute</span>
               </Button>
               <Button onClick={() => handlePageChange('track-delivery-status')} className={`nav-link ${selectedPage === 'track-delivery-status' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
-                <LocalShippingOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                <animated.div style={iconSpringProps}>
+                  <LocalShippingOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                </animated.div>
                 <span className='nav-link-name' style={{ color: 'white' }}>Delivery</span>
               </Button>
             </div>

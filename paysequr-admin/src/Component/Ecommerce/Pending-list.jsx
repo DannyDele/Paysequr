@@ -24,19 +24,46 @@ const PendingListPage = () => {
     setSelectedProduct(null);
   };
 
+  const handleApprove = () => {
+    // Logic to approve the selected product
+    // This can include updating the product status in the database, sending notifications, etc.
+    console.log("Product approved:", selectedProduct);
+    // Close the dialog after approval
+    handleCloseDialog();
+  };
+
   const renderProductImages = () => {
+   
     return (
-      <Carousel>
+      <Carousel showArrows={false}>
         {selectedProduct.images.map((image, index) => (
-          <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '100%', borderRadius: '5px' }} />
+          <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '60%', borderRadius: '5px' }} />
         ))}
+
+<style >{`
+    .rec-dot {
+      width: 5px;
+      height: 5px;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      margin: 0 7px;
+    }
+
+    .rec-dot_active {
+      background-color: grey;
+    }
+
+    .rec-dot:nth-child(4) {
+      display: none;
+    }
+  `}</style>
       </Carousel>
     );
   };
 
   return (
     <Container>
-      <Typography variant="h4" className='text-gray-700'style={{marginTop:'0'}} gutterBottom>Pending List</Typography>
+      <Typography variant="h4" className='text-gray-700'style={{marginTop:'20px'}} gutterBottom>Product Approval List</Typography>
       <div style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
         <DataGrid
           rows={pendingList}
@@ -83,6 +110,9 @@ const PendingListPage = () => {
         </DialogContent>
         <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
           <Button onClick={handleCloseDialog}>Close</Button>
+          <Button variant="outlined" color="primary" onClick={handleApprove}>
+            Approve
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

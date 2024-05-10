@@ -187,7 +187,7 @@ const SecuritySettingsPage = () => {
       </Box>
 
       <Paper elevation={3} style={{ marginBottom: '16px' }}>
-      <Box mt={6}  id="data-privacy-section">
+      <Box mt={6}   id="data-privacy-section">
         <Typography variant="h5" gutterBottom>
           Privacy Settings
         </Typography>

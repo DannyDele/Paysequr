@@ -107,14 +107,14 @@ const DashboardBody = () => {
       {/* Third Row */}
       <Grid item xs={12} sm={6} md={4} lg={3}>
         <Paper elevation={3} sx={paperStyle}>
-          <Link to="/customer-support" style={{ textDecoration: 'none' }}>
+          {/* <Link to="/customer-support" style={{ textDecoration: 'none' }}> */}
             <ListItemIcon style={iconStyle}>
               <LiveHelpIcon sx={{ fontSize: 50, color: '#F36C00' }} />
             </ListItemIcon>
             <Typography variant="h5" gutterBottom>
               CUSTOMER SUPPORT
             </Typography>
-          </Link>
+          {/* </Link> */}
         </Paper>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>

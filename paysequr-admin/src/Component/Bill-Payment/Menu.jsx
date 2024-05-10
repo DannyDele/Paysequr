@@ -63,7 +63,7 @@ const Sidebar = ({ onPageChange }) => {
               <Link to="/" style={{ textDecoration: 'none' }}>
                 <Button className='nav-link' style={{ marginBottom: '10px' }}>
                   <DashboardOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
-                  <span className='nav-link-name' style={{ color: 'white' }}>Dashboard</span>
+                  <span className='nav-link-name' style={{ color: 'white', fontSize:'' }}>Dashboard</span>
                 </Button>
               </Link>
               <Button onClick={() => handlePageChange('categories-management')} className={`nav-link ${selectedPage === 'categories-management' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>

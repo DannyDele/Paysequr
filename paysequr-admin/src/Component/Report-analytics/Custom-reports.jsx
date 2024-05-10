@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Typography, Box, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Container, Typography, Box, Button, FormControl, Select, MenuItem, TextField } from '@mui/material';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
@@ -45,19 +45,21 @@ const CustomReports = () => {
           Generate Custom Reports
         </Typography>
         <FormControl sx={{ m: 1, minWidth: 150 }}>
-          <InputLabel>Select Module</InputLabel>
-          <Select
+          <TextField
+            select
+            label="Select Module"
             value={selectedModule}
             onChange={(e) => setSelectedModule(e.target.value)}
           >
             <MenuItem value="module1">Module 1</MenuItem>
             <MenuItem value="module2">Module 2</MenuItem>
             <MenuItem value="module3">Module 3</MenuItem>
-          </Select>
+          </TextField>
         </FormControl>
         <FormControl sx={{ m: 1, minWidth: 150 }}>
-          <InputLabel>Select Time Range</InputLabel>
-          <Select
+          <TextField
+            select
+            label="Select Time Range"
             value={selectedTimeRange}
             onChange={(e) => setSelectedTimeRange(e.target.value)}
           >
@@ -65,28 +67,30 @@ const CustomReports = () => {
             <MenuItem value="thisWeek">This Week</MenuItem>
             <MenuItem value="thisMonth">This Month</MenuItem>
             <MenuItem value="custom">Custom</MenuItem>
-          </Select>
+          </TextField>
         </FormControl>
         <FormControl sx={{ m: 1, minWidth: 150 }}>
-          <InputLabel>Select Data</InputLabel>
-          <Select
+          <TextField
+            select
+            label="Select Data"
             value={selectedData}
             onChange={(e) => setSelectedData(e.target.value)}
           >
             <MenuItem value="data1">Data 1</MenuItem>
             <MenuItem value="data2">Data 2</MenuItem>
             <MenuItem value="data3">Data 3</MenuItem>
-          </Select>
+          </TextField>
         </FormControl>
         <FormControl sx={{ m: 1, minWidth: 150 }}>
-          <InputLabel>Select Display Mode</InputLabel>
-          <Select
+          <TextField
+            select
+            label="Select Display Mode"
             value={displayMode}
             onChange={(e) => setDisplayMode(e.target.value)}
           >
             <MenuItem value="table">Table</MenuItem>
             <MenuItem value="chart">Chart</MenuItem>
-          </Select>
+          </TextField>
         </FormControl>
         <Button variant="contained" onClick={handleGenerateReport}>
           Generate Report

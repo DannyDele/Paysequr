@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Grid, Paper, IconButton, List, ListItem, ListItemText, Avatar } from '@mui/material';
-import { Search, Phone as PhoneIcon,ArrowBack } from '@mui/icons-material'; // Import the PhotoCamera, Search, and Phone icons
+import { Search, Phone as PhoneIcon,ArrowBack ,AttachFile} from '@mui/icons-material'; // Import the PhotoCamera, Search, and Phone icons
 import { InputAdornment} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
@@ -13,7 +13,16 @@ const ChatBox = () => {
     { sender: 'User 1', content: 'How are you?', timestamp: '2024-03-13 10:05:00' },
     { sender: 'User 2', content: 'I am good, thanks!', timestamp: '2024-03-13 10:07:00' },
   ]);
-
+  const handleUpload = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      console.log('Selected file:', file);
+      // You can handle the selected file here, like uploading it to a server
+    };
+    fileInput.click();
+  };
   // Function to handle sending a message
   const sendMessage = () => {
     if (message.trim() === '') return;
@@ -73,12 +82,14 @@ const ChatBox = () => {
               />
             </div>
             <List>
-              {[...Array(10)].map((_, index) => (
-                <ListItem button key={index} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                  <Avatar src={`user${index + 1}.jpg`} alt={`User ${index + 1}`} style={{ marginRight: '20px' }} />
-                  <ListItemText primary={`User ${index + 1}`} />
-                </ListItem>
-              ))}
+              <ListItem button style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <Avatar src={`user1.jpg`} alt={`User 1`} style={{ marginRight: '20px' }} />
+                <ListItemText primary={`Sender`} />
+              </ListItem>
+              <ListItem button style={{ borderBottom: '1px solid #f0f0f0' }}>
+                <Avatar src={`user2.jpg`} alt={`User 2`} style={{ marginRight: '20px' }} />
+                <ListItemText primary={`Receiver`} />
+              </ListItem>
             </List>
           </Paper>
         </Grid>
@@ -122,7 +133,7 @@ const ChatBox = () => {
                 <div style={{ textAlign: msg.sender === 'User 1' ? 'right' : 'left' }}>
                   {/* Chat message bubbles */}
                   <Paper
-                    elevation={3}
+                    elevation={1}
                     style={{
                       marginTop:'20px',
                       marginBottom: '10px',
@@ -158,6 +169,9 @@ const ChatBox = () => {
   InputProps={{
     endAdornment: (
       <InputAdornment position="end">
+        <IconButton onClick={handleUpload}>
+  <AttachFile />
+</IconButton>
         <IconButton onClick={sendMessage}>
           <SendIcon />
         </IconButton>
