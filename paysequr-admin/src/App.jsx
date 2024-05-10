@@ -48,19 +48,7 @@ import TrackDeliveryStatusPage from './Component/Escrow/Delivery-status';
 import MessagingSystem from './Component/Customer-support/Messaging';
 import { useState } from 'react';
 const App = () => {
-  // const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // useEffect(() => {
-  //   const savedTheme = localStorage.getItem('theme');
-  //   if (savedTheme === 'dark') {
-  //     setIsDarkMode(true);
-  //   }
-  // }, []);
-
-  // const handleThemeChange = (theme) => {
-  //   setIsDarkMode(theme === 'dark');
-  //   localStorage.setItem('theme', theme);
-  // };
+ 
   return (
     <Provider store={store}> {/* Wrap your App component with Provider and pass store as prop */}
             <ThemeProvider theme={theme}>
