@@ -10,6 +10,7 @@ import {
   HowToRegOutlined, // Replaced icon for User Verifications
   VerifiedUserOutlined, // Replaced icon for KYC Verification
 } from '@mui/icons-material'; // Import icons from Material-UI
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import { Typography } from '@mui/material';
 import PaysequrIcon from '../Dashboard/images/Paysequricon.png';
 import { Link } from 'react-router-dom';
@@ -17,11 +18,12 @@ import UserDatabase from './User-database';
 import UserActionPage from './User-actions';
 import UserVerificationPage from './User-verification';
 import KYCVerificationPage from './KYC-verification';
+import UserProfileChangeRequest from './User-profile-change-request'
 import Avatar from '@mui/material/Avatar';
 
 const Sidebar = ({ onPageChange }) => {
   const [show, setShow] = useState(false);
-  const [selectedPage, setSelectedPage] = useState('product-management');
+  const [selectedPage, setSelectedPage] = useState('user-verification');
 
   const handlePageChange = (page) => {
     setSelectedPage(page);
@@ -36,7 +38,9 @@ const Sidebar = ({ onPageChange }) => {
       case 'user-database':
         return <UserDatabase/>;
       case 'kyc-verification':
-        return <KYCVerificationPage/>;
+        return <KYCVerificationPage />;
+      case 'user-profile-change-request':
+        return <UserProfileChangeRequest/>
       default:
         return null;
     }
@@ -84,6 +88,10 @@ const Sidebar = ({ onPageChange }) => {
               <Button onClick={() => handlePageChange('kyc-verification')} className={`nav-link ${selectedPage === 'payment-transactions' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
                 <VerifiedUserOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
                 <span className='nav-link-name' style={{ color: 'white' }}>KYC Verification</span>
+              </Button>
+              <Button onClick={() => handlePageChange('user-profile-change-request')} className={`nav-link ${selectedPage === 'payment-transactions' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
+                <ManageAccountsOutlinedIcon style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                <span className='nav-link-name' style={{ color: 'white' }}>Profile Change Request</span>
               </Button>
             </div>
           </div>

@@ -17,13 +17,15 @@ import {
   DialogActions,
   Avatar,
   CircularProgress,
-  IconButton
+  IconButton,
+  Tab,
+  Tabs,
 } from '@mui/material';
 import { Edit, Delete, Add } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import VerifiedIcon from '@mui/icons-material/Verified'; // Import the green check circle icon
 import { HourglassEmpty } from '@mui/icons-material'; // Import icons for different verification statuses
-import { fetchUsers, deleteUsers  } from './../../redux/userSlice';
+import { fetchUsers, fetchUserAccount, deleteUsers  } from './../../redux/userSlice';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { HelpOutline } from '@mui/icons-material'; // Import icons for different verification statuses
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
@@ -61,7 +63,10 @@ const UserDatabase = () => {
     const classes = useStyles();
 
   const users = useSelector((state) => state.users.users);
+  const userAccount = useSelector((state) => state.users.userAccount);
+
   const [searchQuery, setSearchQuery] = useState('');
+    const [tabValue, setTabValue] = useState(0); // State variable to track the selected tab
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openQuerryDialog, setOpenQuerryDialog] = useState(false);
@@ -72,6 +77,9 @@ const UserDatabase = () => {
   // Loading state
   const [loading, setLoading] = useState(false); // State to manage loading
   const [selectedUserId, setSelectedUserId] = useState('')
+  
+// const [userAccount, setUserAccount] = useState(null);
+
 
 
 
@@ -105,6 +113,21 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     // Implement search logic here
     // Filter users based on search query
   };
+
+
+// Function to handle tab change
+ const handleTabChange = async (event, newValue) => {
+  setTabValue(newValue);
+  // Fetch user account details when the "Bank Account" tab is clicked
+  if (newValue === 1) {
+    const wallet = await dispatch(fetchUserAccount(selectedUser.id));
+    console.log('User Account:', wallet)
+  }
+};
+;
+
+
+
 
 
 
@@ -316,33 +339,72 @@ const handleSnackbarClose = () => {
               rowsPerPageOptions={[10, 20, 50]}
               checkboxSelection
               disableSelectionOnClick
-              onRowClick={(params) => handleViewUser(params.row)}
+            onRowClick={(params) => {
+              console.log('User id Clicked:', params.row.id)
+              handleViewUser(params.row)
+              }
+            }
               />
               )
             }
-          </div>
+      </div>
+      
+
+
       
       {/* Dynamically Populate the users information */}
 <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-      <DialogTitle  className='Dialog-title-header'>User Profile</DialogTitle>
-      <DialogContent dividers>
-    {selectedUser && (
-  <div>
-    {Object.entries(selectedUser)
-      .filter(([key]) => key !== 'password') // Filter out 'password' field
-      .reduce((pairs, [key, value], index, array) => {
-        if (index % 2 === 0) {
-          pairs.push(array.slice(index, index + 2));
-        }
-        return pairs;
-      }, [])
-      .map((pair, index) => (
-        <div key={index} style={{ display: 'flex', gap: '16px' }}>
-          {pair.map(([key, value]) => (
+  <DialogTitle className='Dialog-title-header'>User Profile</DialogTitle>
+  <DialogContent dividers>
+    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Tabs value={tabValue} onChange={handleTabChange} aria-label="user profile and bank account tabs">
+        <Tab label="Profile" />
+        <Tab label="Bank Account" />
+      </Tabs>
+    </Box>
+    {tabValue === 0 && (
+      <div>
+        {/* Display user profile */}
+        {selectedUser && (
+          <div>
+            {Object.entries(selectedUser)
+              .filter(([key]) => key !== 'password') // Filter out 'password' field
+              .reduce((pairs, [key, value], index, array) => {
+                if (index % 2 === 0) {
+                  pairs.push(array.slice(index, index + 2));
+                }
+                return pairs;
+              }, [])
+              .map((pair, index) => (
+                <div key={index} style={{ display: 'flex', gap: '16px' }}>
+                  {pair.map(([key, value]) => (
+                    <TextField
+                      key={key}
+                      label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the label
+                      value={value}
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      InputProps={{
+                        readOnly: true, // Make the text field read-only
+                      }}
+                    />
+                  ))}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+    )}
+    {tabValue === 1 && (
+      <div>
+        {/* Display bank account details form */}
+        {/* Populate with user's bank information */}
+        {selectedUser && (
+          <div>
             <TextField
-              key={key}
-              label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the label
-              value={value}
+              label="Account Number"
+              value={userAccount?.wallet.acct_number}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -350,51 +412,77 @@ const handleSnackbarClose = () => {
                 readOnly: true, // Make the text field read-only
               }}
             />
-          ))}
-        </div>
-      ))}
-  </div>
-)}
+            <TextField
+              label="Account Name"
+              value={userAccount?.wallet.acct_name}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+            <TextField
+              label="BVN"
+              value={userAccount?.wallet.bvn}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+            <TextField
+              label="Accessable Balance"
+              value={userAccount?.wallet.accessable_balance}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+          </div>
+        )}
+      </div>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button
+      startIcon={<Delete style={{ transition: 'transform 0.3s' }} />}
+      variant="contained"
+      color="error"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleDeleteUser(selectedUserId); // Pass the selectedUserId to the function
+      }}
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      {loading ? (<CircularProgress style={{ width: '20px', color: 'inherit' }} />) : 'Delete'}
+    </Button>
+    <Button
+      startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+      variant="contained"
+      onClick={handleCloseDialog}
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
 
-      </DialogContent>
-      <DialogActions>
-      <Button
-  startIcon={<Delete style={{ transition: 'transform 0.3s' }} />}
-  variant="contained"
-  color="error" 
-  onClick={(e) => {
-    e.stopPropagation();
-    handleDeleteUser(selectedUserId); // Pass the selectedUserId to the function
-  }}
-  style={{ transition: 'background-color 0.3s' }}
-  onMouseEnter={(e) => {
-    e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-  }}
->
-  {loading ? (<CircularProgress style={{width:'20px', color:'inherit'}} />) : 'Delete'}
-</Button>
-
-          <Button
-            startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
-                    variant="contained"
- onClick={handleCloseDialog}
-                        style={{ transition: 'background-color 0.3s' }}
-
-            onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-          
-          >
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
 
       
 

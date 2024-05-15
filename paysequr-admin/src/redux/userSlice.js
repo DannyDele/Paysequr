@@ -22,6 +22,23 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
 });
 
 
+// Function to fetch user account details
+export const fetchUserAccount = createAsyncThunk('users/fetchUserAccount', async (userId) => {
+  try {
+    const response = await axios.get(`${API_ENDPOINT}/api-wallet/get-user-account?userid=${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log('User Account Details:', response.data);
+    return response.data;
+  } catch (error) {
+    throw Error(error.response.data.message);
+  }
+});
+
+
+
 // Function to Delete a user
 
 export const deleteUsers = createAsyncThunk('users/deleteUsers', async (userId) => {
@@ -65,6 +82,18 @@ const userSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
       })
+      .addCase(fetchUserAccount.pending, (state) => {
+    state.status = 'loading';
+  })
+  .addCase(fetchUserAccount.fulfilled, (state, action) => {
+    state.status = 'succeeded';
+    // Update the state with the fetched user account details
+    state.userAccount = action.payload;
+  })
+  .addCase(fetchUserAccount.rejected, (state, action) => {
+    state.status = 'failed';
+    state.error = action.error.message;
+  })
       .addCase(deleteUsers.pending, (state) => {
         state.status = 'loading';
       })
