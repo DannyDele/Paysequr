@@ -16,7 +16,7 @@ import {
   Grid
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { Edit, Delete, Add } from '@mui/icons-material';
+import { Edit, Delete, Add, Visibility } from '@mui/icons-material';
 import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
 import { fetchAllSubCategories} from './../../redux/subCategoriesSlice'; // Import fetchCategories action
 
@@ -222,7 +222,7 @@ const itemColumns = [
       renderCell: (params) => (
         <span>
         <IconButton style={{color:'blue'}} onClick={() => handleViewProduct(params.row)}>
-            <Edit />
+            <Visibility />
           </IconButton>
           <IconButton style={{ color: 'red' }} onClick={() => handleDeleteProduct(params.row.id)}>
           <Delete />

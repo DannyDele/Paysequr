@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'; // Import axios
+import { v4 as uuidv4 } from 'uuid'; // Import uuid
+
 
 const API_ENDPOINT = 'https://secure.paysequr.com'
 
@@ -76,7 +78,6 @@ const subCategoriesSlice = createSlice({
   state.status = 'succeeded';
   state.subcategories = [...state.subcategories, action.payload.data];
 })
-
       .addCase(addSubCategories.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
