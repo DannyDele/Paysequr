@@ -21,7 +21,7 @@ import Avatar from '@mui/material/Avatar';
 
 const Sidebar = ({ onPageChange }) => {
   const [show, setShow] = useState(false);
-  const [selectedPage, setSelectedPage] = useState('product-management');
+  const [selectedPage, setSelectedPage] = useState('user-verification');
 
   const handlePageChange = (page) => {
     setSelectedPage(page);
