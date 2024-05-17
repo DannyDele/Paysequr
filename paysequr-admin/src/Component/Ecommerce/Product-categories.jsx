@@ -19,7 +19,7 @@ import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; /
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { CheckCircle as CheckCircleIcon, UploadFile as UploadFileIcon } from '@mui/icons-material';
 import { fetchAllSubCategories, addSubCategories, deleteSubCategory } from './../../redux/subCategoriesSlice'; // Import fetchCategories action
 
 
@@ -42,8 +42,21 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
   },
+  uploadButton: {
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: theme.spacing(2),
+  },
+  input: {
+    display: 'none',
+  },
+  label: {
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    color: theme.palette.primary.main,
+  },
 }));
-
 
 
 
@@ -74,7 +87,8 @@ function ProductCategories() {
     
     
      // State for new category input and editing
-    const [newSubCategory, setNewSubCategory] = useState('');
+  const [newSubCategory, setNewSubCategory] = useState('');
+    const [newCategoryImage, setNewCategoryImage] = useState(null); // New state for category image
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [openDialog, setOpenDialog] = useState(false)
     const [editMode, setEditMode] = useState(false);
@@ -266,13 +280,28 @@ const handleSnackbarClose = () => {
         <DialogTitle>{editMode ? 'Edit Category' : 'Add Category'}</DialogTitle>
         <DialogContent style={{paddingTop:'1rem'}}>
           <TextField
-            label="Subcategory Name"
+            label="category name"
             value={newSubCategory}
             onChange={(e) => setNewSubCategory(e.target.value)}
             variant="outlined"
             fullWidth
             style={{ marginBottom: '1rem' }}
           />
+       <div className={classes.uploadButton}>
+            <input
+              accept="image/*"
+              className={classes.input}
+              id="upload-image"
+              type="file"
+              onChange={(e) => setNewCategoryImage(e.target.files[0])}
+            />
+            <label htmlFor="upload-image">
+              <IconButton color="primary" aria-label="upload picture" component="span">
+                <UploadFileIcon />
+              </IconButton>
+              {newCategoryImage ? newCategoryImage.name : 'Upload Category Image'}
+            </label>
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>

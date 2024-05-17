@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
-import '../../assets/styles/DialogHeader.css'
+import '../../assets/styles/DialogHeader.css';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { Typography, TextField, Grid, CircularProgress, IconButton } from '@mui/material';
-import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAddress } from './../../redux/userKycSlice';
-import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
+import { Typography, TextField, CircularProgress, IconButton, Link, Snackbar, SnackbarContent, Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import { CheckCircle as CheckCircleIcon, Done } from '@mui/icons-material';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import DoneAllIcon from '@mui/icons-material/DoneAll';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-
-
-
-
+import { CheckCircle as CheckCircleIcon, Done, ThumbUp as ThumbUpIcon, DoneAll as DoneAllIcon, VerifiedUser as VerifiedUserIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAddress } from './../../redux/userKycSlice';
 
 const useStyles = makeStyles((theme) => ({
   success: {
@@ -39,55 +31,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
-
-
-
-
 const KYCVerificationPage = () => {
-
   const dispatch = useDispatch();
   const userKyc = useSelector((state) => state.userKyc.userKyc);
-    const classes = useStyles();
-
+  const classes = useStyles();
   
-
   // Loading state
-    const [loading, setLoading] = useState(false); // State to manage loading
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const fetchUser = await dispatch(fetchUserKyc());
+        console.log('All Users Gotten:', fetchUser);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        console.log('An Error Occurred', e);
+      }
+    };
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const fetchUser = await dispatch(fetchUserKyc()); // Wait for the fetchUserKyc action to complete
-      console.log('All Users Gotten:', fetchUser)
-      setLoading(false); // Set loading to false after successful data fetch
-    } catch (e) {
-      setLoading(false);
-      console.log('An Error Occurred', e);
-    }
-  };
-
-  fetchData(); // Call the fetchData function
-
-}, [dispatch]);
-
-
+    fetchData();
+  }, [dispatch]);
 
   const [open, setOpen] = useState(false);
   const [kycSuccess, setKycSuccess] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
-
-
-  
-  // Snackbar states
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-      const [message, setMessage] = useState('');
-
+  const [message, setMessage] = useState('');
 
   const handleRowClick = (params) => {
     if (params.field !== 'actions') {
@@ -100,56 +74,44 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     setOpen(false);
   };
 
+  const handleApproveKYC = async (userId) => {
+    try {
+      const response = await dispatch(approveUserKyc(userId));
+      console.log(`KYC Verification button clicked for user ID ${userId}`);
 
-  const handleView = (userId) => {
-    console.log(`View button clicked for user ID ${userId}`);
-    // Implement logic to handle viewing
+      if (response.payload?.Error?.message) {
+        const message = 'User already approved';
+        setSnackbarSeverity('success');
+        setSnackbarMessage(message);
+        setSnackbarOpen(true);
+        console.error('User already approved:', response);
+      } else {
+        const message = 'User approved successfully';
+        setSnackbarSeverity('success');
+        setSnackbarMessage(message);
+        setSnackbarOpen(true);
+        console.error('User approved successfully:', response);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        const errorMessage = error.response.data?.Error?.message || 'User already approved';
+        setSnackbarSeverity('error');
+        setSnackbarMessage(errorMessage);
+        setSnackbarOpen(true);
+        console.error('User already approved:', error);
+      } else {
+        setSnackbarSeverity('error');
+        setSnackbarMessage(error.message || 'An unknown error occurred');
+        setSnackbarOpen(true);
+        console.error('An error occurred while approving KYC:', error);
+      }
+    }
   };
 
-
- // Function to handle User Kyc verification
-const handleApproveKYC = async (userId) => {
-  try {
-    const response = await dispatch(approveUserKyc(userId)); // Dispatch the action and await the response
-    console.log(`KYC Verification button clicked for user ID ${userId}`);
-
-    if (response.payload?.Error?.message) {
-      const message = 'User already approved';
-      setSnackbarSeverity('success');
-      setSnackbarMessage(message); // Set the message
-      setSnackbarOpen(true);
-      console.error('User already approved:', response);
-    } else {
-      const message = 'User approved successfully';
-      setSnackbarSeverity('success');
-      setSnackbarMessage(message); // Set the message
-      setSnackbarOpen(true);
-      console.error('User approved successfully:', response);
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      const errorMessage = error.response.data?.Error?.message || 'User already approved';
-      setSnackbarSeverity('error');
-      setSnackbarMessage(errorMessage); // Set the error message from the server response
-      setSnackbarOpen(true);
-      console.error('User already approved:', error);
-    } else {
-      setSnackbarSeverity('error');
-      setSnackbarMessage(error.message || 'An unknown error occurred'); // Fallback to a generic error message
-      setSnackbarOpen(true);
-      console.error('An error occurred while approving KYC:', error);
-    }
-  }
-};
-
-
-
-
-      // Function to handle User Kyc document verification
-   const handleKYCDocument = async () => {
+  const handleKYCDocument = async () => {
     try {
       console.log('KYC Document button clicked');
-      const response = await dispatch(approveUserKycDocument(selectedRowData.userId)); // Dispatch the action to approve KYC document
+      const response = await dispatch(approveUserKycDocument(selectedRowData.userId));
       const errorMessage = response.payload.msg || 'KYC Document already approved';
       setSnackbarSeverity('success');
       setSnackbarMessage(errorMessage);
@@ -164,12 +126,10 @@ const handleApproveKYC = async (userId) => {
     }
   };
 
-
-        // Function to handle User Kyc address verification
-   const handleKYCAddress = async () => {
-     try {
+  const handleKYCAddress = async () => {
+    try {
       console.log('KYC Address button clicked');
-      const response = await dispatch(approveUserKycAddress(selectedRowData.userId)); // Dispatch the action to approve KYC address
+      const response = await dispatch(approveUserKycAddress(selectedRowData.userId));
       const errorMessage = response.payload.msg || 'KYC Address already approved';
       setSnackbarSeverity('success');
       setSnackbarMessage(errorMessage);
@@ -184,125 +144,135 @@ const handleApproveKYC = async (userId) => {
     }
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
-
-
-  // Function to handle snackbar
-const handleSnackbarClose = () => {
-  setSnackbarOpen(false);
-};
-  
-
-
-
-
-const columns = [
-  { field: 'id', headerName: 'ID', width: 100 },
-  { field: 'firstname', headerName: 'First Name', width: 200 },
-  { field: 'lastname', headerName: 'Last Name', width: 200 },
-  { field: 'bvn', headerName: 'Bvn', width: 200 },
-{ 
-  field: 'status', 
-  headerName: 'Status', 
-  width: 200,
-  renderCell: (params) => (
-     <span>
+  const columns = [
+    { field: 'id', headerName: 'ID', width: 100 },
+    { field: 'firstname', headerName: 'First Name', width: 200 },
+    { field: 'lastname', headerName: 'Last Name', width: 200 },
+    { field: 'bvn', headerName: 'Bvn', width: 200 },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 200,
+      renderCell: (params) => (
+        <span>
           {params.value}
           {params.value === 'Approved' ? <VerifiedUserIcon style={{ color: 'green', marginRight: 5 }} /> :
             <DoneAllIcon style={{ color: '#227BD4', marginRight: 5 }} />}
-          </span>
-  )
-},
+        </span>
+      )
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 200,
+      renderCell: (params) => (
+        <Button
+          startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
+          variant="contained"
+          color="primary"
+          style={{ transition: 'background-color 0.3s' }}
+          onMouseEnter={(e) => {
+            e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleApproveKYC(params.row.userid);
+          }}
+        >
+          Approve KYC
+        </Button>
+      ),
+    },
+  ];
 
+  const customNamesMap = {
+    id: 'ID',
+    userid: 'User ID',
+    firstname: 'First Name',
+    lastname: 'Last Name',
+    middlename: 'Middlename',
+    bvn: 'BVN',
+    status: 'Status',
+    country: 'Country',
+    birth_date: 'Date of Birth',
+    city: 'City',
+    postal_code: 'Postal Code',
+    street: 'Street',
+    gender: 'Gender',
+    phone: 'Phone',
+    document_type: 'Document Type',
+    address_status: 'Address Status',
+    document_status: 'Document Status',
+    document_image: 'Document Image',
+    document_image_back: 'Document Image Back',
+    address_image: 'Address Image',
+    image: 'Image'
+  };
 
-  {
-    field: 'actions',
-    headerName: 'Actions',
-    width: 200,
-    renderCell: (params) => (
-      <Button
-    startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
-        variant="contained"
-        color="primary"
-                 style={{ transition: 'background-color 0.3s' }}
-            onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-        onClick={(e) => {
-          e.stopPropagation();
-         handleApproveKYC(params.row.userid); // Call handleApproveKYC from component's scope
-        }}
-      >
-        Approve KYC
-      </Button>
-    ),
-    
-  },
-];
-
+  const renderValue = (key, value) => {
+    const imageKeys = ['image', 'document_image', 'document_image_back', 'address_image'];
+    if (imageKeys.includes(key)) {
+      return (
+        <Link href={value} target="_blank" rel="noopener noreferrer">
+          Open Image
+        </Link>
+      );
+    }
+    return value;
+  };
 
   return (
     <div style={{ height: 400, width: '100%' }}>
-
-
-
-  {/* Snackbar component */}
-
-<Snackbar
-  anchorOrigin={{
-    vertical: 'top', // Change to 'top'
-    horizontal: 'right', // Change to 'right'
-  }}
-  open={snackbarOpen}
-  autoHideDuration={6000}
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
-                TransitionComponent={Slide} // Use Slide transition
+        TransitionComponent={Slide}
+      >
+        <SnackbarContent
+          className={snackbarSeverity === 'success' ? classes.success : classes.error}
+          message={
+            <span className={classes.message}>
+              <CheckCircleIcon className={classes.icon} />
+              {snackbarMessage}
+            </span>
+          }
+          action={[
+            <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+              <CloseIcon className={classes.icon} />
+            </IconButton>,
+          ]}
+        />
+      </Snackbar>
 
->
-  <SnackbarContent
-    className={snackbarSeverity === 'success' ? classes.success : classes.error}
-    message={
-      <span className={classes.message}>
-        <CheckCircleIcon className={classes.icon} />
-        {snackbarMessage}
-      </span>
-    }
-    action={[
-      <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
-        <CloseIcon className={classes.icon} />
-      </IconButton>,
-    ]}
-  />
-</Snackbar>
-
-
-
-
-
-
-
-      {loading ? <CircularProgress style={{ margin: '50vh 0 0 50vw'}}/> : (
-     <DataGrid
-  rows={userKyc || []} // Ensure userKyc is an array or use an empty array as fallback
-  columns={columns}
-  pageSize={5}
-  rowsPerPageOptions={[5, 10, 20]}
-  checkboxSelection
-  onRowClick={handleRowClick}
-/>
-
-        )
-        }
-<Dialog open={open} onClose={handleCloseForm} maxWidth="lg" fullWidth>
-  <DialogTitle  className='Dialog-title-header' >KYC Verification Form</DialogTitle>
+      {loading ? <CircularProgress style={{ margin: '50vh 0 0 50vw' }} /> : (
+        <DataGrid
+          rows={userKyc || []}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5, 10, 20]}
+          checkboxSelection
+          onRowClick={handleRowClick}
+        />
+      )}
+     <Dialog open={open} onClose={handleCloseForm} maxWidth="lg" fullWidth>
+  <DialogTitle className='Dialog-title-header'>KYC Verification Form</DialogTitle>
   <DialogContent dividers>
     {selectedRowData && (
       <div>
         {Object.entries(selectedRowData)
-          .filter(([key]) => key !== 'password') // Filter out 'password' field
+          .filter(([key]) => key !== 'password')
           .reduce((pairs, [key, value], index, array) => {
             if (index % 2 === 0) {
               pairs.push(array.slice(index, index + 2));
@@ -312,72 +282,89 @@ const columns = [
           .map((pair, index) => (
             <div key={index} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
               {pair.map(([key, value]) => (
-                <TextField
-                  key={key}
-                  fullWidth
-                  label={key}
-                  value={value}
-                  variant="outlined"
-                  InputProps={{
-                    readOnly: true, // Make the text field read-only
-                  }}
-                />
+                key === 'image' || key === 'document_image' || key === 'document_image_back' || key === 'address_image' ? null : (
+                  <TextField
+                    key={key}
+                    fullWidth
+                    label={customNamesMap[key] || key}
+                    value={value}
+                    variant="outlined"
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                )
               ))}
             </div>
           ))}
+        <Typography variant="h6" className='Dialog-title-header' style={{ marginTop: '16px' }}>Document Images</Typography>
+        <div style={{ display: 'flex', justifyContent:'center', gap: '8px', marginTop: '8px' }}>
+          {Object.entries(selectedRowData)
+            .filter(([key]) => ['image', 'document_image', 'document_image_back', 'address_image'].includes(key))
+            .map(([key, value]) => (
+              <Button
+                startIcon= {<VisibilityIcon/>}
+                key={key}
+                variant="outlined"
+                color="primary"
+                onClick={() => window.open(value, '_blank')}
+                style={{ textTransform: 'none', width: 'fit-content' }}
+              >
+                View {customNamesMap[key] || key}
+              </Button>
+            ))}
+        </div>
       </div>
     )}
   </DialogContent>
- <DialogActions style={{ display: 'flex', justifyContent: 'center' }}>
-  <Button
-    startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
-    onClick={handleKYCAddress}
-    color="primary"
-    variant="contained"
-    style={{ transition: 'background-color 0.3s' }}
-    onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-  >
-    Approve KYC Address
-  </Button>
-  <Button
-    startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
-    onClick={handleKYCDocument}
-    color="primary"
-    variant="contained"
-    style={{ transition: 'background-color 0.3s' }}
-    onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-  >
-    Approve KYC Document
-  </Button>
-  <Button
-    startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }}  />}
-    onClick={handleCloseForm}
-    color="primary"
-    variant="contained"
-            style={{ transition: 'background-color 0.3s' }}
-            onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-  >
-    Close
-  </Button>
-</DialogActions>
-
+  <DialogActions style={{ display: 'flex', justifyContent: 'center' }}>
+    <Button
+      startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
+      onClick={handleKYCAddress}
+      color="primary"
+      variant="contained"
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Approve KYC Address
+    </Button>
+    <Button
+      startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
+      onClick={handleKYCDocument}
+      color="primary"
+      variant="contained"
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Approve KYC Document
+    </Button>
+    <Button
+      startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+      onClick={handleCloseForm}
+      color="primary"
+      variant="contained"
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
 </Dialog>
-
 
     </div>
   );

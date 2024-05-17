@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTQ5OTIzNTYsImV4cCI6MTcxNTU5NzE1Nn0.nAo0UjVSHGhnZV7__6qLvLKQx2ruwlkGDBmnWoQFR1Q'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTU3NjMwNzcsImV4cCI6MTcxNjM2Nzg3N30.Z9chumR4mLSJl_TAGrSb8CccXrHI5czkPCr4aZoXXSU'
 
 const API_ENDPOINT = 'https://secure.paysequr.com'
 

@@ -73,7 +73,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTQ5OTIzNTYsImV4cCI6MTcxNTU5NzE1Nn0.nAo0UjVSHGhnZV7__6qLvLKQx2ruwlkGDBmnWoQFR1Q'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTU3NjMwNzcsImV4cCI6MTcxNjM2Nzg3N30.Z9chumR4mLSJl_TAGrSb8CccXrHI5czkPCr4aZoXXSU'
 
 
 
@@ -378,7 +378,9 @@ const handleSnackbarClose = () => {
 
                                       </Box>
       </CardContent>
-    </Card>
+            </Card>
+            
+            <CompareArrowsOutlinedIcon style={{alignSelf: 'center', justifySelf:'center', marginRight:'.5rem'}}/>
 
     {/* Section for user information in the database */}
     <Card variant="outlined" style={{ flex: 1, boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', height:'500px' }}>
