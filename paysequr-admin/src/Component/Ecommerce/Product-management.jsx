@@ -66,6 +66,11 @@ const ProductManagementPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openProductDialog, setOpenProductDialog] = useState(false);
   const [openAddCategoryDialog, setOpenAddCategoryDialog] = useState(false);
+
+
+  // state to manage filtering of category
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
   
   
   // Snackbar states
@@ -376,24 +381,24 @@ const renderFormFields = (data, parentKey = '') => {
         Product Management
       </Typography>
       <div className="flex" style={{ width: '20%' }}>
-        <Autocomplete
-          options={subcategories}
-          getOptionLabel={(option) => option.name}
-          fullWidth
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Search by categories"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-          value={subcategories.find(subcategory => subcategory.id === selectedProduct) || null}
-          onChange={(event, newValue) => {
-            console.log('Category Selected!!', newValue.id)
-            setSelectedProduct(newValue.id);
-          }}
-        />
+ <Autocomplete
+  options={subcategories}
+  getOptionLabel={(option) => option.name}
+  fullWidth
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Search by categories"
+      variant="outlined"
+      fullWidth
+    />
+  )}
+  value={selectedCategory}
+  onChange={(event, newValue) => {
+    console.log('Category Selected!!', newValue);
+    setSelectedCategory(newValue);
+  }}
+/>
       </div>
     </div>
        
@@ -402,7 +407,7 @@ const renderFormFields = (data, parentKey = '') => {
           { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
 
           <DataGrid
-            rows={productItems}
+  rows={selectedCategory ? productItems.filter(item => item.category === selectedCategory.name) : productItems}
             columns={itemColumns}
             pageSize={5}
             rowsPerPageOptions={[5, 10, 20]}

@@ -6,7 +6,8 @@ import {
   Button,
   Dialog,
   DialogContent,
-  DialogTitle, DialogActions,
+  DialogTitle,
+  DialogActions,
   TextField, 
   Input,
   MenuItem,
@@ -14,12 +15,13 @@ import {
   IconButton,
   Box,
   Grid
-} from '@mui/material'; import { DataGrid } from '@mui/x-data-grid';
+} from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { Edit, Delete, Add, Visibility} from '@mui/icons-material';
 import Carousel from 'react-elastic-carousel';
 import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
 
-
+// import for mui snackbar component
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';

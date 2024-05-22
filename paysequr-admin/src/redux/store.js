@@ -4,6 +4,7 @@ import categoriesReducer from './categoriesSlice';
 import itemsReducer from './itemsSlice'; // Import items reducer
 import userKycReducer from './userKycSlice'
 import subCategoriesReducer from './subCategoriesSlice'
+import escrowReducer from './escrowSlice'
 
 export default configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export default configureStore({
     categories: categoriesReducer,
     items: itemsReducer, // Include items reducer,
     userKyc: userKycReducer,
-    subcategories: subCategoriesReducer
+    subcategories: subCategoriesReducer,
+    escrow: escrowReducer,
   },
 });
