@@ -47,6 +47,9 @@ import theme from './assets/muiStyles/theme'
 import TrackDeliveryStatusPage from './Component/Escrow/Delivery-status';
 import MessagingSystem from './Component/Customer-support/Messaging';
 import { useState } from 'react';
+import Announcement from './Component/Announcements/Announcement';
+import PopNotificationPage from './Component/Announcements/Pop-notification';
+import AnnouncementPage from './Component/Announcements/Announce';
 const App = () => {
  
   return (
@@ -99,6 +102,9 @@ const App = () => {
         <Route path="/kyc-verification" element={<KYCVerificationPage />}/>
         <Route path="/track-delivery-status" element={<TrackDeliveryStatusPage />}/>
         <Route path="/messaging-system" element={<MessagingSystem />}/>
+        <Route path="/announcement" element={<Announcement/>}/>
+        <Route path="/pop-notification" element={<PopNotificationPage/>}/>
+        <Route path="/main-announcement" element={<AnnouncementPage/>}/>
       </Routes>
         </Router>
               </ThemeProvider>
