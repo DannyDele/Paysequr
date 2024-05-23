@@ -80,14 +80,26 @@ const TransactionPage = () => {
     setSnackbarOpen(false);
   };
 
+
+// function to calculate all On Going Escrow transactions
+  
+  const pendingTransactions = transactions.filter(transaction => transaction.status === 'pending');
+  const pendingTransactionsCount = pendingTransactions.length;
+
+
+
+
+
+
+ // Function to determine status background color
   const getStatusBackgroundColor = (status) => {
     switch (status) {
-      case 'Not Shipped':
-        return 'rgba(255, 0, 0, 0.3)';
+      case 'pending':
+        return 'rgba(255, 0, 0, 0.3)'; // Red with 30% opacity
       case 'On transit':
-        return 'rgba(255, 255, 0, 0.3)';
+        return 'rgba(255, 255, 0, 0.3)'; // Yellow with 30% opacity
       case 'Delivered':
-        return 'rgba(0, 128, 0, 0.3)';
+        return 'rgba(0, 128, 0, 0.3)'; // Green with 30% opacity
       default:
         return 'transparent';
     }
@@ -145,6 +157,14 @@ const TransactionPage = () => {
     { field: 'fee', headerName: 'Amount', flex: 1 },
     { field: 'productType', headerName: 'Product Type', flex: 1 },
     { field: 'created_at', headerName: 'Date of Transaction', flex: 1 },
+    {
+              field: 'status',
+              headerName: 'Delivery Status',
+               flex: 1,
+              renderCell: (params) => (
+              <span style={{ backgroundColor: getStatusBackgroundColor(params.value), borderRadius: '8px', padding: '4px 8px' }}>{params.value}</span>
+               )
+             },
   ];
 
   return (
@@ -166,7 +186,7 @@ const TransactionPage = () => {
               <ScheduleOutlined sx={{ fontSize: 50, color: '#F36C00' }} />
             </animated.div>
             <Typography variant="h6" gutterBottom>Total Pending</Typography>
-            <Typography variant="h4" component="div">3</Typography>
+            <Typography variant="h4" component="div">{pendingTransactionsCount }</Typography>
           </Paper>
         </Grid>
 
@@ -232,76 +252,37 @@ const TransactionPage = () => {
         />
       </div>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Escrow Details</DialogTitle>
-        <DialogContent>
-          {selectedEscrow ? (
-            <Box>
-              <TextField
-                label="Escrow ID"
-                fullWidth
-                margin="dense"
-                value={selectedEscrow.id}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-              <TextField
-                label="Buyer Username"
-                fullWidth
-                margin="dense"
-                value={selectedEscrow.buyerName}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-              <TextField
-                label="Merchant Username"
-                fullWidth
-                margin="dense"
-                value={selectedEscrow.sellerName}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-              <TextField
-                label="Amount"
-                fullWidth
-                margin="dense"
-                value={selectedEscrow.fee}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-              <TextField
-                label="Product Type"
-                fullWidth
-                margin="dense"
-                value={selectedEscrow.productType}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-              <TextField
-                label="Date of Transaction"
-                fullWidth
-                margin="dense"
-                value={selectedEscrow.created_at}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-            </Box>
-          ) : (
-            <CircularProgress />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+ <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+  <DialogTitle className='Dialog-title-header'>Escrow Details</DialogTitle>
+  <DialogContent>
+    {selectedEscrow ? (
+      <Box>
+        {Object.keys(selectedEscrow)
+          .filter((key) => key !== 'buyer_id' && key !== 'seller_id') // Filter out buyer_id and seller_id
+          .map((key) => (
+            <TextField
+              key={key}
+              label={key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+              fullWidth
+              margin="dense"
+              value={selectedEscrow[key]}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          ))}
+      </Box>
+    ) : (
+      <CircularProgress />
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenDialog(false)} color="primary">
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </Container>
   );
 };
