@@ -50,6 +50,24 @@ import { useState } from 'react';
 import Announcement from './Component/Announcements/Announcement';
 import PopNotificationPage from './Component/Announcements/Pop-notification';
 import AnnouncementPage from './Component/Announcements/Announce';
+import EditUser from './Component/features/user/EditUser';
+import ViewUser from './Component/features/user/ViewUser';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const App = () => {
  
   return (
@@ -105,6 +123,8 @@ const App = () => {
         <Route path="/announcement" element={<Announcement/>}/>
         <Route path="/pop-notification" element={<PopNotificationPage/>}/>
         <Route path="/main-announcement" element={<AnnouncementPage/>}/>
+        <Route path="/edituser" element={<EditUser/>}/>
+        <Route path="/edituser" element={<ViewUser/>}/>
       </Routes>
         </Router>
               </ThemeProvider>

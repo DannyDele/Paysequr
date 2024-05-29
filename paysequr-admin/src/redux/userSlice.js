@@ -5,6 +5,7 @@ import axios from 'axios';
 const API_ENDPOINT = 'https://secure.paysequr.com'
 
 const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTQzODczNjksImV4cCI6MTcxNDk5MjE2OX0.l2Wy1DJmuG3DFOXNg3ajWpqa84Xb0Dda3HGvmd06BCo'
+const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTY5MzY4MDEsImV4cCI6MTcxNzU0MTYwMX0.HpnXrpCS1mxAEgm6SBXEqUlnVjlBnjaaeiBRNjjM2tw'
 
 // Function to fecth all users
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
@@ -20,6 +21,23 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
     throw Error(error.response.data.message); // You may want to handle errors more gracefully
   }
 });
+
+
+// Function to fetch a user by ID
+export const fetchUserById = createAsyncThunk('users/fetchUserById', async (userId) => {
+  try {
+    const response = await axios.get(`${API_ENDPOINT}/api-admin/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    console.log('User Details:', response.data);
+    return response.data.user.result[0]; // Assuming the response contains a single user object
+  } catch (error) {
+    throw Error(error.response.data.message);
+  }
+});
+
 
 
 // Function to fetch user account details
@@ -84,7 +102,18 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserAccount.pending, (state) => {
     state.status = 'loading';
-  })
+      })
+       .addCase(fetchUserById.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchUserById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.userDetails = action.payload; // Update the state with the fetched user
+      })
+      .addCase(fetchUserById.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
   .addCase(fetchUserAccount.fulfilled, (state, action) => {
     state.status = 'succeeded';
     // Update the state with the fetched user account details

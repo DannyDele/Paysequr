@@ -1,39 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
-import '../../assets/styles/DialogHeader.css'
+import '../../assets/styles/DialogHeader.css';
 import {
   Container,
   TextField,
-  TextareaAutosize,
-  Grid,
-  Paper,
-  Typography,
+  CircularProgress,
   Box,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Avatar,
-  CircularProgress,
+  Snackbar,
+  SnackbarContent,
+  Slide,
   IconButton,
-  Tab,
-  Tabs,
+  Paper,
+  Typography,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
-import { Edit, Delete, Add } from '@mui/icons-material';
-import CloseIcon from '@mui/icons-material/Close';
-import VerifiedIcon from '@mui/icons-material/Verified'; // Import the green check circle icon
-import { HourglassEmpty } from '@mui/icons-material'; // Import icons for different verification statuses
-import { fetchUsers, fetchUserAccount, deleteUsers  } from './../../redux/userSlice';
-import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
-import { HelpOutline } from '@mui/icons-material'; // Import icons for different verification statuses
-import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
+import {
+  CheckCircle as CheckCircleIcon,
+  Close as CloseIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Visibility as VisibilityIcon,
+  EditNote as EditNoteIcon,
+  QueryStats as QueryStatsIcon,
+  Delete as DeleteIcon,
+  HourglassEmpty,
+  Verified as VerifiedIcon,
+} from '@mui/icons-material';
+import { fetchUsers, fetchUserById, fetchUserAccount, deleteUsers } from './../../redux/userSlice';
 import { makeStyles } from '@mui/styles';
+import { styled, alpha } from '@mui/material/styles';
+import ViewUser from '../features/user/ViewUser';
+import EditUser from '../features/user/EditUser';
 
-
-
-
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color: theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    boxShadow: 'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenu-list': {
+      padding: '4px 0',
+    },
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        fontSize: 18,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5),
+      },
+      '&:active': {
+        backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity),
+      },
+    },
+  },
+}));
 
 const useStyles = makeStyles((theme) => ({
   success: {
@@ -53,169 +93,140 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
-
-
-
 const UserDatabase = () => {
   const dispatch = useDispatch();
-    const classes = useStyles();
-
+  const classes = useStyles();
   const users = useSelector((state) => state.users.users);
   const userAccount = useSelector((state) => state.users.userAccount);
+  const userDetails = useSelector((state) => state.users.userDetails);
 
   const [searchQuery, setSearchQuery] = useState('');
-    const [tabValue, setTabValue] = useState(0); // State variable to track the selected tab
+  const [tabValue, setTabValue] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openQuerryDialog, setOpenQuerryDialog] = useState(false);
   const [userName, setUserName] = useState('');
   const [reason, setReason] = useState('');
-
-  
-  // Loading state
-  const [loading, setLoading] = useState(false); // State to manage loading
-  const [selectedUserId, setSelectedUserId] = useState('')
-  
-// const [userAccount, setUserAccount] = useState(null);
-
-
-
-
-
-   // Snackbar states
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [isViewMode, setIsViewMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-      const [message, setMessage] = useState('');
-
-  
+  const [dialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
   
 
   useEffect(() => {
-    console.log('All Users From Database:', users)
-
     const fetchAllUsers = async () => {
-      setLoading(true)
-    await dispatch(fetchUsers());
-    setLoading(false)
-    }
-
-    fetchAllUsers()
-
-    
+      setLoading(true);
+      await dispatch(fetchUsers());
+      setLoading(false);
+    };
+    fetchAllUsers();
   }, [dispatch]);
 
-  // Function to handle search
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-    // Implement search logic here
-    // Filter users based on search query
   };
 
+  const handleTabChange = async (event, newValue) => {
+    setTabValue(newValue);
+    if (newValue === 1) {
+      const wallet = await dispatch(fetchUserAccount(selectedUser.id));
+      console.log('User Account:', wallet);
+    }
+  };
 
-// Function to handle tab change
- const handleTabChange = async (event, newValue) => {
-  setTabValue(newValue);
-  // Fetch user account details when the "Bank Account" tab is clicked
-  if (newValue === 1) {
-    const wallet = await dispatch(fetchUserAccount(selectedUser.id));
-    console.log('User Account:', wallet)
-  }
-};
-;
-
-
-
-
-
-
-// Function to open Query dialog for user
- const handleQueryUser =  (userId) => {
-  console.log('Query Button Clicked Here!!');
-  console.log('Users Array:', users); // Log the users array for debugging
-  const user = users.find((user) => user.id === userId);
-  console.log('Found User:', user); // Log the found user for debugging
-  if (user) {
-    console.log('Query Button ALSO Clicked Here!!');
-    setUserName(`${user.firstname} ${user.lastname}`);
-    setOpenQuerryDialog(true);
-  }
-};7
-
-
-  // Function to Query User
+  const handleQueryUser = (userId) => {
+    const user = users.find((user) => user.id === userId);
+    if (user) {
+      setUserName(`${user.firstname} ${user.lastname}`);
+      setOpenQuerryDialog(true);
+    }
+  };
 
   const handleQuery = () => {
-  // Assuming you want to display an alert when the "Query" button is clicked
-  alert('Querying user...');
-};
+    alert('Querying user...');
+  };
 
+  const handleDeleteUser = async () => {
+    try {
+      setLoading(true);
+      const deletedUser = await dispatch(deleteUsers(selectedUserId));
+      setLoading(false);
+      setSnackbarSeverity('success');
+      setSnackbarMessage('User deleted successfully!');
+      setSnackbarOpen(true);
+      setDialogOpen(false); // Close the dialog after deletion
+    } catch (error) {
+      setLoading(false);
+      setDialogOpen(false); // Close the dialog in case of error
+      console.error('Error deleting user:', error);
+    }
+  };
 
-  
-  
-  
-// Function to view a user
- const handleViewUser = (user) => {
-  setSelectedUser(user);
-  setSelectedUserId(user.id); // Store the id of the selected user
-  setOpenDialog(true);
-};
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+  };
 
-
-  
-  
-  
-  // Function to Delete a User
-  const handleDeleteUser = async (userId) => {
-  try {
-    setLoading(true);
-    const deletedUser = await dispatch(deleteUsers(userId));
-    setLoading(false);
-    console.log('Selected users ID:', selectedUserId)
-    console.log('User Deleted Successully:', deletedUser)
-       setSnackbarSeverity('success');
-    setSnackbarMessage('User deleted successfuly!');
-    setSnackbarOpen(true);
-      setOpenDialog(false);
-
-  } catch (error) {
-    setLoading(false);
-          setOpenDialog(false);
-
-    console.error('Error deleting user:', error);
-  }
-};
-
-
-
-
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleDialogClose = () => {
+    setDialogOpen(false);
   };
 
   const handleCloseQuerryDialog = () => {
-     setOpenQuerryDialog(false)
-  }
+    setOpenQuerryDialog(false);
+  };
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
- // Function to handle snackbar
-const handleSnackbarClose = () => {
-  setSnackbarOpen(false);
-};
-  
+  const handleMenuOpen = (event, row) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedUserId(row.id);
+    setSelectedUser(row);
+  };
 
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
 
+  const handleMenuAction = async (action) => {
+    handleMenuClose();
+    if (action === 'View') {
+      const userDetails = await dispatch(fetchUserById(selectedUserId));
+      const userAccDetails = await dispatch(fetchUserAccount(selectedUserId));
+      setIsViewMode(true);
+    } else if (action === 'Edit') {
+      const userDetails = await dispatch(fetchUserById(selectedUserId));
+      setIsEditMode(true);
+    } else if (action === 'Query') {
+      handleQueryUser(selectedUserId);
+    } else if (action === 'Delete') {
+      handleDialogOpen(); // Open the confirmation dialog for delete
+    }
+  };
 
-  // Columns definition for the DataGrid
+  const handleRowSelection = (newSelection) => {
+    if (newSelection.length > 0) {
+      const selectedRow = users.find((user) => user.id === newSelection[0]);
+      setSelectedUserId(selectedRow.id);
+      setSelectedUser(selectedRow);
+    } else {
+      setSelectedUserId('');
+      setSelectedUser(null);
+    }
+  };
+
   const columns = [
-     { field: 'id', headerName: 'ID', width: 90 },
-  { field: 'username', headerName: 'Username', width: 150 },
-  { field: 'firstname', headerName: 'First Name', width: 150 },
-  { field: 'lastname', headerName: 'Last Name', width: 150 },
-  { field: 'tier', headerName: 'KYC Level', width: 150 },
+    { field: 'id', headerName: 'ID', width: 90 },
+    { field: 'username', headerName: 'Username', width: 150 },
+    { field: 'firstname', headerName: 'First Name', width: 150 },
+    { field: 'lastname', headerName: 'Last Name', width: 150 },
+    { field: 'tier', headerName: 'KYC Level', width: 150 },
     {
       field: 'vstatus',
       headerName: 'Status',
@@ -223,339 +234,180 @@ const handleSnackbarClose = () => {
       renderCell: (params) => (
         <span>
           {params.value}
-          {params.value === 'verified' ? <VerifiedIcon style={{ color: 'green', marginRight: 5 }} /> :
-            <HourglassEmpty style={{ color: '#227BD4', marginRight: 5 }} />}
-          </span>
-      )
+          {params.value === 'verified' ? (
+            <VerifiedIcon style={{ color: 'green', marginRight: 5 }} />
+          ) : (
+            <HourglassEmpty style={{ color: '#227BD4', marginRight: 5 }} />
+          )}
+        </span>
+      ),
     },
-
-
     {
-    field: 'actions',
-    headerName: 'Actions',
-    width: 200,
-    renderCell: (params) => (
-      <Button
-        startIcon={<HelpOutline style={{ transition: 'transform 0.3s' }} />}
-  variant="contained"
-  color="error" // Change color to red
-  size="small" // Reduce the size
-  style={{
-    transition: 'background-color 0.3s',
-    color: 'white', // Change text color to white
-    backgroundColor: '#f44336', // Set background color to red
-    minWidth: 'unset', // Reset minimum width
-    width: 'auto', // Make width auto to fit content
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-  }}
-  onClick={(e) => {
-    e.stopPropagation();
-        console.log('Clicked User ID:', params.row.id)
-
-     handleQueryUser(params.row.id); // Call handleApproveKYC from component's scope
-  }}
->
-  Query
-</Button>
-
-    ),
-    
-  },
-    // Rest of the columns...
+      field: 'actions',
+      headerName: 'Actions',
+      width: 200,
+      renderCell: (params) => (
+        <div>
+          <Button
+            aria-controls={menuAnchorEl ? 'customized-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={menuAnchorEl ? 'true' : undefined}
+            variant="contained"
+            size="small"
+            endIcon={<ArrowDropDownIcon />}
+            onClick={(event) => handleMenuOpen(event, params.row)}
+          >
+            Action
+          </Button>
+        </div>
+      ),
+    },
   ];
-
-
-
-
-
 
   return (
     <Container>
-
-
- {/* Snackbar component */}
-
-<Snackbar
-  anchorOrigin={{
-    vertical: 'top', // Change to 'top'
-    horizontal: 'right', // Change to 'right'
-  }}
-  open={snackbarOpen}
-  autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-                TransitionComponent={Slide} // Use Slide transition
-
->
-  <SnackbarContent
-    className={snackbarSeverity === 'success' ? classes.success : classes.error}
-    message={
-      <span className={classes.message}>
-        <CheckCircleIcon className={classes.icon} />
-        {snackbarMessage}
-      </span>
-    }
-    action={[
-      <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
-        <CloseIcon className={classes.icon} />
-      </IconButton>,
-    ]}
-  />
-</Snackbar>
-
-
-
-
-
-
-      <Box mt={4}>
-        <Paper elevation={3} sx={{ padding: '20px', marginBottom: '20px' }}>
-          <Typography variant="h6" gutterBottom>
-            User Database
-          </Typography>
-          <TextField
-            label="Search users"
-            variant="outlined"
-            fullWidth
-            value={searchQuery}
-            onChange={handleSearch}
-          />
-        </Paper>
-      </Box>
-          <div style={{ height: 500, width: '100%' }}>
-
-            { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
-            <DataGrid
-              rows={users}
-              columns={columns}
-              pageSize={10}
-              rowsPerPageOptions={[10, 20, 50]}
-              checkboxSelection
-              disableSelectionOnClick
-            onRowClick={(params) => {
-              console.log('User id Clicked:', params.row.id)
-              handleViewUser(params.row)
+      {isViewMode ? (
+        <ViewUser
+          user={userDetails}
+          userAccount={userAccount}
+          onClose={() => setIsViewMode(false)}
+        />
+      ) : isEditMode ? (
+        <EditUser
+          user={userDetails}
+          onClose={() => setIsEditMode(false)}
+        />
+      ) : (
+        <>
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            TransitionComponent={Slide}
+          >
+            <SnackbarContent
+              className={snackbarSeverity === 'success' ? classes.success : classes.error}
+              message={
+                <span className={classes.message}>
+                  <CheckCircleIcon className={classes.icon} />
+                  {snackbarMessage}
+                </span>
               }
-            }
+              action={[
+                <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+                  <CloseIcon className={classes.icon} />
+                </IconButton>,
+              ]}
+            />
+          </Snackbar>
+
+          <Box mt={4}>
+            <Paper elevation={3} sx={{ padding: '20px', marginBottom: '20px' }}>
+              <Typography variant="h6" gutterBottom>
+                User Database
+              </Typography>
+              <TextField
+                label="Search users"
+                variant="outlined"
+                fullWidth
+                value={searchQuery}
+                onChange={handleSearch}
               />
-              )
-            }
-      </div>
-      
-
-
-      
-      {/* Dynamically Populate the users information */}
-<Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-  <DialogTitle className='Dialog-title-header'>User Profile</DialogTitle>
-  <DialogContent dividers>
-    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-      <Tabs value={tabValue} onChange={handleTabChange} aria-label="user profile and bank account tabs">
-        <Tab label="Profile" />
-        <Tab label="Bank Account" />
-      </Tabs>
-    </Box>
-    {tabValue === 0 && (
-      <div>
-        {/* Display user profile */}
-        {selectedUser && (
-          <div>
-            {Object.entries(selectedUser)
-              .filter(([key]) => key !== 'password') // Filter out 'password' field
-              .reduce((pairs, [key, value], index, array) => {
-                if (index % 2 === 0) {
-                  pairs.push(array.slice(index, index + 2));
-                }
-                return pairs;
-              }, [])
-              .map((pair, index) => (
-                <div key={index} style={{ display: 'flex', gap: '16px' }}>
-                  {pair.map(([key, value]) => (
-                    <TextField
-                      key={key}
-                      label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the label
-                      value={value}
-                      variant="outlined"
-                      fullWidth
-                      margin="normal"
-                      InputProps={{
-                        readOnly: true, // Make the text field read-only
-                      }}
-                    />
-                  ))}
-                </div>
-              ))}
+            </Paper>
+          </Box>
+          <div style={{ height: 500, width: '100%' }}>
+            {loading ? (
+              <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
+            ) : (
+              <DataGrid
+                rows={users}
+                columns={columns}
+                pageSize={10}
+                rowsPerPageOptions={[10, 20, 50]}
+                checkboxSelection
+                disableSelectionOnClick
+                selectionModel={selectedUser ? [selectedUser.id] : []}
+                onSelectionModelChange={(newSelection) => handleRowSelection(newSelection)}
+              />
+            )}
           </div>
-        )}
-      </div>
-    )}
-    {tabValue === 1 && (
-      <div>
-        {/* Display bank account details form */}
-        {/* Populate with user's bank information */}
-        {selectedUser && (
-          <div>
-            <TextField
-              label="Account Number"
-              value={userAccount?.wallet.acct_number}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              InputProps={{
-                readOnly: true, // Make the text field read-only
+
+          <StyledMenu
+            id="customized-menu"
+            MenuListProps={{
+              'aria-labelledby': 'customized-button',
+            }}
+            anchorEl={menuAnchorEl}
+            open={Boolean(menuAnchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem
+              onClick={(event) => {
+                event.stopPropagation();
+                handleMenuAction('View');
               }}
-            />
-            <TextField
-              label="Account Name"
-              value={userAccount?.wallet.acct_name}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              InputProps={{
-                readOnly: true, // Make the text field read-only
+            >
+              <VisibilityIcon sx={{ margin: '0 .5rem 0 0 ' }} fontSize="small" />
+              View
+            </MenuItem>
+            <MenuItem
+              onClick={(event) => {
+                event.stopPropagation();
+                handleMenuAction('Edit');
               }}
-            />
-            <TextField
-              label="BVN"
-              value={userAccount?.wallet.bvn}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              InputProps={{
-                readOnly: true, // Make the text field read-only
+            >
+              <EditNoteIcon sx={{ margin: '0 .5rem 0 0 ' }} fontSize="small" />
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={(event) => {
+                event.stopPropagation();
+                handleMenuAction('Query');
               }}
-            />
-            <TextField
-              label="Accessable Balance"
-              value={userAccount?.wallet.accessable_balance}
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              InputProps={{
-                readOnly: true, // Make the text field read-only
+            >
+              <QueryStatsIcon sx={{ margin: '0 .5rem 0 0 ' }} fontSize="small" />
+              Query
+            </MenuItem>
+            <MenuItem
+              onClick={(event) => {
+                event.stopPropagation();
+                handleMenuAction('Delete');
               }}
-            />
-          </div>
-        )}
-      </div>
-    )}
-  </DialogContent>
-  <DialogActions>
-    <Button
-      startIcon={<Delete style={{ transition: 'transform 0.3s' }} />}
-      variant="contained"
-      color="error"
-      onClick={(e) => {
-        e.stopPropagation();
-        handleDeleteUser(selectedUserId); // Pass the selectedUserId to the function
-      }}
-      style={{ transition: 'background-color 0.3s' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-      }}
-    >
-      {loading ? (<CircularProgress style={{ width: '20px', color: 'inherit' }} />) : 'Delete'}
-    </Button>
-    <Button
-      startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
-      variant="contained"
-      onClick={handleCloseDialog}
-      style={{ transition: 'background-color 0.3s' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-      }}
-    >
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
+            >
+              <DeleteIcon sx={{ margin: '0 .5rem 0 0 ' }} fontSize="small" />
+              Delete
+            </MenuItem>
+          </StyledMenu>
 
-
-      
-
-      {/* Open Querry Dialog */}
-  <Dialog open={openQuerryDialog} onClose={handleCloseQuerryDialog} maxWidth="sm" fullWidth>
-    <DialogTitle  className='Dialog-title-header'>Querry User</DialogTitle>
-<DialogContent style={{ paddingTop: '1rem' }}>
-      <TextField
-        label="User Name"
-        value={userName}
-        variant="outlined"
-        fullWidth
-        style={{ marginBottom: '1rem' }}
-      />
-        <TextField
-  label="Reason for query"
-  multiline
-  rows={5}
-  placeholder="Reason for query"
-  value={reason}
-  onChange={(e) => setReason(e.target.value)}
-  variant="outlined"
-  fullWidth
-  style={{
-    resize: 'none', // Disable resizing
-    marginBottom: '1rem', // Match marginBottom of TextField
-  }}
-/>
-
-    </DialogContent>
-    <DialogActions>
-      <Button
-        startIcon={<HelpOutline style={{ transition: 'transform 0.3s' }} />}
-        variant="contained"
-        color="error"
-              onClick={() => { 
-              handleQuery();
-
-        }}
-        style={{ transition: 'background-color 0.3s' }}
-        onMouseEnter={(e) => {
-          e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-        }}
-      >
-        Query
-      </Button>
-      <Button
-        startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
-        variant="contained"
-        onClick={handleCloseQuerryDialog}
-        style={{ transition: 'background-color 0.3s' }}
-        onMouseEnter={(e) => {
-          e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-        }}
-      >
-        Close
-      </Button>
-    </DialogActions>
-  </Dialog>
-
+          <Dialog
+            open={dialogOpen}
+            onClose={handleDialogClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Delete User"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this user? This action cannot be undone.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDialogClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={handleDeleteUser} variant="contained" style={{ backgroundColor: 'red', textTransform: 'capitalize' }} autoFocus>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
     </Container>
   );
 };
 
 export default UserDatabase;
-
-
-
-
-

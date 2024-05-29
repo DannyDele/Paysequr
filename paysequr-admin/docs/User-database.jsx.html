@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: User-database.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: User-database.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { DataGrid } from '@mui/x-data-grid';
+import '../../assets/styles/DialogHeader.css'
+import {
+  Container,
+  TextField,
+  TextareaAutosize,
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Avatar,
+  CircularProgress,
+  IconButton,
+  Tab,
+  Tabs,
+} from '@mui/material';
+import { Edit, Delete, Add } from '@mui/icons-material';
+import CloseIcon from '@mui/icons-material/Close';
+import VerifiedIcon from '@mui/icons-material/Verified'; // Import the green check circle icon
+import { HourglassEmpty } from '@mui/icons-material'; // Import icons for different verification statuses
+import { fetchUsers, fetchUserAccount, deleteUsers  } from './../../redux/userSlice';
+import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+import { HelpOutline } from '@mui/icons-material'; // Import icons for different verification statuses
+import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+
+
+
+
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
+
+
+
+
+
+
+// /**
+//  * @typedef {import('react').ReactElement} ReactElement
+//  * @typedef {import('@mui/x-data-grid').ColDef} ColDef
+//  * @typedef {import('react-redux').Dispatch} Dispatch
+//  * @typedef {import('react-redux').Selector} Selector
+//  * @typedef {import('../../redux/userSlice').User} User
+//  * @typedef {import('../../redux/userSlice').UserAccount} UserAccount
+//  * @typedef {import('@mui/material').Theme} Theme
+//  */
+
+
+/**
+ * @typedef {Object} Props
+ * @property {Object} props
+ */
+
+/**
+ * UserDatabase component.
+ * @returns {ReactElement} The UserDatabase component.
+ */
+const UserDatabase = () => {
+  const dispatch /** @type {Dispatch} */ = useDispatch();
+  const classes /** @type {Record&lt;string, string>} */ = useStyles();
+
+  const users /** @type {User[]} */ = useSelector((state) => state.users.users);
+  const userAccount /** @type {UserAccount} */ = useSelector((state) => state.users.userAccount);
+
+  // State variables
+  const [searchQuery, setSearchQuery] = useState('');
+  const [tabValue, setTabValue] = useState(0);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openQuerryDialog, setOpenQuerryDialog] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  
+  
+
+  useEffect(() => {
+    console.log('All Users From Database:', users)
+
+    const fetchAllUsers = async () => {
+      setLoading(true)
+    await dispatch(fetchUsers());
+    setLoading(false)
+    }
+
+    fetchAllUsers()
+
+    
+  }, [dispatch]);
+
+  // Function to handle search
+ /**
+   * Handle search input change.
+   * @param {React.ChangeEvent&lt;HTMLInputElement>} e - The event object.
+   */
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    // Implement search logic here
+    // Filter users based on search query
+  };
+
+
+
+  
+
+// Function to handle tab change
+   /**
+   * Handle tab change.
+   * @param {React.MouseEvent&lt;HTMLElement>} event - The event object.
+   * @param {number} newValue - The new tab value.
+   */
+  const handleTabChange = async (event, newValue) => {
+    setTabValue(newValue);
+    // Fetch user account details when the "Bank Account" tab is clicked
+    if (newValue === 1) {
+      const wallet = await dispatch(fetchUserAccount(selectedUser.id));
+      console.log('User Account:', wallet);
+    }
+  };
+
+
+
+
+
+
+// Function to open Query dialog for user
+ const handleQueryUser =  (userId) => {
+  console.log('Query Button Clicked Here!!');
+  console.log('Users Array:', users); // Log the users array for debugging
+  const user = users.find((user) => user.id === userId);
+  console.log('Found User:', user); // Log the found user for debugging
+  if (user) {
+    console.log('Query Button ALSO Clicked Here!!');
+    setUserName(`${user.firstname} ${user.lastname}`);
+    setOpenQuerryDialog(true);
+  }
+};7
+
+
+  // Function to Query User
+
+  const handleQuery = () => {
+  // Assuming you want to display an alert when the "Query" button is clicked
+  alert('Querying user...');
+};
+
+
+  
+  
+  
+// Function to view a user
+ const handleViewUser = (user) => {
+  setSelectedUser(user);
+  setSelectedUserId(user.id); // Store the id of the selected user
+  setOpenDialog(true);
+};
+
+
+  
+  
+  
+  // Function to Delete a User
+  const handleDeleteUser = async (userId) => {
+  try {
+    setLoading(true);
+    const deletedUser = await dispatch(deleteUsers(userId));
+    setLoading(false);
+    console.log('Selected users ID:', selectedUserId)
+    console.log('User Deleted Successully:', deletedUser)
+       setSnackbarSeverity('success');
+    setSnackbarMessage('User deleted successfuly!');
+    setSnackbarOpen(true);
+      setOpenDialog(false);
+
+  } catch (error) {
+    setLoading(false);
+          setOpenDialog(false);
+
+    console.error('Error deleting user:', error);
+  }
+};
+
+
+
+
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleCloseQuerryDialog = () => {
+     setOpenQuerryDialog(false)
+  }
+
+
+ // Function to handle snackbar
+const handleSnackbarClose = () => {
+  setSnackbarOpen(false);
+};
+  
+
+
+
+  // Columns definition for the DataGrid
+  const columns = [
+     { field: 'id', headerName: 'ID', width: 90 },
+  { field: 'username', headerName: 'Username', width: 150 },
+  { field: 'firstname', headerName: 'First Name', width: 150 },
+  { field: 'lastname', headerName: 'Last Name', width: 150 },
+  { field: 'tier', headerName: 'KYC Level', width: 150 },
+    {
+      field: 'vstatus',
+      headerName: 'Status',
+      width: 150,
+      renderCell: (params) => (
+        &lt;span>
+          {params.value}
+          {params.value === 'verified' ? &lt;VerifiedIcon style={{ color: 'green', marginRight: 5 }} /> :
+            &lt;HourglassEmpty style={{ color: '#227BD4', marginRight: 5 }} />}
+          &lt;/span>
+      )
+    },
+
+
+    {
+    field: 'actions',
+    headerName: 'Actions',
+    width: 200,
+    renderCell: (params) => (
+      &lt;Button
+        startIcon={&lt;HelpOutline style={{ transition: 'transform 0.3s' }} />}
+  variant="contained"
+  color="error" // Change color to red
+  size="small" // Reduce the size
+  style={{
+    transition: 'background-color 0.3s',
+    color: 'white', // Change text color to white
+    backgroundColor: '#f44336', // Set background color to red
+    minWidth: 'unset', // Reset minimum width
+    width: 'auto', // Make width auto to fit content
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+  }}
+  onClick={(e) => {
+    e.stopPropagation();
+        console.log('Clicked User ID:', params.row.id)
+
+     handleQueryUser(params.row.id); // Call handleApproveKYC from component's scope
+  }}
+>
+  Query
+&lt;/Button>
+
+    ),
+    
+  },
+    // Rest of the columns...
+  ];
+
+
+
+
+
+
+  return (
+    &lt;Container>
+
+
+ {/* Snackbar component */}
+
+&lt;Snackbar
+  anchorOrigin={{
+    vertical: 'top', // Change to 'top'
+    horizontal: 'right', // Change to 'right'
+  }}
+  open={snackbarOpen}
+  autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+                TransitionComponent={Slide} // Use Slide transition
+
+>
+  &lt;SnackbarContent
+    className={snackbarSeverity === 'success' ? classes.success : classes.error}
+    message={
+      &lt;span className={classes.message}>
+        &lt;CheckCircleIcon className={classes.icon} />
+        {snackbarMessage}
+      &lt;/span>
+    }
+    action={[
+      &lt;IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+        &lt;CloseIcon className={classes.icon} />
+      &lt;/IconButton>,
+    ]}
+  />
+&lt;/Snackbar>
+
+
+
+
+
+
+      &lt;Box mt={4}>
+        &lt;Paper elevation={3} sx={{ padding: '20px', marginBottom: '20px' }}>
+          &lt;Typography variant="h6" gutterBottom>
+            User Database
+          &lt;/Typography>
+          &lt;TextField
+            label="Search users"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        &lt;/Paper>
+      &lt;/Box>
+          &lt;div style={{ height: 500, width: '100%' }}>
+
+            { loading ? (&lt;CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
+            &lt;DataGrid
+              rows={users}
+              columns={columns}
+              pageSize={10}
+              rowsPerPageOptions={[10, 20, 50]}
+              checkboxSelection
+              disableSelectionOnClick
+            onRowClick={(params) => {
+              console.log('User id Clicked:', params.row.id)
+              handleViewUser(params.row)
+              }
+            }
+              />
+              )
+            }
+      &lt;/div>
+      
+
+
+      
+      {/* Dynamically Populate the users information */}
+&lt;Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+  &lt;DialogTitle className='Dialog-title-header'>User Profile&lt;/DialogTitle>
+  &lt;DialogContent dividers>
+    &lt;Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      &lt;Tabs value={tabValue} onChange={handleTabChange} aria-label="user profile and bank account tabs">
+        &lt;Tab label="Profile" />
+        &lt;Tab label="Bank Account" />
+      &lt;/Tabs>
+    &lt;/Box>
+    {tabValue === 0 &amp;&amp; (
+      &lt;div>
+        {/* Display user profile */}
+        {selectedUser &amp;&amp; (
+          &lt;div>
+            {Object.entries(selectedUser)
+              .filter(([key]) => key !== 'password') // Filter out 'password' field
+              .reduce((pairs, [key, value], index, array) => {
+                if (index % 2 === 0) {
+                  pairs.push(array.slice(index, index + 2));
+                }
+                return pairs;
+              }, [])
+              .map((pair, index) => (
+                &lt;div key={index} style={{ display: 'flex', gap: '16px' }}>
+                  {pair.map(([key, value]) => (
+                    &lt;TextField
+                      key={key}
+                      label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the label
+                      value={value}
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      InputProps={{
+                        readOnly: true, // Make the text field read-only
+                      }}
+                    />
+                  ))}
+                &lt;/div>
+              ))}
+          &lt;/div>
+        )}
+      &lt;/div>
+    )}
+    {tabValue === 1 &amp;&amp; (
+      &lt;div>
+        {/* Display bank account details form */}
+        {/* Populate with user's bank information */}
+        {selectedUser &amp;&amp; (
+          &lt;div>
+            &lt;TextField
+              label="Account Number"
+              value={userAccount?.wallet.acct_number}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+            &lt;TextField
+              label="Account Name"
+              value={userAccount?.wallet.acct_name}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+            &lt;TextField
+              label="BVN"
+              value={userAccount?.wallet.bvn}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+            &lt;TextField
+              label="Accessable Balance"
+              value={userAccount?.wallet.accessable_balance}
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              InputProps={{
+                readOnly: true, // Make the text field read-only
+              }}
+            />
+          &lt;/div>
+        )}
+      &lt;/div>
+    )}
+  &lt;/DialogContent>
+  &lt;DialogActions>
+    &lt;Button
+      startIcon={&lt;Delete style={{ transition: 'transform 0.3s' }} />}
+      variant="contained"
+      color="error"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleDeleteUser(selectedUserId); // Pass the selectedUserId to the function
+      }}
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      {loading ? (&lt;CircularProgress style={{ width: '20px', color: 'inherit' }} />) : 'Delete'}
+    &lt;/Button>
+    &lt;Button
+      startIcon={&lt;CloseIcon style={{ transition: 'transform 0.3s' }} />}
+      variant="contained"
+      onClick={handleCloseDialog}
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Close
+    &lt;/Button>
+  &lt;/DialogActions>
+&lt;/Dialog>
+
+
+      
+
+      {/* Open Querry Dialog */}
+  &lt;Dialog open={openQuerryDialog} onClose={handleCloseQuerryDialog} maxWidth="sm" fullWidth>
+    &lt;DialogTitle  className='Dialog-title-header'>Querry User&lt;/DialogTitle>
+&lt;DialogContent style={{ paddingTop: '1rem' }}>
+      &lt;TextField
+        label="User Name"
+        value={userName}
+        variant="outlined"
+        fullWidth
+        style={{ marginBottom: '1rem' }}
+      />
+        &lt;TextField
+  label="Reason for query"
+  multiline
+  rows={5}
+  placeholder="Reason for query"
+  value={reason}
+  onChange={(e) => setReason(e.target.value)}
+  variant="outlined"
+  fullWidth
+  style={{
+    resize: 'none', // Disable resizing
+    marginBottom: '1rem', // Match marginBottom of TextField
+  }}
+/>
+
+    &lt;/DialogContent>
+    &lt;DialogActions>
+      &lt;Button
+        startIcon={&lt;HelpOutline style={{ transition: 'transform 0.3s' }} />}
+        variant="contained"
+        color="error"
+              onClick={() => { 
+              handleQuery();
+
+        }}
+        style={{ transition: 'background-color 0.3s' }}
+        onMouseEnter={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+        }}
+      >
+        Query
+      &lt;/Button>
+      &lt;Button
+        startIcon={&lt;CloseIcon style={{ transition: 'transform 0.3s' }} />}
+        variant="contained"
+        onClick={handleCloseQuerryDialog}
+        style={{ transition: 'background-color 0.3s' }}
+        onMouseEnter={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+        }}
+      >
+        Close
+      &lt;/Button>
+    &lt;/DialogActions>
+  &lt;/Dialog>
+
+    &lt;/Container>
+  );
+};
+
+export default UserDatabase;
+
+
+
+
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#UserDatabase">UserDatabase</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu May 23 2024 13:23:28 GMT+0100 (West Africa Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

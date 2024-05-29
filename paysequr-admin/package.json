@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "doc": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -25,6 +26,7 @@
     "axios": "^1.6.8",
     "formik": "^2.4.6",
     "framer-motion": "^11.1.5",
+    "jsdoc": "^4.0.3",
     "lottie-react": "^2.4.0",
     "lottie-web": "^5.12.2",
     "react": "^18.2.0",
