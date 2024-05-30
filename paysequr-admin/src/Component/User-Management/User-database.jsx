@@ -200,6 +200,14 @@ const UserDatabase = () => {
     setMenuAnchorEl(null);
   };
 
+
+
+  
+  
+  // *************************************************************
+  // function to open action menu for delete, view or edit a user
+  // *************************************************************
+
   const handleMenuAction = async (action) => {
     handleMenuClose();
     if (action === 'View') {
