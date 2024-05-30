@@ -16,17 +16,23 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import EditUser from './EditUser';
+import UserKyc from './UserKyc';
 
 
 
 
 
 
-function ViewUser({ user, userAccount }) {
+function ViewUser({ user, onClose, userAccount }) {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
       const [isEditMode, setIsEditMode] = useState(false); // Add state for edit mode
+      const [isViewKycMode, setIsViewKycMode] = useState(false); // Add state for view user kyc mode
+        const navigate = useNavigate(); // Initialize navigate function
+
 
 
   const tableCellStyle = (isHeader, index) => ({
@@ -78,6 +84,10 @@ function ViewUser({ user, userAccount }) {
     setIsEditMode(true); // Set edit mode to true when the Edit button is clicked
   };
     
+  const handleViewKyc = () => {
+    setIsViewKycMode(true); // Set edit mode to true when the Edit button is clicked
+  };
+    
     
     return (
       
@@ -87,11 +97,16 @@ function ViewUser({ user, userAccount }) {
             {isEditMode ? (
                 <EditUser user={user} onClose={() => setIsEditMode(false)} />
             
-            ): (
+            ) : isViewKycMode ? (<UserKyc onClose={() => setIsViewKycMode(false)} />) 
+
+            : (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       {/* User View Paper */}
-      <Paper style={{ padding: '20px', marginBottom: '2rem' }}>
-        <Typography variant='h5'>User View</Typography>
+                        <Paper style={{ padding: '20px', marginBottom: '2rem' }}>
+            <div className='flex items-center'>
+                <ArrowBackIcon sx={{ marginRight: '1rem' }} onClick={onClose} />                     
+            <Typography variant='h5'>User View</Typography>
+            </div>
       </Paper>
 
       {/* User Details Section */}
@@ -163,17 +178,26 @@ function ViewUser({ user, userAccount }) {
                     <AccountBalanceWalletIcon/>
                 </Avatar>
                 <div>
-                  <Typography variant="h6">Total Deposited</Typography>
+                  <Typography sx={{fontSize:'0.875rem'}} variant="h6">Total Balance</Typography>
                   <Typography variant="h6">0</Typography>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', width: '50%', marginBottom: '70px' }}>
+                    <Avatar variant="square" src={user.profilePicture} sx={{ backgroundColor: '#1565C0', borderRadius: '5px', marginRight: '10px', width: 100, height: 100 }}>
+                    <AccountBalanceWalletIcon/>
+                </Avatar>
+                <div>
+                  <Typography sx={{fontSize:'0.875rem'}}  variant="h6">Total Escrow</Typography>
+                  <Typography variant="h6">0</Typography>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', width: '50%' }}>
                         <Avatar variant="square" sx={{ backgroundColor: '#1565C0', borderRadius: '5px', marginRight: '10px', width: 100, height: 100 }}>
                                                 
                 <AccountBalanceWalletIcon/>
                 </Avatar>
                 <div>
-                  <Typography variant="h6">Total Withdrawal</Typography>
+                  <Typography sx={{fontSize:'0.875rem'}} variant="h6">Current Escrow Sent</Typography>
                   <Typography variant="h6">0</Typography>
                 </div>
               </div>
@@ -183,14 +207,14 @@ function ViewUser({ user, userAccount }) {
 
                 </Avatar>
                 <div>
-                  <Typography variant="h6">Total Fee</Typography>
+                  <Typography sx={{fontSize:'0.875rem'}} variant="h6">Current Escrow Pending</Typography>
                   <Typography variant="h6">0</Typography>
                 </div>
               </div>
             </div>
             <div className='mt-10'>
-              <Button sx={{ textTransform: 'capitalize', backgroundColor: '#0DA8EE' }} variant="contained">
-                Investigate
+              <Button sx={{ textTransform: 'capitalize', backgroundColor: '#0DA8EE' }} onClick={handleViewKyc} variant="contained">
+                View Kyc Document
               </Button>
             </div>
           </div>

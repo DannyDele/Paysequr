@@ -151,6 +151,12 @@ const UserDatabase = () => {
     alert('Querying user...');
   };
 
+
+  
+  // **************************************
+  // function to delete a user
+  // **************************************
+
   const handleDeleteUser = async () => {
     try {
       setLoading(true);

@@ -1,10 +1,15 @@
 import React from 'react';
 import { Paper, TextField, Button, Typography, Box } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-function EditUser({user}) {
+
+function EditUser({user, onClose}) {
   return (
       <Paper elevation={3} style={{ padding: 40, maxWidth: 1000, margin: 'auto' }}>
-          <Typography sx={{marginBottom:'2rem'}} variant='h6'>Edit User</Typography>
+          <div className='flex items-center mb-7'>
+                <ArrowBackIcon sx={{ marginRight: '1rem' }} onClick={onClose} /> 
+              <Typography  variant='h6'>Edit User</Typography>
+              </div>
       <Box display="flex" flexDirection="column">
         <Box display="flex" flexDirection="row" justifyContent="space-between" marginBottom={4}>
           <TextField label="First Name" value={user.firstname} variant="outlined" style={{ flex: 1, marginRight: 10 }} />
