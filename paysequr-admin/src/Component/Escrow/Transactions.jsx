@@ -15,6 +15,10 @@ import {
   Button,
   CircularProgress,
   Box,
+  Snackbar,
+  SnackbarContent,
+  Slide,
+  IconButton,
 } from '@mui/material';
 import {
   ShoppingCartOutlined,
@@ -27,6 +31,8 @@ import { useSpring, animated } from 'react-spring';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+
+
 
 const useStyles = makeStyles((theme) => ({
   success: {
@@ -48,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
 
 const TransactionPage = () => {
   const transactions = useSelector((state) => state.escrow.escrow);
+  const loading = useSelector((state) => state.escrow.loading);
   const dispatch = useDispatch();
   const classes = useStyles();
 
@@ -65,6 +72,7 @@ const TransactionPage = () => {
 
   useEffect(() => {
     const fetch = async () => {
+      
       const escrowTrasnaction = await dispatch(fetchAllEscrow());
       console.log('Escrow transactions when component mounts:', escrowTrasnaction);
     };
@@ -164,11 +172,58 @@ const TransactionPage = () => {
               renderCell: (params) => (
               <span style={{ backgroundColor: getStatusBackgroundColor(params.value), borderRadius: '8px', padding: '4px 8px' }}>{params.value}</span>
                )
-             },
+    },
+    
+      {
+      field: 'action',
+      headerName: 'Action',
+      width: 100,
+      renderCell: (params) => (
+        <Button
+          variant='contained'
+          size='small'
+          onClick={() => {
+          console.log('Escrow id Clicked:', params.row.id);
+            handleViewEscrow(params.row);
+
+          }}
+          >View</Button>
+      )
+    },
   ];
 
   return (
     <Container style={{ marginTop: '30px' }}>
+
+{/* Snack bar component */}
+  <Snackbar
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            TransitionComponent={Slide}
+          >
+            <SnackbarContent
+              className={snackbarSeverity === 'success' ? classes.success : classes.error}
+              message={
+                <span className={classes.message}>
+                  <CheckCircleIcon className={classes.icon} />
+                  {snackbarMessage}
+                </span>
+              }
+              action={[
+                <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+                  <CloseIcon className={classes.icon} />
+                </IconButton>,
+              ]}
+            />
+          </Snackbar>
+
+
+
       <Grid container spacing={2} justifyContent="flex-start">
         <Grid item xs={6} sm={3}>
           <Paper elevation={3} sx={{ textAlign: 'center', padding: '1rem', height: '180px', width: '230px' }}>
@@ -238,19 +293,20 @@ const TransactionPage = () => {
       <Typography variant="h5" gutterBottom style={{ textAlign: 'left', marginTop: '20px', color: '#222' }}>
         Escrow Transactions
       </Typography>
-      <div style={{ height: 400, width: '100%', marginTop: '1rem' }}>
+
+      {loading ? (
+          <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
+      ) : (
+           <div style={{ height: 400, width: '100%', marginTop: '1rem' }}>
         <DataGrid
           rows={transactions}
           columns={escrowColumn}
           pageSize={rowsPerPage}
           pagination
           onPageChange={handleChangePage}
-          onRowClick={(params) => {
-            console.log('Escrow id Clicked:', params.row.id);
-            handleViewEscrow(params.row);
-          }}
         />
       </div>
+     ) }
 
  <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
   <DialogTitle className='Dialog-title-header'>Escrow Details</DialogTitle>

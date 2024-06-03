@@ -3,7 +3,7 @@ import axios from 'axios'; // Import axios
 
 const API_ENDPOINT = 'https://secure.paysequr.com'
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTYzMDA2ODMsImV4cCI6MTcxNjkwNTQ4M30.PVkb2qcxQWfybeYHqmJQ2ySf46DVKpZc9kKoARQMjjI'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTY5MzY4MDEsImV4cCI6MTcxNzU0MTYwMX0.HpnXrpCS1mxAEgm6SBXEqUlnVjlBnjaaeiBRNjjM2tw'
 
 // Thunk function to fetch all escrow from the API endpoint
 

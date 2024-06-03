@@ -33,11 +33,13 @@ import {
   HourglassEmpty,
   Verified as VerifiedIcon,
 } from '@mui/icons-material';
-import { fetchUsers, fetchUserById, fetchUserAccount, deleteUsers } from './../../redux/userSlice';
+import { fetchUsers, fetchUserById, fetchUserAccount, deleteUsers} from './../../redux/userSlice';
 import { makeStyles } from '@mui/styles';
 import { styled, alpha } from '@mui/material/styles';
 import ViewUser from '../features/user/ViewUser';
 import EditUser from '../features/user/EditUser';
+import Swal from 'sweetalert2';
+
 
 const StyledMenu = styled((props) => (
   <Menu
@@ -75,6 +77,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
+
 const useStyles = makeStyles((theme) => ({
   success: {
     backgroundColor: theme.palette.success.main,
@@ -97,8 +100,10 @@ const UserDatabase = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const users = useSelector((state) => state.users.users);
+  const error = useSelector((state) => state.users.error);
   const userAccount = useSelector((state) => state.users.userAccount);
   const userDetails = useSelector((state) => state.users.userDetails);
+  const userKyc = useSelector((state) => state.userKyc.userKyc);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [tabValue, setTabValue] = useState(0);
@@ -118,6 +123,11 @@ const UserDatabase = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
   
 
+
+  
+  // *******************************************************************************
+  // Funtion to fetch all users
+  // *******************************************************************************
   useEffect(() => {
     const fetchAllUsers = async () => {
       setLoading(true);
@@ -126,6 +136,19 @@ const UserDatabase = () => {
     };
     fetchAllUsers();
   }, [dispatch]);
+
+
+  // *******************************************************************************
+  // Funtion to display error message if an error occurs while fetching users
+  // *******************************************************************************
+    useEffect(() => {
+    if (error) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage(error || 'An error occurred');
+      setSnackbarOpen(true);
+    }
+  }, [error]);
+ 
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -207,8 +230,7 @@ const UserDatabase = () => {
   // *************************************************************
   // function to open action menu for delete, view or edit a user
   // *************************************************************
-
-  const handleMenuAction = async (action) => {
+const handleMenuAction = async (action) => {
     handleMenuClose();
     if (action === 'View') {
       const userDetails = await dispatch(fetchUserById(selectedUserId));
@@ -220,7 +242,21 @@ const UserDatabase = () => {
     } else if (action === 'Query') {
       handleQueryUser(selectedUserId);
     } else if (action === 'Delete') {
-      handleDialogOpen(); // Open the confirmation dialog for delete
+      // Use SweetAlert for delete confirmation
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete user',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          handleDeleteUser();
+          Swal.fire('Deleted!', 'The user has been deleted.', 'success');
+        }
+      });
     }
   };
 
@@ -284,6 +320,7 @@ const UserDatabase = () => {
         <ViewUser
           user={userDetails}
           userAccount={userAccount}
+          userId = {selectedUserId}
           onClose={() => setIsViewMode(false)}
         />
       ) : isEditMode ? (
@@ -397,27 +434,7 @@ const UserDatabase = () => {
             </MenuItem>
           </StyledMenu>
 
-          <Dialog
-            open={dialogOpen}
-            onClose={handleDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">{"Delete User"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete this user? This action cannot be undone.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDialogClose} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={handleDeleteUser} variant="contained" style={{ backgroundColor: 'red', textTransform: 'capitalize' }} autoFocus>
-                Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
+        
         </>
       )}
     </Container>

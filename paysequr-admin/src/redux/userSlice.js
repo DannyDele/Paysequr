@@ -4,11 +4,10 @@ import axios from 'axios';
 
 const API_ENDPOINT = 'https://secure.paysequr.com'
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTQzODczNjksImV4cCI6MTcxNDk5MjE2OX0.l2Wy1DJmuG3DFOXNg3ajWpqa84Xb0Dda3HGvmd06BCo'
-const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTY5MzY4MDEsImV4cCI6MTcxNzU0MTYwMX0.HpnXrpCS1mxAEgm6SBXEqUlnVjlBnjaaeiBRNjjM2tw'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTY5MzY4MDEsImV4cCI6MTcxNzU0MTYwMX0.HpnXrpCS1mxAEgm6SBXEqUlnVjlBnjaaeiBRNjjM2tw'
 
 // Function to fecth all users
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejectWithValue }) => {
   try {
     const response = await axios.get(`${API_ENDPOINT}/api-admin/all_users`, {
       headers: {
@@ -18,7 +17,7 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
       console.log(response.data.users.result)
     return response.data.users.result;
   } catch (error) {
-    throw Error(error.response.data.message); // You may want to handle errors more gracefully
+    return rejectWithValue(error.response.data);  // Use rejectWithValue to pass the error payload to the slice
   }
 });
 
@@ -28,7 +27,7 @@ export const fetchUserById = createAsyncThunk('users/fetchUserById', async (user
   try {
     const response = await axios.get(`${API_ENDPOINT}/api-admin/user/${userId}`, {
       headers: {
-        Authorization: `Bearer ${userToken}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     console.log('User Details:', response.data);
@@ -98,7 +97,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload.msg || 'An unknown error occurred';  // Extract and set the error message
       })
       .addCase(fetchUserAccount.pending, (state) => {
     state.status = 'loading';

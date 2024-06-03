@@ -187,7 +187,22 @@ const handleSnackbarClose = () => {
     { field: 'username', headerName: 'Username', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
     { field: 'phone_no', headerName: 'Phone Number', flex: 1 },
-    { field: 'address', headerName: 'Address', flex: 1 },
+    {
+      field: 'action',
+      headerName: 'Action',
+      width: 200,
+      renderCell: (params) => (
+        <Button
+          variant='contained'
+          size='small'
+          onClick={() => {
+            handleRowClick(params.row)
+            setOpenDialog(true)
+
+          }}
+          >View</Button>
+      )
+    },
   ];
 
   return (
@@ -238,10 +253,6 @@ const handleSnackbarClose = () => {
         rows={users}
         columns={columns}
         pageSize={5}
-              onRowClick={(params) => {
-                  handleRowClick(params.row)
-                  setOpenDialog(true)
-        }}
       />
 
       {/* Dialog to display user information */}
