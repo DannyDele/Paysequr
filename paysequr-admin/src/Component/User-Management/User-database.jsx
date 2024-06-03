@@ -118,6 +118,14 @@ const UserDatabase = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
   
 
+
+
+
+  
+  
+  // *************************************************
+  // function to fecth all users when the page loads
+  // *************************************************
   useEffect(() => {
     const fetchAllUsers = async () => {
       setLoading(true);
