@@ -34,17 +34,29 @@ const useStyles = makeStyles((theme) => ({
 const KYCVerificationPage = () => {
   const dispatch = useDispatch();
   const userKyc = useSelector((state) => state.userKyc.userKyc);
+  const error = useSelector((state) => state.userKyc.error);
+  console.log('Error from kyc component:', error)
   const classes = useStyles();
   
+
+ const [open, setOpen] = useState(false);
+  const [kycSuccess, setKycSuccess] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [message, setMessage] = useState('');
+
+
   // Loading state
   const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const fetchUser = await dispatch(fetchUserKyc());
-        console.log('All Users Gotten:', fetchUser);
+        await dispatch(fetchUserKyc()).unwrap();  // Use .unwrap() to properly handle rejected action
         setLoading(false);
       } catch (e) {
         setLoading(false);
@@ -55,19 +67,22 @@ const KYCVerificationPage = () => {
     fetchData();
   }, [dispatch]);
 
-  const [open, setOpen] = useState(false);
-  const [kycSuccess, setKycSuccess] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [message, setMessage] = useState('');
-
-  const handleRowClick = (params) => {
-    if (params.field !== 'actions') {
-      setSelectedRowData(params.row);
-      setOpen(true);
+  useEffect(() => {
+    if (error) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage(error || 'An error occurred');
+      setSnackbarOpen(true);
     }
+  }, [error]);
+ 
+
+// ******************************************************************************
+  // Funtion to open a user dialog when the view button is clicked for a row
+  // *****************************************************************************
+  const handleRowClick = (params) => {
+      setSelectedRowData(params);
+      setOpen(true);
+    
   };
 
   const handleCloseForm = () => {
@@ -168,9 +183,20 @@ const KYCVerificationPage = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 200,
+      width: 300,
       renderCell: (params) => (
-        <Button
+    <span className='flex'>
+          <Button
+            sx={{marginRight:'2px'}}
+          variant='contained'
+          size='small'
+            onClick={() => (
+            handleRowClick(params.row)
+          )}
+          >View</Button>
+
+          <Button
+            size='small'
           startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
           variant="contained"
           color="primary"
@@ -187,7 +213,8 @@ const KYCVerificationPage = () => {
           }}
         >
           Approve KYC
-        </Button>
+          </Button>
+          </span>
       ),
     },
   ];
@@ -256,14 +283,15 @@ const KYCVerificationPage = () => {
         />
       </Snackbar>
 
-      {loading ? <CircularProgress style={{ margin: '50vh 0 0 50vw' }} /> : (
+      {loading ?
+          <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
+        : (
         <DataGrid
           rows={userKyc || []}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
           checkboxSelection
-          onRowClick={handleRowClick}
         />
       )}
      <Dialog open={open} onClose={handleCloseForm} maxWidth="lg" fullWidth>
@@ -303,6 +331,7 @@ const KYCVerificationPage = () => {
             .filter(([key]) => ['image', 'document_image', 'document_image_back', 'address_image'].includes(key))
             .map(([key, value]) => (
               <Button
+                size='small'
                 startIcon= {<VisibilityIcon/>}
                 key={key}
                 variant="outlined"
@@ -318,7 +347,8 @@ const KYCVerificationPage = () => {
     )}
   </DialogContent>
   <DialogActions style={{ display: 'flex', justifyContent: 'center' }}>
-    <Button
+          <Button
+                            size='small'
       startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
       onClick={handleKYCAddress}
       color="primary"
@@ -333,7 +363,9 @@ const KYCVerificationPage = () => {
     >
       Approve KYC Address
     </Button>
-    <Button
+          <Button
+            size='small'
+
       startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
       onClick={handleKYCDocument}
       color="primary"
@@ -348,7 +380,9 @@ const KYCVerificationPage = () => {
     >
       Approve KYC Document
     </Button>
-    <Button
+          <Button
+            size='small'
+
       startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
       onClick={handleCloseForm}
       color="primary"

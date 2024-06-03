@@ -251,7 +251,11 @@ const itemColumns = [
 
 
       <Typography variant="h4" className='text-gray-700'style={{marginTop:'20px'}} gutterBottom>Product Approval List</Typography>
-      <div style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
+      {loading ? (
+      <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
+      ) 
+        : (
+           <div style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
         <DataGrid
           // rows={pendingList}
           rows={productItems}
@@ -260,6 +264,7 @@ const itemColumns = [
           rowsPerPageOptions={[5, 10, 20]}
         />
       </div>
+     )}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle style={{ backgroundColor: '#f0f0f0', padding: '0.5rem',marginBottom:'20px', borderBottom: '1px solid #ccc' }}>{selectedProduct && selectedProduct.productName}</DialogTitle>
         <DialogContent>

@@ -7,8 +7,14 @@ const theme = createTheme({
     },
     // Define other colors as needed
   },
+  typography: {
+    fontFamily: 'Poppins, Arial, sans-serif', // Set Poppins as the default font family
+  },
   components: {
     MuiButton: {
+      defaultProps: {
+        size: 'small', // Set all buttons to small size by default
+      },
       styleOverrides: {
         root: {
           textTransform: 'capitalize',

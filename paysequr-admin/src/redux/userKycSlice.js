@@ -7,7 +7,7 @@ const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55Iiwi
 const API_ENDPOINT = 'https://secure.paysequr.com'
 
 // Fetch User KYC data
-export const fetchUserKyc = createAsyncThunk('userKyc/fetchUserKyc', async () => {
+export const fetchUserKyc = createAsyncThunk('userKyc/fetchUserKyc', async (_, { rejectWithValue }) => {
   try {
     const response = await axios.get(`${API_ENDPOINT}/api-admin/kyc`, {
       headers: {
@@ -17,7 +17,8 @@ export const fetchUserKyc = createAsyncThunk('userKyc/fetchUserKyc', async () =>
     console.log('Fetched Users:', response.data)
     return response.data;
   } catch (error) {
-    throw Error(error.response.data); // You may want to handle errors more gracefully
+    console.log('cannot fetch user kyc info:', error.response.data) // Throw the error response data
+    return rejectWithValue(error.response.data);  // Use rejectWithValue to pass the error payload to the slice
   }
 });
 
@@ -119,9 +120,10 @@ const userKycSlice = createSlice({
         state.status = 'succeeded';
         state.userKyc = action.payload; // Assign the fetched data directly to userKyc
       })
-      .addCase(fetchUserKyc.rejected, (state, action) => {
+         .addCase(fetchUserKyc.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload.msg || 'An unknown error occurred';  // Extract and set the error message
+        console.log('error fetching user kyc:', action.payload);
       })
       .addCase(approveUserKyc.pending, (state) => {
         state.status = 'loading';
