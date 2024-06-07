@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmllbCIsInVzZXJJZCI6MiwiaWF0IjoxNzEyNzI5OTYxLCJleHAiOjE3MTMzMzQ3NjF9.VWu-9PWq6FZoURH21788Wj5hW8HC2ZyBfAh43kyTl7g'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTc1OTE4ODAsImV4cCI6MTcxODE5NjY4MH0.EurZGSu9Ti7174V5NmWHP8HOtSPUxwj-_o6Fs56gbSc'
 
 // Define an asynchronous thunk action to disable or activate a user
 export const updateUserStatus = createAsyncThunk(

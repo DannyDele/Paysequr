@@ -429,7 +429,7 @@ const handleMenuAction = async (action) => {
             </MenuItem>
             <MenuItem
               onClick={(event) => {
-                event.stopPropagation();
+                event.stopPropagation();0
                 handleMenuAction('Delete');
               }}
             >

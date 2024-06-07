@@ -17,13 +17,21 @@ import {
   DialogTitle,
   Chip,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import EditUser from './EditUser';
 import UserKyc from './UserKyc';
 import tableCellStyle from '../../utils/helperFunctions'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import CloseIcon from '@mui/icons-material/Close';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+
+
+
 
 
 
@@ -36,8 +44,9 @@ function ViewUser({ user, onClose, userAccount, userId }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false); // Add state for edit mode
   const [isViewKycMode, setIsViewKycMode] = useState(false); // Add state for view user kyc mode
-  const [isImgageExpand, setIsImageExpand] = useState(false)
   const [openImageDialog, setOpenImageDialog] = useState(false)
+  const [isPrintMode, setIsPrintMode] = useState(false)
+  const [receiptConfirmationMessage, setReceiptConfirmationMessage] = useState('')
  
   
 
@@ -58,13 +67,58 @@ function ViewUser({ user, onClose, userAccount, userId }) {
       amount: '$50',
       status: 'Pending',
     },
+    {
+      id: 'T003',
+      date: '2024-05-06',
+      type: 'Debit',
+      amount: '$200',
+      status: 'Failed',
+    },
     // Add more transaction data as needed
   ];
 
+
+  // Function to print transaction receipt
   const handlePrintReceipt = (transactionId) => {
     // Implement the print receipt functionality here
     console.log(`Printing receipt for transaction ID: ${transactionId}`);
   };
+
+  // Function to open reciept modal
+  const handleOpenReceipt = (transaction) => {
+    if (transaction.status === 'Completed') {
+      setReceiptConfirmationMessage('Success')
+    }
+    else if (transaction.status === 'Pending') {
+      setReceiptConfirmationMessage('Pending')
+    }
+    else if (transaction.status === 'Failed') {
+      setReceiptConfirmationMessage('Failed')
+    }
+    setIsPrintMode(true)
+  }
+
+  const handleCloseReceipt = () => {
+    setIsPrintMode(false)
+  }
+
+
+
+  // function to download receipt as pdf
+  const handleDownloadReceipt = () => {
+    const input = document.getElementById('receipt-content');
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const padding = 10; // Adjust padding as needed
+
+      pdf.addImage(imgData, 'PNG', padding, padding, pdfWidth - 2 * padding, pdfHeight - 2 * padding);
+      pdf.save('receipt.pdf');
+    });
+  };
+
 
 
     // Function to delete a user
@@ -203,7 +257,7 @@ function ViewUser({ user, onClose, userAccount, userId }) {
               </TableContainer>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-              <Button variant="contained" color="primary" style={{ textTransform: 'capitalize' }}>
+              <Button onClick={handleEdit} variant="contained" color="primary" style={{ textTransform: 'capitalize' }}>
                 Edit
               </Button>
               <Button variant="contained" style={{ backgroundColor: 'red', textTransform: 'capitalize' }} onClick={handleDeleteOpenDialog}>
@@ -287,9 +341,11 @@ function ViewUser({ user, onClose, userAccount, userId }) {
                   <TableCell style={tableCellStyle(false, index)}>{transaction.date}</TableCell>
                   <TableCell style={tableCellStyle(false, index)}>{transaction.type}</TableCell>
                   <TableCell style={tableCellStyle(false, index)}>{transaction.amount}</TableCell>
-                  <TableCell style={tableCellStyle(false, index)}>{transaction.status}</TableCell>
+                  <TableCell style={tableCellStyle(false, index, transaction.status)}>{transaction.status}</TableCell>
                   <TableCell style={tableCellStyle(false, index)}>
-                    <Button style={{ textTransform: 'capitalize' }} size='small' variant="contained" onClick={() => handlePrintReceipt(transaction.id)}>
+                    <Button style={{ textTransform: 'capitalize' }} size='small' variant="contained" onClick={() => {
+                      handleOpenReceipt(transaction)
+                    }}>
                       Print Receipt
                     </Button>
                   </TableCell>
@@ -311,6 +367,105 @@ function ViewUser({ user, onClose, userAccount, userId }) {
             <DialogActions>
               <Button onClick={handleCloseImageDialog} color="primary">
                 Close
+              </Button>
+            </DialogActions>
+                </Dialog>
+                
+
+
+                {/* Open receipt Dialog */}
+          <Dialog  open={isPrintMode} onClose={handleCloseReceipt}>
+                  <DialogContent >
+                     <div className='flex justify-end'>
+                            <SaveAltIcon onClick={handleDownloadReceipt}  sx={{cursor:'pointer'}}/>
+                          </div>
+            <div id="receipt-content" className="flex flex-col items-center">
+
+                      
+  
+
+                      <div className='flex flex-col items-center mb-10'>
+
+                      <div className='mb-3' >
+                        <div className='rounded-full bg-[#E4F3ED] p-2'>
+                            {receiptConfirmationMessage === 'Completed' ? (
+                               <CheckCircleIcon sx={{
+                            color:'green', justifyContent: 'center', alignItems:'center'
+                          }} />
+                            ) :
+                              receiptConfirmationMessage === 'Pending' ? (
+                                <HourglassEmptyIcon sx={{
+                                  color: 'blue', justifyContent: 'center', alignItems: 'center'
+                                }} />
+                              ) : receiptConfirmationMessage === 'Failed' ? (
+                                  <CloseIcon sx={{
+                                    color: 'red', justifyContent: 'center', alignItems: 'center'
+                                  }} />
+                              )  : (
+                                  <CheckCircleIcon sx={{
+                            color:'green', justifyContent: 'center', alignItems:'center'
+                          }} />  
+                            )
+                         }
+                        </div>
+                        
+                       
+                      </div>
+                    <div>
+                          <Typography>Payment {receiptConfirmationMessage}!</Typography>
+                      </div>
+                    <div>
+                      <Typography sx={{fontWeight:'bold'}}>₦1000,000</Typography>
+                        </div>
+                        
+
+                        </div>
+
+                    
+                      <div>
+
+                  <Table>
+                  <TableHead>
+                  
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>Reference Number</TableCell>
+                      <TableCell>094476859</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell >Payment Time</TableCell>
+                      <TableCell >25-02-2023, 13:22:16</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell >Paymemt Method</TableCell>
+                      <TableCell >Bank Transfer</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell >Sender Name</TableCell>
+                      <TableCell >Antonio Alberto</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell >Receiver Name</TableCell>
+                      <TableCell >Cobie Smulders</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell >Amount</TableCell>
+                      <TableCell >₦1000,000</TableCell>
+                    </TableRow>
+                
+                    {/* Add more user personal info here */}
+                  </TableBody>
+                        </Table>
+                        </div>
+                </div>
+                  </DialogContent>
+            <DialogActions>
+              <Button startIcon={<CloseIcon/>} variant='outlined' onClick={handleCloseReceipt} color="primary">
+                Close
+              </Button>
+            <Button startIcon={<SaveAltIcon />} variant="contained" color="primary" onClick={handleDownloadReceipt}>
+                Download receipt
               </Button>
             </DialogActions>
           </Dialog>
