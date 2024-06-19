@@ -8,12 +8,20 @@ import { useSelector, useDispatch } from 'react-redux';import {
   DialogTitle, DialogActions,
   TextField, 
   Input,
+     Menu,
   MenuItem,
     CircularProgress,
   Paper,
   IconButton
 } from '@mui/material';
+import {
+  ArrowDropDown as ArrowDropDownIcon,
+  Visibility as VisibilityIcon,
+  Delete as DeleteIcon,
+  Verified as VerifiedIcon,
+} from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
+import { styled, alpha } from '@mui/material/styles';
 import { Edit, Delete, Add } from '@mui/icons-material';
 import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
@@ -21,11 +29,53 @@ import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon, UploadFile as UploadFileIcon } from '@mui/icons-material';
 import { fetchAllSubCategories, addSubCategories, deleteSubCategory } from './../../redux/subCategoriesSlice'; // Import fetchCategories action
+import Swal from 'sweetalert2';
+
+
+// StyledMenu is a styled component that customizes the appearance of the Menu component from Material-UI.
+// It sets specific styles for the paper, list, and menu item elements within the Menu component.
+
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'right',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  '& .MuiPaper-root': {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color: theme.palette.mode === 'light' ? 'rgb(55, 65, 81)' : theme.palette.grey[300],
+    boxShadow: 'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
+    '& .MuiMenu-list': {
+      padding: '4px 0',
+    },
+    '& .MuiMenuItem-root': {
+      '& .MuiSvgIcon-root': {
+        fontSize: 18,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5),
+      },
+      '&:active': {
+        backgroundColor: alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity),
+      },
+    },
+  },
+}));
 
 
 
 
-
+// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
+// It creates CSS classes based on the provided theme.
 const useStyles = makeStyles((theme) => ({
   success: {
     backgroundColor: theme.palette.success.main,
@@ -89,7 +139,8 @@ function ProductCategories() {
      // State for new category input and editing
   const [newSubCategory, setNewSubCategory] = useState('');
     const [newCategoryImage, setNewCategoryImage] = useState(null); // New state for category image
-    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCategoryId, setSelectedCategoryId] = useState('');
     const [openDialog, setOpenDialog] = useState(false)
     const [editMode, setEditMode] = useState(false);
         const [loading, setLoading] = useState(false); // State to manage loading
@@ -103,6 +154,12 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
       const [message, setMessage] = useState('');
 
 
+  
+  // state to manage the action button
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+  
+  
 
 
   // Function to add a new category
@@ -183,6 +240,61 @@ const handleSnackbarClose = () => {
 };
 
   
+  
+  
+  
+  // Function to open action menu
+  
+  const handleMenuOpen = (event, row) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedCategoryId(row.id);
+    setSelectedCategory(row);
+  };
+
+    // Function to close action menu
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
+  
+
+
+
+     // *************************************************************
+  // function to open action menu for delete or edit a product category
+  // *************************************************************
+const handleMenuAction = async (action) => {
+    handleMenuClose();
+    if (action === 'Edit') { 
+       setNewSubCategory(selectedCategory.name);
+            setEditMode(true);
+            console.log('Selected SubCategory Id for Editing:', selectedCategoryId)
+            console.log('Selected SubCategory:', selectedCategory)
+            setSelectedCategoryId(selectedCategoryId);
+            setOpenDialog(true);
+    } 
+    else if (action === 'Delete') {
+      // Use SweetAlert for delete confirmation
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete product category',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          handleDeleteSubCategory(selectedCategoryId);
+          Swal.fire('Deleted!', 'The product category has been deleted.', 'success');
+        }
+      });
+    }
+  };
+  
+  
+  
+  
 
 
 
@@ -195,24 +307,19 @@ const handleSnackbarClose = () => {
       headerName: 'Actions',
       width: 120,
       renderCell: (params) => (
-        <span>
-          <IconButton style={{color:'blue'}} onClick={() => {
-            setNewSubCategory(params.row.name);
-            setEditMode(true);
-            console.log('Selected SubCategory Id for Editing:', params.row.id)
-            setSelectedCategoryId(params.row.id);
-            setOpenDialog(true);
-          }}>
-            <Edit />
-          </IconButton>
-          <IconButton style={{ color: 'red' }} onClick={() => {
-            console.log('ID Selceted is:', params.row.id)
-            handleDeleteSubCategory(params.row.id)
-          }
-            }>
-            <Delete />
-          </IconButton>
-        </span>
+        <div>
+            <Button
+            aria-controls={menuAnchorEl ? 'customized-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={menuAnchorEl ? 'true' : undefined}
+            variant="contained"
+            size="small"
+            endIcon={<ArrowDropDownIcon />}
+            onClick={(event) => handleMenuOpen(event, params.row)}
+          >
+            Action
+          </Button>
+        </div>
       ),
     },
   ];
@@ -224,7 +331,7 @@ const handleSnackbarClose = () => {
 
 
   return (
-      <Container style={{ marginTop: '1rem' }}>
+      <div style={{ marginTop: '1rem' }}>
           
 
 
@@ -304,7 +411,7 @@ const handleSnackbarClose = () => {
           </div>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button variant='outlined' onClick={() => setOpenDialog(false)}>Cancel</Button>
           <Button
             onClick={editMode ? handleEditCategory : handleAddSubCategory}
             color="primary"
@@ -318,7 +425,7 @@ const handleSnackbarClose = () => {
           
 
  
-          <Paper elevation={3} style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
+          <Paper elevation={3} style={{ height: 500, width: '100%', marginBottom: '2rem' }}>
               
                    { loadingSubCategories ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
 
@@ -334,8 +441,41 @@ const handleSnackbarClose = () => {
               </Paper>
                           
      
+      
 
-      </Container>
+
+      {/* component for action menu */}
+          <StyledMenu
+            id="customized-menu"
+            MenuListProps={{
+              'aria-labelledby': 'customized-button',
+            }}
+            anchorEl={menuAnchorEl}
+            open={Boolean(menuAnchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem
+              onClick={(event) => {
+                event.stopPropagation();
+                handleMenuAction('Edit');
+              }}
+            >
+              <Edit sx={{ margin: '0 .5rem 0 0 ' }} fontSize="small" />
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={(event) => {
+                event.stopPropagation();0
+                handleMenuAction('Delete');
+              }}
+            >
+              <DeleteIcon sx={{ margin: '0 .5rem 0 0 ' }} fontSize="small" />
+              Delete
+            </MenuItem>
+          </StyledMenu>
+
+
+      </div>
   )
 }
 

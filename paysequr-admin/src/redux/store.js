@@ -5,6 +5,7 @@ import itemsReducer from './itemsSlice'; // Import items reducer
 import userKycReducer from './userKycSlice'
 import subCategoriesReducer from './subCategoriesSlice'
 import escrowReducer from './escrowSlice'
+import shopReducer from './shopSlice';
 
 export default configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export default configureStore({
     userKyc: userKycReducer,
     subcategories: subCategoriesReducer,
     escrow: escrowReducer,
+    shop: shopReducer,
   },
 });

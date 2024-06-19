@@ -13,7 +13,8 @@ import CategoriesManagementPage from './Component/Bill-Payment/Categories-manage
 import ServiceProviderPage from './Component/Bill-Payment/Service-provider-management';
 import PaymentTransactionPage from './Component/Bill-Payment/Payment-transactions';
 import OrderPage from './Component/Ecommerce/Order-and-transactions';
-import PendingListPage from './Component/Ecommerce/Pending-list';
+import ShopApprovalList from './Component/Ecommerce/shop-approval-list';
+import ShopItemsPage from './Component/Ecommerce/shop-items-list';
 import ProductManagementPage from './Component/Ecommerce/Product-management';
 import UserDatabase from './Component/User-Management/User-database';
 import UserPage from './Component/User-Management/User-management';
@@ -21,6 +22,7 @@ import UserActionPage from './Component/User-Management/User-actions';
 import CommunicationWithUsers from './Component/User-Management/Communication';
 import UserBanning from './Component/User-Management/User-banning';
 import UserVerificationPage from './Component/User-Management/User-verification';
+import UserProfileChangeRequest from './Component/User-Management/User-profile-change-request'
 import PendingVerificationsPage from './Component/User-Management/Pending-verifications';
 import QueriedVerifications from './Component/User-Management/Queried-verifications';
 import CompletedVerifications from './Component/User-Management/Completed-verifications';
@@ -52,6 +54,7 @@ import PopNotificationPage from './Component/Announcements/Pop-notification';
 import AnnouncementPage from './Component/Announcements/Announce';
 import EditUser from './Component/features/user/EditUser';
 import ViewUser from './Component/features/user/ViewUser';
+import UserEscrowDetails from './Component/features/UserEscrowDetails';
 
 
 
@@ -91,10 +94,12 @@ const App = () => {
         <Route path="/service-provider-management" element={<ServiceProviderPage />}/>
         <Route path="/payment-transactions" element={<PaymentTransactionPage />}/>
         <Route path ="/order-and-transactions" element={<OrderPage />}/>
-        <Route path ="/pending-list" element={<PendingListPage />}/>
+        <Route path ="/shop-approval-list" element={<ShopApprovalList />}/>
+        <Route path ="/shop-items-list" element={<ShopItemsPage />}/>
         <Route path ="/product-management" element={<ProductManagementPage />}/>
         <Route path="/user-database" element={<UserDatabase />}/>
         <Route path="/user-management" element={<UserPage />}/>
+        <Route path="/user-profile-change-request" element={<UserProfileChangeRequest />}/>
         <Route path="/user-actions" element={<UserActionPage />}/>
         <Route path="/communication" elemenet={<CommunicationWithUsers />}/>
         <Route path ="/user-banning" elementl={<UserBanning />}/>
@@ -123,8 +128,9 @@ const App = () => {
         <Route path="/announcement" element={<Announcement/>}/>
         <Route path="/pop-notification" element={<PopNotificationPage/>}/>
         <Route path="/main-announcement" element={<AnnouncementPage/>}/>
-        <Route path="/edituser" element={<EditUser/>}/>
-        <Route path="/edituser" element={<ViewUser/>}/>
+        <Route path="/edit-user" element={<EditUser/>}/>
+        <Route path="/view-user" element={<ViewUser/>}/>
+        <Route path="/view-user-escrow" element={<UserEscrowDetails/>}/>
       </Routes>
         </Router>
               </ThemeProvider>

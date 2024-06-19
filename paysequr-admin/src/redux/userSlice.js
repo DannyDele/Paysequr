@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const API_ENDPOINT = 'https://secure.paysequr.com'
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTc1OTE4ODAsImV4cCI6MTcxODE5NjY4MH0.EurZGSu9Ti7174V5NmWHP8HOtSPUxwj-_o6Fs56gbSc'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmllbCIsInVzZXJJZCI6MiwiaWF0IjoxNzE4NTkzODI4LCJleHAiOjE3MTkxOTg2Mjh9.WIfNpLaloW6V0rrPCdgQjP-6up3ttrLGCTxkjgfo0iA'
 // Function to fecth all users
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejectWithValue }) => {
   try {
@@ -13,9 +13,10 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async (_, { rejec
         Authorization: `Bearer ${token}`,
       },
     });
-      console.log(response.data.users.result)
+      console.log('Users coming from thunk:',response.data.users.result)
     return response.data.users.result;
   } catch (error) {
+    console.log('Error fetching users:', error)
     return rejectWithValue(error.response.data);  // Use rejectWithValue to pass the error payload to the slice
   }
 });
@@ -32,7 +33,8 @@ export const fetchUserById = createAsyncThunk('users/fetchUserById', async (user
     console.log('User Details:', response.data);
     return response.data.user.result[0]; // Assuming the response contains a single user object
   } catch (error) {
-    throw Error(error.response.data.message);
+    console.log('Error fetching user from slice:', error)
+    return error.response.data;
   }
 });
 
@@ -49,7 +51,7 @@ export const fetchUserAccount = createAsyncThunk('users/fetchUserAccount', async
     console.log('User Account Details:', response.data);
     return response.data;
   } catch (error) {
-    throw Error(error.response.data.message);
+    return error.response.data;
   }
 });
 
@@ -64,16 +66,25 @@ export const deleteUsers = createAsyncThunk('users/deleteUsers', async (userId) 
     password: "Iyeyimosi1"
   };
 
-  const response = await axios.delete(`${API_ENDPOINT}/api-admin/user/${userId}`, {
-    data: userData, // Pass the user data as the request body
-    headers: {  
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    
+    const response = await axios.delete(`${API_ENDPOINT}/api-admin/user/${userId}`, {
+      data: userData, // Pass the user data as the request body
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  console.log('Deleted User Response:', response.data);
-  return response.data;
-});
+    console.log('Deleted User Response:', response.data);
+    return response.data;
+    
+
+  }catch (error) {
+   return error.response.data
+
+  }
+  })
+
 
 
 
@@ -110,7 +121,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserById.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload.msg;
       })
   .addCase(fetchUserAccount.fulfilled, (state, action) => {
     state.status = 'succeeded';

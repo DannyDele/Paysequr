@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
 import '../../assets/styles/DialogHeader.css';
+import UserKyc from '../features/user/UserKyc'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -13,6 +14,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon, Done, ThumbUp as ThumbUpIcon, DoneAll as DoneAllIcon, VerifiedUser as VerifiedUserIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAddress } from './../../redux/userKycSlice';
 
+
+
+
+
+// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
+// It creates CSS classes based on the provided theme.
 const useStyles = makeStyles((theme) => ({
   success: {
     backgroundColor: theme.palette.success.main,
@@ -41,11 +48,11 @@ const KYCVerificationPage = () => {
 
  const [open, setOpen] = useState(false);
   const [kycSuccess, setKycSuccess] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedUserKyc, setSelectedUserKyc] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [message, setMessage] = useState('');
+  const [isViewKycMode, setIsViewKycMode] = useState(false); // Add state for view user kyc mode
 
 
   // Loading state
@@ -77,14 +84,16 @@ const KYCVerificationPage = () => {
  
 
 // ******************************************************************************
-  // Funtion to open a user dialog when the view button is clicked for a row
+  // Funtion to view a user kyc info when the view button is clicked for a row
   // *****************************************************************************
-  const handleRowClick = (params) => {
-      setSelectedRowData(params);
-      setOpen(true);
+  const handleViewKyc = (userid) => {
+      setSelectedUserKyc(userid);
+  console.log('User Id Selected:', userid);
+    setIsViewKycMode(true); // Set edit mode to true when the Edit button is clicked
     
   };
 
+ 
   const handleCloseForm = () => {
     setOpen(false);
   };
@@ -191,7 +200,7 @@ const KYCVerificationPage = () => {
           variant='contained'
           size='small'
             onClick={() => (
-            handleRowClick(params.row)
+            handleViewKyc(params.row.userid)
           )}
           >View</Button>
 
@@ -219,44 +228,17 @@ const KYCVerificationPage = () => {
     },
   ];
 
-  const customNamesMap = {
-    id: 'ID',
-    userid: 'User ID',
-    firstname: 'First Name',
-    lastname: 'Last Name',
-    middlename: 'Middlename',
-    bvn: 'BVN',
-    status: 'Status',
-    country: 'Country',
-    birth_date: 'Date of Birth',
-    city: 'City',
-    postal_code: 'Postal Code',
-    street: 'Street',
-    gender: 'Gender',
-    phone: 'Phone',
-    document_type: 'Document Type',
-    address_status: 'Address Status',
-    document_status: 'Document Status',
-    document_image: 'Document Image',
-    document_image_back: 'Document Image Back',
-    address_image: 'Address Image',
-    image: 'Image'
-  };
-
-  const renderValue = (key, value) => {
-    const imageKeys = ['image', 'document_image', 'document_image_back', 'address_image'];
-    if (imageKeys.includes(key)) {
-      return (
-        <Link href={value} target="_blank" rel="noopener noreferrer">
-          Open Image
-        </Link>
-      );
-    }
-    return value;
-  };
 
   return (
+
+
     <div style={{ height: 400, width: '100%' }}>
+  {isViewKycMode ? (
+        <UserKyc userId={selectedUserKyc}
+        onClose={() => setIsViewKycMode(false)}
+        />
+  ) : (
+    <>
       <Snackbar
         anchorOrigin={{
           vertical: 'top',
@@ -283,9 +265,9 @@ const KYCVerificationPage = () => {
         />
       </Snackbar>
 
-      {loading ?
-          <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
-        : (
+      {loading ? (
+        <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
+      ) : (
         <DataGrid
           rows={userKyc || []}
           columns={columns}
@@ -294,113 +276,12 @@ const KYCVerificationPage = () => {
           checkboxSelection
         />
       )}
-     <Dialog open={open} onClose={handleCloseForm} maxWidth="lg" fullWidth>
-  <DialogTitle className='Dialog-title-header'>KYC Verification Form</DialogTitle>
-  <DialogContent dividers>
-    {selectedRowData && (
-      <div>
-        {Object.entries(selectedRowData)
-          .filter(([key]) => key !== 'password')
-          .reduce((pairs, [key, value], index, array) => {
-            if (index % 2 === 0) {
-              pairs.push(array.slice(index, index + 2));
-            }
-            return pairs;
-          }, [])
-          .map((pair, index) => (
-            <div key={index} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-              {pair.map(([key, value]) => (
-                key === 'image' || key === 'document_image' || key === 'document_image_back' || key === 'address_image' ? null : (
-                  <TextField
-                    key={key}
-                    fullWidth
-                    label={customNamesMap[key] || key}
-                    value={value}
-                    variant="outlined"
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                )
-              ))}
-            </div>
-          ))}
-        <Typography variant="h6" className='Dialog-title-header' style={{ marginTop: '16px' }}>Document Images</Typography>
-        <div style={{ display: 'flex', justifyContent:'center', gap: '8px', marginTop: '8px' }}>
-          {Object.entries(selectedRowData)
-            .filter(([key]) => ['image', 'document_image', 'document_image_back', 'address_image'].includes(key))
-            .map(([key, value]) => (
-              <Button
-                size='small'
-                startIcon= {<VisibilityIcon/>}
-                key={key}
-                variant="outlined"
-                color="primary"
-                onClick={() => window.open(value, '_blank')}
-                style={{ textTransform: 'none', width: 'fit-content' }}
-              >
-                View {customNamesMap[key] || key}
-              </Button>
-            ))}
-        </div>
-      </div>
-    )}
-  </DialogContent>
-  <DialogActions style={{ display: 'flex', justifyContent: 'center' }}>
-          <Button
-                            size='small'
-      startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
-      onClick={handleKYCAddress}
-      color="primary"
-      variant="contained"
-      style={{ transition: 'background-color 0.3s' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-      }}
-    >
-      Approve KYC Address
-    </Button>
-          <Button
-            size='small'
+    </>
+  )}
+</div>
 
-      startIcon={<ThumbUpIcon style={{ transition: 'transform 0.3s' }} />}
-      onClick={handleKYCDocument}
-      color="primary"
-      variant="contained"
-      style={{ transition: 'background-color 0.3s' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-      }}
-    >
-      Approve KYC Document
-    </Button>
-          <Button
-            size='small'
-
-      startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
-      onClick={handleCloseForm}
-      color="primary"
-      variant="contained"
-      style={{ transition: 'background-color 0.3s' }}
-      onMouseEnter={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-      }}
-    >
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
-
-    </div>
+    
+ 
   );
 };
 

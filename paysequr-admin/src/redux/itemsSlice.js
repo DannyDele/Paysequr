@@ -1,17 +1,43 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
-const API_ENDPOINT = 'https://secure.paysequr.com'
+const API_ENDPOINT = 'https://secure.paysequr.com';
 
-// Thunk function to fetch all items from the API endpoint
+// Thunk function to fetch items from a specific store
 export const fetchAllItems = createAsyncThunk(
   'items/fetchAllItems',
-  async () => {
-    const response = await axios.get(`${API_ENDPOINT}/api-escrow/allitems`);
-    console.log('All Product Item Added:', response.data)
+  async (storeid) => {
+    const response = await axios.get(`${API_ENDPOINT}/api-escrow/storeItems/${storeid}`);
+    console.log('All Product Items Fetched:', response.data);
     return response.data;
   }
 );
+
+
+
+
+// Thunk function to verify a user item from the API endpoint
+export const verifyItem = createAsyncThunk(
+  'shop/verifyItem',
+  async (itemId) => {
+    // Approval payload to be sent on request
+    const data = {
+       "status":"approved"
+    };
+
+    try {
+      const response = await axios.post(`${API_ENDPOINT}/api-admin/edititems/${itemId}`, data);
+      return response.data;
+    } catch (error) {
+      // Handle the error here and return a rejected value
+      throw error; // This will be handled in the `rejected` case in the slice
+    }
+  }
+);
+
+
+
+
 
 export const addItem = createAsyncThunk(
   'items/addItem',
@@ -36,6 +62,12 @@ export const deleteItem = createAsyncThunk(
 );
 
 
+
+
+
+
+
+
 // Slice for handling items state
 const itemsSlice = createSlice({
   name: 'items',
@@ -44,7 +76,7 @@ const itemsSlice = createSlice({
     loading: false,
     error: null,
   },
-    reducers: {},
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllItems.pending, (state) => {
@@ -59,7 +91,7 @@ const itemsSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(addItem.pending, (state) => {
+     .addCase(addItem.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -88,7 +120,4 @@ const itemsSlice = createSlice({
   },
 });
 
-// Export the slice reducer
-
-// export const { itemDeleted } = itemsSlice.actions;
 export default itemsSlice.reducer;

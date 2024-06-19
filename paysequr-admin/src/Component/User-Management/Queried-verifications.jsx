@@ -19,7 +19,7 @@ const rows = [
 
 const QueriedVerifications = () => {
   return (
-    <div style={{  marginLeft:'50px',marginTop:'20px',height: 400, width: '95%' }}>
+    <div style={{  marginLeft:'50px',marginTop:'20px',height: 500, width: '95%' }}>
       <DataGrid
         rows={rows}
         columns={columns}

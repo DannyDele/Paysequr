@@ -8,12 +8,15 @@ import {
   AttachMoneyOutlined, // Replaced icon for Transaction
   ScheduleOutlined, // Replaced icon for Dispute
   AssignmentTurnedInOutlined, // Replaced icon for Delivery
+  Storefront,
+  ProductionQuantityLimits
 } from '@mui/icons-material'; // Import icons from Material-UI
 import { Typography } from '@mui/material';
 import PaysequrIcon from '../Dashboard/images/Paysequricon.png';
 import { Link } from 'react-router-dom';
 import OrderPage from './Order-and-transactions';
-import PendingListPage from './Pending-list';
+import ShopApprovalList from './shop-approval-list';
+import ShopItemsList from './shop-items-list'
 import ProductManagementPage from './Product-management';
 import Product from './Product'
 import Avatar from '@mui/material/Avatar';
@@ -31,7 +34,9 @@ const Sidebar = ({ onPageChange }) => {
       case 'product-management':
         return <Product />;
       case 'pending-list':
-        return <PendingListPage />;
+        return <ShopApprovalList />;
+      case 'shop-list':
+        return <ShopItemsList />;
       case 'order-and-transactions':
         return <OrderPage/>;
       default:
@@ -71,8 +76,13 @@ const Sidebar = ({ onPageChange }) => {
                 <span className='nav-link-name' style={{ color: 'white' }}>Management</span>
               </Button>
               <Button onClick={() => handlePageChange('pending-list')} className={`nav-link ${selectedPage === 'dispute-resolution' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
-                <ScheduleOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
-                <span className='nav-link-name' style={{ color: 'white' }}>Pending</span>
+                <Storefront
+                style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                <span className='nav-link-name' style={{ color: 'white' }}>Shop Approval List</span>
+              </Button>
+              <Button onClick={() => handlePageChange('shop-list')} className={`nav-link ${selectedPage === 'dispute-resolution' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
+                <ProductionQuantityLimits style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
+                <span className='nav-link-name' style={{ color: 'white' }}>Shop Itmes List</span>
               </Button>
               <Button onClick={() => handlePageChange('order-and-transactions')} className={`nav-link ${selectedPage === 'track-delivery-status' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
                 <AssignmentTurnedInOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />

@@ -39,7 +39,7 @@ const UserVerificationPage = () => {
           variant="outlined"
           color="primary"
           startIcon={<HourglassEmpty />}
-          style={{ marginRight: '20px', height: '70px', backgroundColor: showPendingVerifications ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
+          style={{ marginRight: '20px', height: '40px', backgroundColor: showPendingVerifications ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
           onClick={handleViewPendingVerifications}
         >
           Pending Verifications
@@ -50,7 +50,7 @@ const UserVerificationPage = () => {
           variant="outlined"
           color="warning"
           startIcon={<HelpOutline />}
-          style={{ marginRight: '20px', height: '70px', backgroundColor: showQueriedVerifications ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
+          style={{ marginRight: '20px', height: '40px', backgroundColor: showQueriedVerifications ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
           onClick={handleViewQueriedVerifications}
         >
           Queried Verifications
@@ -61,7 +61,7 @@ const UserVerificationPage = () => {
           variant="outlined"
           color="success"
           startIcon={<CheckCircle />}
-          style={{ height: '70px', backgroundColor: showCompletedVerifications ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
+          style={{ height: '40px', backgroundColor: showCompletedVerifications ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
           onClick={handleViewCompletedVerifications}
         >
           Completed Verifications

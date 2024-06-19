@@ -93,6 +93,8 @@ const OrderPage = () => {
     },
   ];
 
+
+  // Function to display images in a carousel
   const renderProductImages = () => {
     return (
       <Carousel showArrows={false}>

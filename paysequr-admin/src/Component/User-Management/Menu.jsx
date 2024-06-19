@@ -89,7 +89,7 @@ const Sidebar = ({ onPageChange }) => {
                 <VerifiedUserOutlined style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
                 <span className='nav-link-name' style={{ color: 'white' }}>KYC Verification</span>
               </Button>
-              <Button onClick={() => handlePageChange('user-profile-change-request')} className={`nav-link ${selectedPage === 'payment-transactions' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
+              <Button onClick={() => handlePageChange('user-profile-change-request')} className={`nav-link ${selectedPage === 'user-profile-change-request' ? 'active' : ''}`} style={{ marginBottom: '10px' }}>
                 <ManageAccountsOutlinedIcon style={{ color: '#F36C00', fontSize: '28px' }} className='nav-link-icon' />
                 <span className='nav-link-name' style={{ color: 'white' }}>Profile Change Request</span>
               </Button>

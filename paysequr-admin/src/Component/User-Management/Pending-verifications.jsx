@@ -45,6 +45,8 @@ import EditUser from '../features/user/EditUser';
 
 
 
+// StyledMenu is a styled component that customizes the appearance of the Menu component from Material-UI.
+// It sets specific styles for the paper, list, and menu item elements within the Menu component.
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
@@ -86,7 +88,8 @@ const StyledMenu = styled((props) => (
 
 
 
-
+// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
+// It creates CSS classes based on the provided theme.
 const useStyles = makeStyles((theme) => ({
   success: {
     backgroundColor: theme.palette.success.main,
@@ -314,7 +317,7 @@ const columns = [
           onClose={() => setIsViewMode(false)}
         />) : (
 
-        <div style={{ marginLeft: '50px', marginTop: '20px', height: 400, width: '95%' }}>
+        <div style={{ marginLeft: '50px', marginTop: '20px', height: 500, width: '95%' }}>
           {loading ? (<CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />) : (
 
             <DataGrid

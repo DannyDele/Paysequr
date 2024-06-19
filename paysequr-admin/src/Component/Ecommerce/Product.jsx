@@ -34,13 +34,13 @@ function Product() {
     
   return (
     <div>
-      <div style={{ marginTop: '20px', marginLeft: '50px' }}>
+      <div style={{ marginTop: '20px'}}>
         {/* Button for viewing all products */}
         <Button
           variant="outlined"
           color="primary"
           startIcon={<ProductionQuantityLimitsIcon />}
-          style={{ height: '70px', marginRight:'1rem' }}
+          style={{ height: '40px', marginRight:'1rem' }}
           onClick={handleViewAllProductsClick}
         >
           View All Products
@@ -51,7 +51,7 @@ function Product() {
           variant="outlined"
           color="warning"
           startIcon={<CategoryIcon />}
-          style={{ height: '70px' }}
+          style={{ height: '40px' }}
           onClick={handleProductCategoriesClick}
         >
           Product Categories

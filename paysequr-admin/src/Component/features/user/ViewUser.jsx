@@ -16,6 +16,12 @@ import {
   DialogContentText,
   DialogTitle,
   Chip,
+   Snackbar,
+  SnackbarContent,
+  Slide,
+  IconButton,
+    CircularProgress,
+
 } from '@mui/material';
 import Swal from 'sweetalert2';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -29,6 +35,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { makeStyles } from '@mui/styles';
 
 
 
@@ -37,9 +44,35 @@ import html2canvas from 'html2canvas';
 
 
 
+// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
+// It creates CSS classes based on the provided theme.
+const useStyles = makeStyles((theme) => ({
+  success: {
+    backgroundColor: theme.palette.success.main,
+  },
+  error: {
+    backgroundColor: theme.palette.error.main,
+  },
+  icon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  message: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+}));
 
-function ViewUser({ user, onClose, userAccount, userId }) {
+
+
+
+
+
+function ViewUser({ user, onClose, userAccount, userId, userError }) {
   
+    const classes = useStyles();
+
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false); // Add state for edit mode
@@ -47,6 +80,14 @@ function ViewUser({ user, onClose, userAccount, userId }) {
   const [openImageDialog, setOpenImageDialog] = useState(false)
   const [isPrintMode, setIsPrintMode] = useState(false)
   const [receiptConfirmationMessage, setReceiptConfirmationMessage] = useState('')
+
+
+  
+// snackbar alert state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  
  
   
 
@@ -76,6 +117,28 @@ function ViewUser({ user, onClose, userAccount, userId }) {
     },
     // Add more transaction data as needed
   ];
+
+
+
+
+  // *******************************************************************************
+  // Funtion to display error message if an error occurs while fetching a user
+  // *******************************************************************************
+    useEffect(() => {
+    if (userError) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage(userError || 'An error occurred');
+      setSnackbarOpen(true);
+    }
+  }, [userError]);
+
+
+
+
+
+
+
+
 
 
   // Function to print transaction receipt
@@ -170,10 +233,44 @@ function ViewUser({ user, onClose, userAccount, userId }) {
   const handleCloseImageDialog = () => {
     setOpenImageDialog(false);
   };
+
+
+
+  // function to close snackbar message component
+    const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
     
     return (
       
-        <>        
+      <>
+        
+             {/* snackbar component */}
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleSnackbarClose}
+            TransitionComponent={Slide}
+          >
+            <SnackbarContent
+              className={snackbarSeverity === 'success' ? classes.success : classes.error}
+              message={
+                <span className={classes.message}>
+                  <CheckCircleIcon className={classes.icon} />
+                  {snackbarMessage}
+                </span>
+              }
+              action={[
+                <IconButton key="close" color="inherit" onClick={handleSnackbarClose}>
+                  <CloseIcon className={classes.icon} />
+                </IconButton>,
+              ]}
+            />
+          </Snackbar>
             
         
             {isEditMode ? (
@@ -205,55 +302,70 @@ function ViewUser({ user, onClose, userAccount, userId }) {
             </div>
             <div>
               <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(true)}>Title</TableCell>
-                      <TableCell style={tableCellStyle(true)}>Description</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 2)}>First Name</TableCell>
-                      <TableCell style={tableCellStyle(false, 2)}>{user?.firstname}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 3)}>Last Name</TableCell>
-                      <TableCell style={tableCellStyle(false, 3)}>{user?.lastname}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 0)}>Username</TableCell>
-                      <TableCell style={tableCellStyle(false, 0)}>{user?.username}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 1)}>Email</TableCell>
-                      <TableCell style={tableCellStyle(false, 1)}>{user?.email}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 4)}>Date of Birth</TableCell>
-                      <TableCell style={tableCellStyle(false, 4)}>{user?.dob}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 1)}>Tier</TableCell>
-                      <TableCell style={tableCellStyle(false, 1)}>{user?.tier}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 6)}>Verified Status</TableCell>
-                                <TableCell style={tableCellStyle(false, 6)}>
-                    <Chip label={user?.vstatus} style={{ color: 'white', backgroundColor: 'green' }} />
-                                </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 1)}>Account Number</TableCell>
-                      <TableCell style={tableCellStyle(false, 1)}>{userAccount?.wallet.acct_number}</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell style={tableCellStyle(false, 6)}>Balance</TableCell>
-                      <TableCell style={tableCellStyle(false, 6)}>₦{userAccount?.wallet.accessable_balance}</TableCell>
-                    </TableRow>
-                    {/* Add more user personal info here */}
-                  </TableBody>
-                </Table>
+               <Table>
+  <TableHead>
+    <TableRow>
+      <TableCell style={tableCellStyle(true)}>Title</TableCell>
+      <TableCell style={tableCellStyle(true)}>Description</TableCell>
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 2)}>First Name</TableCell>
+      <TableCell style={tableCellStyle(false, 2)}>
+        {user?.firstname === 'undefined' || user?.firstname === undefined ? 'N/A' : user.firstname}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 3)}>Last Name</TableCell>
+      <TableCell style={tableCellStyle(false, 3)}>
+        {user?.lastname === 'undefined' || user?.lastname === undefined ? 'N/A' : user.lastname}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 0)}>Username</TableCell>
+      <TableCell style={tableCellStyle(false, 0)}>
+        {user?.username === 'undefined' || user?.username === undefined ? 'N/A' : user.username}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 1)}>Email</TableCell>
+      <TableCell style={tableCellStyle(false, 1)}>
+        {user?.email === 'undefined' || user?.email === undefined ? 'N/A' : user.email}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 4)}>Date of Birth</TableCell>
+      <TableCell style={tableCellStyle(false, 4)}>
+        {user?.dob === 'undefined' || user?.dob === undefined ? 'N/A' : user.dob}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 1)}>Tier</TableCell>
+      <TableCell style={tableCellStyle(false, 1)}>
+        {user?.tier === 'undefined' || user?.tier === undefined ? 'N/A' : user.tier}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 6)}>Verified Status</TableCell>
+      <TableCell style={tableCellStyle(false, 6)}>
+        <Chip label={user?.vstatus === 'undefined' || user?.vstatus === undefined ? 'N/A' : user.vstatus} style={{ color: 'white', backgroundColor: 'green' }} />
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 1)}>Account Number</TableCell>
+      <TableCell style={tableCellStyle(false, 1)}>
+        {userAccount?.wallet.acct_number === 'undefined' || userAccount?.wallet.acct_number === undefined ? 'N/A' : userAccount.wallet.acct_number}
+      </TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell style={tableCellStyle(false, 6)}>Balance</TableCell>
+     <TableCell style={tableCellStyle(false, 6)}>₦{userAccount?.wallet.accessable_balance || '0'}</TableCell>
+    </TableRow>
+    {/* Add more user personal info here */}
+  </TableBody>
+</Table>
+
               </TableContainer>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
@@ -277,7 +389,7 @@ function ViewUser({ user, onClose, userAccount, userId }) {
                 </Avatar>
                 <div>
                   <Typography sx={{fontSize:'0.875rem'}} variant="h6">Total Balance</Typography>
-                  <Typography variant="h6">₦{userAccount?.wallet.accessable_balance}</Typography>
+                  <Typography variant="h6">₦{userAccount?.wallet.accessable_balance || '0'}</Typography>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', width: '50%', marginBottom: '70px' }}>

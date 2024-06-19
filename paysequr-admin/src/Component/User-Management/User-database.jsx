@@ -41,6 +41,11 @@ import EditUser from '../features/user/EditUser';
 import Swal from 'sweetalert2';
 
 
+
+
+
+// StyledMenu is a styled component that customizes the appearance of the Menu component from Material-UI.
+// It sets specific styles for the paper, list, and menu item elements within the Menu component.
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
@@ -78,6 +83,9 @@ const StyledMenu = styled((props) => (
 }));
 
 
+
+// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
+// It creates CSS classes based on the provided theme.
 const useStyles = makeStyles((theme) => ({
   success: {
     backgroundColor: theme.palette.success.main,
@@ -105,6 +113,11 @@ const UserDatabase = () => {
   const userDetails = useSelector((state) => state.users.userDetails);
   const userKyc = useSelector((state) => state.userKyc.userKyc);
 
+
+  // set error state when fetching a user details
+  const [userError, setUserError] = useState('')
+  const [userAccountError, setUserAccountError] = useState('')
+
   const [searchQuery, setSearchQuery] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -116,12 +129,19 @@ const UserDatabase = () => {
   const [isViewMode, setIsViewMode] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
   const [selectedUserId, setSelectedUserId] = useState('');
+
+
+// snackbar alert state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
   
+
+// state to manage datgrid table search filters
+  const [allUsers, setAllUsers] = useState([]);
+const [filteredUsers, setFilteredUsers] = useState([]);
 
 
 
@@ -132,14 +152,17 @@ const UserDatabase = () => {
   // function to fecth all users when the page loads
   // *************************************************
 
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      setLoading(true);
-      await dispatch(fetchUsers());
-      setLoading(false);
-    };
-    fetchAllUsers();
-  }, [dispatch]);
+useEffect(() => {
+  const fetchAllUsers = async () => {
+    setLoading(true);
+    const result = await dispatch(fetchUsers());
+    setLoading(false);
+    setAllUsers(result.payload);
+    setFilteredUsers(result.payload);
+  };
+  fetchAllUsers();
+}, [dispatch]);
+
 
 
   // *******************************************************************************
@@ -154,9 +177,20 @@ const UserDatabase = () => {
   }, [error]);
  
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
+  // function to search for a user
+ const handleSearch = (e) => {
+  const value = e.target.value;
+  setSearchQuery(value);
+
+  const filtered = users.filter((user) =>
+    user.username.toLowerCase().includes(value.toLowerCase()) ||
+    user.firstname.toLowerCase().includes(value.toLowerCase()) ||
+    user.lastname.toLowerCase().includes(value.toLowerCase())
+  );
+  setFilteredUsers(filtered);
   };
+  
+
 
   const handleTabChange = async (event, newValue) => {
     setTabValue(newValue);
@@ -238,6 +272,8 @@ const handleMenuAction = async (action) => {
     handleMenuClose();
     if (action === 'View') {
       const userDetails = await dispatch(fetchUserById(selectedUserId));
+      console.log('User Details coming from dispatch:', userDetails)
+      setUserError(userDetails.payload.msg);
       const userAccDetails = await dispatch(fetchUserAccount(selectedUserId));
       setIsViewMode(true);
     } else if (action === 'Edit') {
@@ -324,7 +360,8 @@ const handleMenuAction = async (action) => {
         <ViewUser
           user={userDetails}
           userAccount={userAccount}
-          userId = {selectedUserId}
+          userId={selectedUserId}
+          userError={userError}
           onClose={() => setIsViewMode(false)}
         />
       ) : isEditMode ? (
@@ -333,7 +370,8 @@ const handleMenuAction = async (action) => {
           onClose={() => setIsEditMode(false)}
         />
       ) : (
-        <>
+            <>
+              {/* snackbar component */}
           <Snackbar
             anchorOrigin={{
               vertical: 'top',
@@ -361,7 +399,6 @@ const handleMenuAction = async (action) => {
           </Snackbar>
 
           <Box mt={4}>
-            <Paper elevation={3} sx={{ padding: '20px', marginBottom: '20px' }}>
               <Typography variant="h6" gutterBottom>
                 User Database
               </Typography>
@@ -372,25 +409,27 @@ const handleMenuAction = async (action) => {
                 value={searchQuery}
                 onChange={handleSearch}
               />
-            </Paper>
-          </Box>
-          <div style={{ height: 500, width: '100%' }}>
+              </Box>
+              
+          <div style={{ height: 500, width: '100%', marginTop:'1rem' }}>
             {loading ? (
               <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
             ) : (
-              <DataGrid
-                rows={users}
-                columns={columns}
-                pageSize={10}
-                rowsPerPageOptions={[10, 20, 50]}
-                checkboxSelection
-                disableSelectionOnClick
-                selectionModel={selectedUser ? [selectedUser.id] : []}
-                onSelectionModelChange={(newSelection) => handleRowSelection(newSelection)}
-              />
+            <DataGrid
+  rows={filteredUsers}
+  columns={columns}
+  pageSize={10}
+  rowsPerPageOptions={[10, 20, 50]}
+  checkboxSelection
+  disableSelectionOnClick
+  selectionModel={selectedUser ? [selectedUser.id] : []}
+  onSelectionModelChange={(newSelection) => handleRowSelection(newSelection)}
+/>
+
             )}
           </div>
 
+              {/* component for action menu */}
           <StyledMenu
             id="customized-menu"
             MenuListProps={{

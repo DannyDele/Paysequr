@@ -35,7 +35,7 @@ const UserActionPage = () => {
           variant="outlined"
           color="error"
           startIcon={<PersonAddDisabled />}
-          style={{ marginRight: '20px', height: '70px', backgroundColor: showUserBanning ? '#eff1f5' : '#eff1f5 ' }} // Change background color based on state
+          style={{ marginRight: '20px', height: '40px', backgroundColor: showUserBanning ? '#eff1f5' : '#eff1f5 ' }} // Change background color based on state
           onClick={handleViewUserBanning}
         >
           User Banning
@@ -44,7 +44,7 @@ const UserActionPage = () => {
           variant="outlined"
           color="primary"
           startIcon={<Chat />}
-          style={{ height: '70px', backgroundColor: showCommunicationWithUsers ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
+          style={{ height: '40px', backgroundColor: showCommunicationWithUsers ? '#eff1f5' : '#eff1f5' }} // Change background color based on state
           onClick={handleViewCommunicationWithUsers}
         >
           Communication with Users

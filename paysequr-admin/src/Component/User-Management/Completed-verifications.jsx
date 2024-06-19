@@ -327,7 +327,7 @@ const handleSnackbarClose = () => {
           userAccount={userAccount}
           onClose={() => setIsViewMode(false)}
         />) : (
-    <div style={{ marginLeft: '50px', marginTop: '20px', height: 400, width: '95%' }}>
+    <div style={{ marginLeft: '50px', marginTop: '20px', height: 500, width: '95%' }}>
                         { loading ? (<CircularProgress sx={{marginLeft:'40vw', marginTop: '30vh'}}/>) : (
 
       <DataGrid

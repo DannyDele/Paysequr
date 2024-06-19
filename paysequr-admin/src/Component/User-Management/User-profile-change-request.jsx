@@ -73,15 +73,14 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbm55IiwidXNlcklkIjozLCJpYXQiOjE3MTY5MzY4MDEsImV4cCI6MTcxNzU0MTYwMX0.HpnXrpCS1mxAEgm6SBXEqUlnVjlBnjaaeiBRNjjM2tw'
-
-
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmllbCIsInVzZXJJZCI6MiwiaWF0IjoxNzE4NTkzODI4LCJleHAiOjE3MTkxOTg2Mjh9.WIfNpLaloW6V0rrPCdgQjP-6up3ttrLGCTxkjgfo0iA'
 
 function UserProfileChangeRequest() {
     const dispatch = useDispatch();
     const classes = useStyles();
+  const users = useSelector((state) => state.users.users);
+  console.log('User state:', users)
 
-    const users = useSelector((state) => state.users.users);
     
    
 
@@ -102,14 +101,19 @@ function UserProfileChangeRequest() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-      const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('');
+  
 
-    useEffect(() => {
+
+  useEffect(() => {
+          console.log('Component Rendered');
+
     console.log('All Users From Database:', users)
 
     const fetchAllUsers = async () => {
       setLoading(true)
-    await dispatch(fetchUsers());
+      const FUsers = await dispatch(fetchUsers());
+      console.log('Users:', FUsers)
     setLoading(false)
     }
 
@@ -119,7 +123,6 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   }, [dispatch]);
 
     
-
 
  
   const handleClose = () => {
@@ -262,39 +265,39 @@ const handleSnackbarClose = () => {
         <DialogContent style={{ padding: '2rem' }}>
           {selectedUser ? (
                       <div>
-                            <Stack spacing={2}>
+                         <Stack spacing={2}>
+  <h6><strong>First Name:</strong> {selectedUser?.firstname === 'undefined' || selectedUser?.firstname === null ? 'N/A' : selectedUser.firstname}</h6>
+  <Divider/>
+  
+  <h6><strong>Last Name:</strong> {selectedUser?.lastname === 'undefined' || selectedUser?.lastname === null ? 'N/A' : selectedUser.lastname}</h6>
+  <Divider/>
+  
+  <h6><strong>Username:</strong> {selectedUser?.username === 'undefined' || selectedUser?.username === null ? 'N/A' : selectedUser.username}</h6>
+  <Divider/>
+  
+  <h6><strong>Middle Name:</strong> {selectedUser?.middlename === 'undefined' || selectedUser?.middlename === null ? 'N/A' : selectedUser.middlename}</h6>
+  <Divider/>
+  
+  <h6><strong>Email:</strong> {selectedUser?.email === 'undefined' || selectedUser?.email === null ? 'N/A' : selectedUser.email}</h6>
+  <Divider/>
+  
+  <h6><strong>Phone Number:</strong> {selectedUser?.phone_no === 'undefined' || selectedUser?.phone_no  === null  ? 'N/A' : selectedUser.phone_no}</h6>
+  <Divider/>
+  
+  <h6><strong>Address:</strong> {selectedUser?.Address === 'undefined' || selectedUser?.Address === null ? 'N/A' : selectedUser.Address}</h6>
+  <Divider/>
+  
+  <h6><strong>Date of Birth:</strong> {selectedUser?.dob === 'undefined' || selectedUser?.dob === null ? 'N/A' : selectedUser.dob}</h6>
+  <Divider/>
+  
+  <h6><strong>Gender:</strong> {selectedUser?.gender === 'undefined' || selectedUser?.gender === null ? 'N/A' : selectedUser.gender}</h6>
+  <Divider/>
+</Stack>
 
-                              <h6><strong>First Name:</strong> {selectedUser.firstname}</h6>
-                              <Divider/>
-                              <h6><strong>Last Name:</strong> {selectedUser.lastname}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Username:</strong> {selectedUser.username}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Middle Name:</strong> {selectedUser.middleName}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Email:</strong> {selectedUser.email}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Phone Number:</strong> {selectedUser.phone_no}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Address:</strong> {selectedUser.address}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Date of Birth:</strong> {selectedUser.dob}</h6>
-                                                            <Divider/>
-
-                              <h6><strong>Gender:</strong> {selectedUser.gender}</h6>
-                                                            <Divider/>
-
-                              </Stack>
             <div className='mt-6'>
-  {selectedUser.documentImageUrl ? (
+  {selectedUser?.documentImageUrl ? (
                                   
-<Link href={selectedUser.documentImageUrl} target="_blank" rel="noopener noreferrer" underline="always">
+<Link href={selectedUser?.documentImageUrl} target="_blank" rel="noopener noreferrer" underline="always">
   View Document
 </Link>
   ) : (
@@ -366,26 +369,26 @@ const handleSnackbarClose = () => {
                                   </Typography>
                                   </Box>
                               <Box sx={{ width: '100%' }}>
-  <Stack spacing={2}>
-  <Typography><strong>First Name:</strong> {selectedUser?.firstname}</Typography>
-                                      <Divider />
-                                      <Typography><strong>Middle Name:</strong> {selectedUser?.middleName}</Typography>
-  <Divider/>
-  <Typography><strong>Last Name:</strong> {selectedUser?.lastname}</Typography>
-  <Divider/>
-  <Typography><strong>Username:</strong> {selectedUser?.username}</Typography>
-<Divider />
-  <Typography><strong>Email:</strong> {selectedUser?.email}</Typography>
-  <Divider/>
-  <Typography><strong>Phone Number:</strong> {selectedUser?.phone_no}</Typography>
-  <Divider/>
-  <Typography><strong>Address:</strong> {selectedUser?.address}</Typography>
-  <Divider/>
-  <Typography><strong>Date of Birth:</strong> {selectedUser?.dob}</Typography>
-  <Divider/>
-  <Typography><strong>Gender:</strong> {selectedUser?.gender}</Typography>
-  {/* Add more fields as needed */}
-</Stack>
+{/* <Stack spacing={2}>
+  <Typography><strong>First Name:</strong> {selectedUser?.firstname === 'undefined' || selectedUser?.firstname === null ? 'N/A' : selectedUser.firstname}</Typography>
+  <Divider />
+  <Typography><strong>Middle Name:</strong> {selectedUser?.middlename === 'undefined' || selectedUser?.middlename === null ? 'N/A' : selectedUser.middlename}</Typography>
+  <Divider />
+  <Typography><strong>Last Name:</strong> {selectedUser?.lastname === 'undefined' || selectedUser?.lastname === null ? 'N/A' : selectedUser.lastname}</Typography>
+  <Divider />
+  <Typography><strong>Username:</strong> {selectedUser?.username === 'undefined' || selectedUser?.username === null ? 'N/A' : selectedUser.username}</Typography>
+  <Divider />
+  <Typography><strong>Email:</strong> {selectedUser?.email === 'undefined' || selectedUser?.email === null ? 'N/A' : selectedUser.email}</Typography>
+  <Divider />
+  <Typography><strong>Phone Number:</strong> {selectedUser?.phone_no === 'undefined' || selectedUser?.phone_no === null ? 'N/A' : selectedUser.phone_no}</Typography>
+  <Divider />
+  <Typography><strong>Address:</strong> {selectedUser?.Address === 'undefined' || selectedUser?.Address === null ? 'N/A' : selectedUser.Address}</Typography>
+  <Divider />
+  <Typography><strong>Date of Birth:</strong> {selectedUser?.dob === 'undefined' || selectedUser?.dob === null ? 'N/A' : selectedUser.dob}</Typography>
+  <Divider />
+  <Typography><strong>Gender:</strong> {selectedUser?.gender === 'undefined' || selectedUser?.gender === null ? 'N/A' : selectedUser.gender}</Typography>
+</Stack> */}
+
 
                                       </Box>
       </CardContent>
@@ -405,26 +408,26 @@ const handleSnackbarClose = () => {
     {/* Display user information in the database here */}
                               {/* Example: */}
     <Box sx={{ width: '100%' }}>
-   <Stack spacing={2}>
-    <Typography variant="body1"><strong>First Name:</strong> { storedUser?.user.result[0].firstname}</Typography>
-                                      <Divider />
-                                      <Typography variant="body1"><strong>Middle Name:</strong> { storedUser?.user.result[0].middlename}</Typography>
-  <Divider/>
-  <Typography variant="body1"><strong>Last Name:</strong> { storedUser?.user.result[0].lastname}</Typography>
-  <Divider/>
-  <Typography variant="body1"><strong>Username:</strong> { storedUser?.user.result[0].username}</Typography>
+{/* <Stack spacing={2}>
+  <Typography variant="body1"><strong>First Name:</strong> {storedUser?.user.result[0].firstname === 'undefined' || storedUser?.user.result[0].firstname === null ? 'N/A' : storedUser.user.result[0].firstname}</Typography>
   <Divider />
-  <Typography variant="body1"><strong>Email:</strong> { storedUser?.user.result[0].email}</Typography>
-  <Divider/>
-  <Typography variant="body1"><strong>Phone Number:</strong> { storedUser?.user.result[0].phone_no}</Typography>
-  <Divider/>
-  <Typography variant="body1"><strong>Address:</strong> { storedUser?.user.result[0].address}</Typography>
-  <Divider/>
-  <Typography variant="body1"><strong>Date of Birth:</strong> { storedUser?.user.result[0].dob}</Typography>
-  <Divider/>
-  <Typography variant="body1"><strong>Gender:</strong> Male</Typography>
-  {/* Add more fields as needed */}
-</Stack>
+  <Typography variant="body1"><strong>Middle Name:</strong> {storedUser?.user.result[0].middlename === 'undefined' || storedUser?.user.result[0].middlename === null ? 'N/A' : storedUser.user.result[0].middlename}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Last Name:</strong> {storedUser?.user.result[0].lastname === 'undefined' || storedUser?.user.result[0].lastname === null ? 'N/A' : storedUser.user.result[0].lastname}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Username:</strong> {storedUser?.user.result[0].username === 'undefined' || storedUser?.user.result[0].username === null ? 'N/A' : storedUser.user.result[0].username}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Email:</strong> {storedUser?.user.result[0].email === 'undefined' || storedUser?.user.result[0].email === null ? 'N/A' : storedUser.user.result[0].email}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Phone Number:</strong> {storedUser?.user.result[0].phone_no === 'undefined' || storedUser?.user.result[0].phone_no === null ? 'N/A' : storedUser.user.result[0].phone_no}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Address:</strong> {storedUser?.user.result[0].Address === 'undefined' || storedUser?.user.result[0].Address === null ? 'N/A' : storedUser.user.result[0].Address}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Date of Birth:</strong> {storedUser?.user.result[0].dob === 'undefined' || storedUser?.user.result[0].dob === null ? 'N/A' : storedUser.user.result[0].dob}</Typography>
+  <Divider />
+  <Typography variant="body1"><strong>Gender:</strong> {storedUser?.user.result[0].gender === 'undefined' || storedUser?.user.result[0].gender === null ? 'N/A' : storedUser.user.result[0].gender}</Typography>
+</Stack> */}
+
 
                                       </Box>
 
