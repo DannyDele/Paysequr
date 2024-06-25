@@ -6,6 +6,7 @@ import userKycReducer from './userKycSlice'
 import subCategoriesReducer from './subCategoriesSlice'
 import escrowReducer from './escrowSlice'
 import shopReducer from './shopSlice';
+import LoginReducer from './loginSlice'
 
 export default configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export default configureStore({
     subcategories: subCategoriesReducer,
     escrow: escrowReducer,
     shop: shopReducer,
+    login: LoginReducer,
   },
 });

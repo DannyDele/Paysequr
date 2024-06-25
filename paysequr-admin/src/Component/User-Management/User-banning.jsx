@@ -5,29 +5,11 @@ import { useDispatch } from 'react-redux';
 import { updateUserStatus } from './../../redux/userStatusSlice'; // Import your updateUserStatus action from userStatusSlice.js
 import { Snackbar, SnackbarContent, IconButton, Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 
 
-
-
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
 
 
 
@@ -95,7 +77,7 @@ const handleSnackbarClose = () => {
   return (
     <Box>
     <Paper elevation={3} style={{ marginLeft: '50px', marginTop: '20px', padding: '20px', marginBottom: '20px' }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h4" className={classes.globalTypography} gutterBottom>
         User Suspension/Banning
       </Typography>
       <Grid container spacing={2} alignItems="center">

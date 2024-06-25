@@ -30,34 +30,10 @@ import {
 import { DataGrid } from '@mui/x-data-grid';
 import { useSpring, animated } from 'react-spring';
 import { makeStyles } from '@mui/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon, Error as ErrorIcon } from '@mui/icons-material';
 import UserEscrowDetails from '../features/UserEscrowDetails'
-
-
-
-
-// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
-// It creates CSS classes based on the provided theme.
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
-
 
 
 
@@ -330,7 +306,7 @@ const TransactionPage = () => {
           </Paper>
         </Grid>
       </Grid>
-      <Typography variant="h5" gutterBottom style={{ textAlign: 'left', marginTop: '20px', color: '#222' }}>
+      <Typography variant="h5" gutterBottom className={classes.globalTypography} style={{  marginTop: '20px' }}>
         Escrow Transactions
       </Typography>
 

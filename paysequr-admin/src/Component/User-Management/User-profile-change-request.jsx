@@ -17,7 +17,8 @@ import {
     Stack,
     Paper,
     Link,
-    CircularProgress
+  CircularProgress,
+  Container,
 } from '@mui/material';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
@@ -31,30 +32,14 @@ import { styled } from '@mui/material/styles';
 import { color } from 'framer-motion';
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
+import { getToken } from '../utils/tokenManager';
 
 
 
 
 
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
-
+const token = getToken();
 
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -73,7 +58,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 
 
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmllbCIsInVzZXJJZCI6MiwiaWF0IjoxNzE4NTkzODI4LCJleHAiOjE3MTkxOTg2Mjh9.WIfNpLaloW6V0rrPCdgQjP-6up3ttrLGCTxkjgfo0iA'
 
 function UserProfileChangeRequest() {
     const dispatch = useDispatch();
@@ -209,11 +193,9 @@ const handleSnackbarClose = () => {
   ];
 
   return (
+    <Container>
       <div style={{ height: 400, width: '100%' }}>
-          
-
-
-
+      
 
  {/* Snackbar component */}
 
@@ -247,9 +229,11 @@ const handleSnackbarClose = () => {
 
 
 
-
-
-
+        <div className='mt-5'>
+           <Typography variant="h4" className={classes.globalTypography}  gutterBottom>
+            Profile Change Request
+        </Typography>
+        </div>
 
       {/* <h1>User Profile Change Request</h1> */}
       <DataGrid
@@ -445,7 +429,8 @@ const handleSnackbarClose = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+      </div>
+      </Container>
   );
 }
 

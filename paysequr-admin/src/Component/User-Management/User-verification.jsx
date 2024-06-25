@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import Button from '@mui/material/Button';
+import { Paper, Typography, TextField, Button, Grid, Container } from '@mui/material';
 import { HourglassEmpty, HelpOutline, CheckCircle } from '@mui/icons-material'; // Import icons for different verification statuses
 import PendingVerifications from './Pending-verifications'; // Import component for pending verifications
 import QueriedVerifications from './Queried-verifications'; // Import component for queried verifications
 import CompletedVerifications from './Completed-verifications'; // Import component for completed verifications
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
+
 
 const UserVerificationPage = () => {
+  const classes = useStyles()
   const [showPendingVerifications, setShowPendingVerifications] = useState(true); // Set initial state to true
   const [showQueriedVerifications, setShowQueriedVerifications] = useState(false);
   const [showCompletedVerifications, setShowCompletedVerifications] = useState(false);
@@ -32,8 +35,8 @@ const UserVerificationPage = () => {
   };
 
   return (
-    <div style={{ textAlign: 'left' }}>
-      <div style={{ marginTop: '20px', marginLeft: '50px' }}>
+    <Container>
+      <div style={{ marginTop: '20px' }}>
         {/* Button for pending verifications */}
         <Button
           variant="outlined"
@@ -66,13 +69,19 @@ const UserVerificationPage = () => {
         >
           Completed Verifications
         </Button>
+
+        <div className='mt-5'>
+           <Typography variant="h4" className={classes.globalTypography}  gutterBottom>
+        User Verification
+      </Typography>
+        </div>
       </div>
 
       {/* Render different verification components based on state */}
       {showPendingVerifications && <PendingVerifications />}
       {showQueriedVerifications && <QueriedVerifications />}
       {showCompletedVerifications && <CompletedVerifications />}
-    </div>
+    </Container>
   );
 };
 

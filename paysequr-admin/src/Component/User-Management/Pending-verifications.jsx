@@ -267,16 +267,16 @@ const handleSnackbarClose = () => {
   // Columns definition for the DataGrid
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 90 },
-  { field: 'username', headerName: 'Username', width: 150 },
-  { field: 'firstname', headerName: 'First Name', width: 150 },
-  { field: 'middlename', headerName: 'Middle Name', width: 150 },
-  { field: 'lastname', headerName: 'Last Name', width: 150 },
-  { field: 'tier', headerName: 'KYC Level', width: 150 },
+  { field: 'id', headerName: 'ID', flex: 1 },
+  { field: 'username', headerName: 'Username', flex: 1 },
+  { field: 'firstname', headerName: 'First Name', flex: 1 },
+  { field: 'middlename', headerName: 'Middle Name', flex: 1 },
+  { field: 'lastname', headerName: 'Last Name', flex: 1 },
+  { field: 'tier', headerName: 'KYC Level', flex: 1 },
   {
     field: 'vstatus',
     headerName: 'Status',
-    width: 150,
+    flex: 1,
     renderCell: (params) => (
       <span style={{display:'flex', alignItems: 'center'}}>
         {params.value}
@@ -287,7 +287,7 @@ const columns = [
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 200,
+      flex: 1,
       renderCell: (params) => (
         <div>
           <Button
@@ -317,7 +317,7 @@ const columns = [
           onClose={() => setIsViewMode(false)}
         />) : (
 
-        <div style={{ marginLeft: '50px', marginTop: '20px', height: 500, width: '95%' }}>
+        <div style={{ height: 500, width: '95%' }}>
           {loading ? (<CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />) : (
 
             <DataGrid

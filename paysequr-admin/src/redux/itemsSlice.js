@@ -3,11 +3,11 @@ import axios from 'axios';
 
 const API_ENDPOINT = 'https://secure.paysequr.com';
 
-// Thunk function to fetch items from a specific store
+// Thunk function to fetch a specific store
 export const fetchAllItems = createAsyncThunk(
   'items/fetchAllItems',
-  async (storeid) => {
-    const response = await axios.get(`${API_ENDPOINT}/api-escrow/storeItems/${storeid}`);
+  async () => {
+    const response = await axios.get(`${API_ENDPOINT}/api-escrow/allitems`);
     console.log('All Product Items Fetched:', response.data);
     return response.data;
   }
@@ -23,6 +23,26 @@ export const verifyItem = createAsyncThunk(
     // Approval payload to be sent on request
     const data = {
        "status":"approved"
+    };
+
+    try {
+      const response = await axios.post(`${API_ENDPOINT}/api-admin/edititems/${itemId}`, data);
+      return response.data;
+    } catch (error) {
+      // Handle the error here and return a rejected value
+      throw error; // This will be handled in the `rejected` case in the slice
+    }
+  }
+);
+
+
+// Thunk function to verify a user item from the API endpoint
+export const rejectItem = createAsyncThunk(
+  'shop/rejectItem',
+  async (itemId) => {
+    // Approval payload to be sent on request
+    const data = {
+       "status":"rejected"
     };
 
     try {

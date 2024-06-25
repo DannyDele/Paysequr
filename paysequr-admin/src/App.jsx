@@ -1,9 +1,14 @@
-import React, { useEffect} from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Import Routes
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { ThemeProvider } from '@mui/material/styles';
+import store from './redux/store';
+import theme from './assets/muiStyles/theme';
+import Login from './Component/Login/Login';
 import TransactionPage from './Component/Escrow/Transactions';
 import DashboardBody from './Component/Dashboard/Dashboard';
-import EcommercePage from './Component/Ecommerce/Ecommerce'; // Import your EcommercePage component
-import Escrow from './Component/Escrow/Escrow'; // Import your PayEscrowPage component
+import EcommercePage from './Component/Ecommerce/Ecommerce';
+import Escrow from './Component/Escrow/Escrow';
 import DisputeResolutionPage from './Component/Escrow/Dispute-resolution';
 import ResolvedDisputePage from './Component/Escrow/Resolved-disputes';
 import UnresolvedDisputesPage from './Component/Escrow/Unresolved-disputes';
@@ -22,7 +27,7 @@ import UserActionPage from './Component/User-Management/User-actions';
 import CommunicationWithUsers from './Component/User-Management/Communication';
 import UserBanning from './Component/User-Management/User-banning';
 import UserVerificationPage from './Component/User-Management/User-verification';
-import UserProfileChangeRequest from './Component/User-Management/User-profile-change-request'
+import UserProfileChangeRequest from './Component/User-Management/User-profile-change-request';
 import PendingVerificationsPage from './Component/User-Management/Pending-verifications';
 import QueriedVerifications from './Component/User-Management/Queried-verifications';
 import CompletedVerifications from './Component/User-Management/Completed-verifications';
@@ -42,13 +47,8 @@ import AppSettingsPage from './Component/Settings/App-setting';
 import SecuritySettingsPage from './Component/Settings/Security-setting';
 import NotificationPreferencesPage from './Component/Settings/Notification-preference';
 import KYCVerificationPage from './Component/User-Management/KYC-verification';
-import { Provider } from 'react-redux';
-import store from './redux/store'
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import theme from './assets/muiStyles/theme'
 import TrackDeliveryStatusPage from './Component/Escrow/Delivery-status';
 import MessagingSystem from './Component/Customer-support/Messaging';
-import { useState } from 'react';
 import Announcement from './Component/Announcements/Announcement';
 import PopNotificationPage from './Component/Announcements/Pop-notification';
 import AnnouncementPage from './Component/Announcements/Announce';
@@ -56,87 +56,83 @@ import EditUser from './Component/features/user/EditUser';
 import ViewUser from './Component/features/user/ViewUser';
 import UserEscrowDetails from './Component/features/UserEscrowDetails';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const App = () => {
- 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        setIsAuthenticated(true);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   return (
-    <Provider store={store}> {/* Wrap your App component with Provider and pass store as prop */}
-            <ThemeProvider theme={theme}>
-
-
-    <Router>
-      <Routes> {/* Wrap Route components inside Routes */}
-        <Route exact path="/" element={<DashboardBody  />} /> {/* Use 'element' prop to specify the component */}
-        <Route path="/ecommerce" element={<EcommercePage  />} />
-        <Route path="/escrow" element={<Escrow />} />
-        {/* Add more routes for other tabs */}
-        <Route path="/dispute-resolution" element={<DisputeResolutionPage />}/>
-        <Route path="/transactions" element={<TransactionPage />}/>
-        <Route path="/resolved-disputes" element={<ResolvedDisputePage/>}/>
-        <Route path="/unresolved-disputes" element={<UnresolvedDisputesPage />}/>
-        <Route path="/chat" element={<ChatBox />}/>
-        <Route path="/billpayment" element={<BillPayment/>} />
-        <Route path="/categories-management" element={<CategoriesManagementPage />}/>
-        <Route path="/service-provider-management" element={<ServiceProviderPage />}/>
-        <Route path="/payment-transactions" element={<PaymentTransactionPage />}/>
-        <Route path ="/order-and-transactions" element={<OrderPage />}/>
-        <Route path ="/shop-approval-list" element={<ShopApprovalList />}/>
-        <Route path ="/shop-items-list" element={<ShopItemsPage />}/>
-        <Route path ="/product-management" element={<ProductManagementPage />}/>
-        <Route path="/user-database" element={<UserDatabase />}/>
-        <Route path="/user-management" element={<UserPage />}/>
-        <Route path="/user-profile-change-request" element={<UserProfileChangeRequest />}/>
-        <Route path="/user-actions" element={<UserActionPage />}/>
-        <Route path="/communication" elemenet={<CommunicationWithUsers />}/>
-        <Route path ="/user-banning" elementl={<UserBanning />}/>
-        <Route path="/user-verification" element={<UserVerificationPage />}/>
-        <Route path="/pending-verification" element={<PendingVerificationsPage />}/>
-        <Route path="/queried-verification" element={<QueriedVerifications/>}/>
-        <Route path="/completed-verification" element={<CompletedVerifications/>}/>
-        <Route path="/financial-analysis" element={<FinancialAnalysisPage />}/>
-        <Route path="/revenue-overview" element={<RevenueOverviewPage />}/>
-        <Route path="/revenue-breakdown" element={<RevenueBreakdown />}/>
-        <Route path="/revenue-trends" element={<RevenueTrends />}/>
-        <Route path="/customer-support" element={<CustomerSupportPage />}/>
-        <Route path="/support-ticket" element={<SupportTicketPage />}/>
-        <Route path="/ticket-response" element={<TicketResponsePage />}/>
-        <Route path="/report-analytics" element={<ReportAnalyticsPage />}/>
-        <Route path="/custom-reports" element={<CustomReports />}/>
-        <Route path="/transaction-logs" element={<TransactionLog />}/>
-        <Route path="/user-activity" elemnt={<UserActivityLogPage />}/>
-        <Route path="/settings" element={<SettingsPage />}/>
-        <Route path="/app-setting" element={<AppSettingsPage />}/>
-        <Route path="/security-setting" element={<SecuritySettingsPage />}/>
-        <Route path="/notification-preference" element={<NotificationPreferencesPage />}/>
-        <Route path="/kyc-verification" element={<KYCVerificationPage />}/>
-        <Route path="/track-delivery-status" element={<TrackDeliveryStatusPage />}/>
-        <Route path="/messaging-system" element={<MessagingSystem />}/>
-        <Route path="/announcement" element={<Announcement/>}/>
-        <Route path="/pop-notification" element={<PopNotificationPage/>}/>
-        <Route path="/main-announcement" element={<AnnouncementPage/>}/>
-        <Route path="/edit-user" element={<EditUser/>}/>
-        <Route path="/view-user" element={<ViewUser/>}/>
-        <Route path="/view-user-escrow" element={<UserEscrowDetails/>}/>
-      </Routes>
-        </Router>
-              </ThemeProvider>
-
-          </Provider>
-
+    <Provider store={store}> 
+      <ThemeProvider theme={theme}> 
+        {isAuthenticated ? (
+          <Router>
+            <Routes>
+              <Route exact path="/" element={<DashboardBody setIsAuthenticated={setIsAuthenticated}  />} />
+              <Route path="/ecommerce" element={<EcommercePage />} />
+              <Route path="/escrow" element={<Escrow />} />
+              <Route path="/dispute-resolution" element={<DisputeResolutionPage />} />
+              <Route path="/transactions" element={<TransactionPage />} />
+              <Route path="/resolved-disputes" element={<ResolvedDisputePage />} />
+              <Route path="/unresolved-disputes" element={<UnresolvedDisputesPage />} />
+              <Route path="/chat" element={<ChatBox />} />
+              <Route path="/billpayment" element={<BillPayment />} />
+              <Route path="/categories-management" element={<CategoriesManagementPage />} />
+              <Route path="/service-provider-management" element={<ServiceProviderPage />} />
+              <Route path="/payment-transactions" element={<PaymentTransactionPage />} />
+              <Route path="/order-and-transactions" element={<OrderPage />} />
+              <Route path="/shop-approval-list" element={<ShopApprovalList />} />
+              <Route path="/shop-items-list" element={<ShopItemsPage />} />
+              <Route path="/product-management" element={<ProductManagementPage />} />
+              <Route path="/user-database" element={<UserDatabase />} />
+              <Route path="/user-management" element={<UserPage />} />
+              <Route path="/user-profile-change-request" element={<UserProfileChangeRequest />} />
+              <Route path="/user-actions" element={<UserActionPage />} />
+              <Route path="/communication" element={<CommunicationWithUsers />} />
+              <Route path="/user-banning" element={<UserBanning />} />
+              <Route path="/user-verification" element={<UserVerificationPage />} />
+              <Route path="/pending-verification" element={<PendingVerificationsPage />} />
+              <Route path="/queried-verification" element={<QueriedVerifications />} />
+              <Route path="/completed-verification" element={<CompletedVerifications />} />
+              <Route path="/financial-analysis" element={<FinancialAnalysisPage />} />
+              <Route path="/revenue-overview" element={<RevenueOverviewPage />} />
+              <Route path="/revenue-breakdown" element={<RevenueBreakdown />} />
+              <Route path="/revenue-trends" element={<RevenueTrends />} />
+              <Route path="/customer-support" element={<CustomerSupportPage />} />
+              <Route path="/support-ticket" element={<SupportTicketPage />} />
+              <Route path="/ticket-response" element={<TicketResponsePage />} />
+              <Route path="/report-analytics" element={<ReportAnalyticsPage />} />
+              <Route path="/custom-reports" element={<CustomReports />} />
+              <Route path="/transaction-logs" element={<TransactionLog />} />
+              <Route path="/user-activity" element={<UserActivityLogPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/app-setting" element={<AppSettingsPage />} />
+              <Route path="/security-setting" element={<SecuritySettingsPage />} />
+              <Route path="/notification-preference" element={<NotificationPreferencesPage />} />
+              <Route path="/kyc-verification" element={<KYCVerificationPage />} />
+              <Route path="/track-delivery-status" element={<TrackDeliveryStatusPage />} />
+              <Route path="/messaging-system" element={<MessagingSystem />} />
+              <Route path="/announcement" element={<Announcement />} />
+              <Route path="/pop-notification" element={<PopNotificationPage />} />
+              <Route path="/main-announcement" element={<AnnouncementPage />} />
+              <Route path="/edit-user" element={<EditUser />} />
+              <Route path="/view-user" element={<ViewUser />} />
+              <Route path="/view-user-escrow" element={<UserEscrowDetails />} />
+            </Routes>
+          </Router>
+        ) : (
+          <Login setIsAuthenticated={setIsAuthenticated} />
+        )}
+      </ThemeProvider>
+    </Provider>
   );
 };
 

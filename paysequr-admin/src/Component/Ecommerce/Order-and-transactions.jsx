@@ -1,26 +1,39 @@
-import React, { useState } from 'react';
-import { Container, Typography, TextField, DialogActions, Dialog, DialogContent, DialogTitle, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, TextField, DialogActions, Dialog, DialogContent, DialogTitle, CircularProgress, Button, Chip, } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Carousel from 'react-elastic-carousel';
+import CloseIcon from '@mui/icons-material/Close';
+import {  useDispatch, useSelector } from 'react-redux';
+import {fetchAllEscrow } from '../../redux/escrowSlice'
+
 
 const OrderPage = () => {
-  // Dummy data for orders
-  const orders = [
-    { id: 1, date: '01/03/2024', transactionId: '123456', productName: 'Product A', price: 100, buyerUsername: 'buyer1', sellerUsername: 'seller1', status: 'Pending' , productCategory: 'Category 1',  discount: 10, images: ['https://via.placeholder.com/150'], description: 'Product A Description', availability: 'In stock', specifications: 'Product A Specifications', shippingInfo: 'Shipping Information for Product A'  },
-    { id: 2, date: '02/03/2024', transactionId: '123457', productName: 'Product B', price: 200, buyerUsername: 'buyer2', sellerUsername: 'seller2', status: 'Completed' , productCategory: 'Category 1',  discount: 10, images: ['https://via.placeholder.com/150'], description: 'Product A Description', availability: 'In stock', specifications: 'Product A Specifications', shippingInfo: 'Shipping Information for Product A' },
-    { id: 3, date: '03/03/2024', transactionId: '123458', productName: 'Product C', price: 150, buyerUsername: 'buyer3', sellerUsername: 'seller3', status: 'Pending', productCategory: 'Category 1',  discount: 10, images: ['https://via.placeholder.com/150'], description: 'Product A Description', availability: 'In stock', specifications: 'Product A Specifications', shippingInfo: 'Shipping Information for Product A'  },
-  ];
+  const dispatch = useDispatch();
+  const orders = useSelector((state) => state.escrow.escrow);
+    const error = useSelector((state) => state.escrow.error);
+  const loading = useSelector((state) => state.escrow.loading);
 
+  useEffect(() => {
+    const fetch = async () => {
+          const response = await dispatch(fetchAllEscrow())
+    }
+    fetch()
+  }, [dispatch])
+
+  // Function to determine status background color
   const getStatusBackgroundColor = (status) => {
-    switch (status) {
-      case 'Pending':
-        return 'rgba(255, 255, 0, 0.3)'; // Yellow with 30% opacity
-      case 'Completed':
-        return 'rgba(0, 128, 0, 0.3)'; // Green with 30% opacity
+   switch (status) {
+      case 'canceled':
+        return <Chip label="Canceled" color="error" />;
+      case 'modified by buyer':
+        return <Chip label="Modified by Buyer" sx={{backgroundColor:'green', color: 'white'}} />;
+      case 'modified by merchant':
+        return <Chip label="Modified by Merchant" sx={{backgroundColor:'green', color: 'white'}} />;
       default:
-        return 'transparent';
+        return <Chip label={status} />;
     }
   };
+
 
   // State variables for search criteria
   const [searchTransactionIdOrUsername, setSearchTransactionIdOrUsername] = useState('');
@@ -38,27 +51,31 @@ const OrderPage = () => {
   };
 
   // Function to filter orders based on search criteria
-  const handleSearch = () => {
-    let filteredOrders = [...orders];
+const handleSearch = () => {
+  let filteredOrders = [...orders];
 
-    if (searchTransactionIdOrUsername) {
-      filteredOrders = filteredOrders.filter(order =>
-        order.transactionId.includes(searchTransactionIdOrUsername) ||
-        order.buyerUsername.toLowerCase().includes(searchTransactionIdOrUsername.toLowerCase())
+  if (searchTransactionIdOrUsername) {
+    filteredOrders = filteredOrders.filter(order => {
+      const buyer = order.buyer ? JSON.parse(order.buyer) : null;
+      return (
+        order?.escrow_id.includes(searchTransactionIdOrUsername) ||
+        (buyer && buyer.lastname && buyer.lastname.toLowerCase().includes(searchTransactionIdOrUsername.toLowerCase()))
       );
-    }
+    });
+  }
 
-    if (searchTransactionDate) {
-      filteredOrders = filteredOrders.filter(order => order.date === searchTransactionDate);
-    }
+  if (searchTransactionDate) {
+    filteredOrders = filteredOrders.filter(order => order.created_at === searchTransactionDate);
+  }
 
-    return filteredOrders;
-  };
+  return filteredOrders;
+};
+
 
   // Function to handle view button click
   const handleView = (params) => {
-    const { id } = params.row;
-    const clickedProduct = orders.find(order => order.id === id);
+    const { escrow_id } = params.row;
+    const clickedProduct = orders.find(order => order.escrow_id === escrow_id);
     setSelectedProduct(clickedProduct);
     setOpenDialog(true);
   };
@@ -69,41 +86,73 @@ const OrderPage = () => {
 
   // Columns configuration for DataGrid
   const columns = [
-    { field: 'date', headerName: 'Date', width: 130 },
-    { field: 'transactionId', headerName: 'Transaction ID', width: 140 },
-    { field: 'productName', headerName: 'Product Name', flex: 1 },
-    { field: 'price', headerName: 'Price', width: 100 },
-    { field: 'buyerUsername', headerName: 'Buyer Username', width: 180 },
-    { field: 'sellerUsername', headerName: 'Seller Username', width: 180 },
-    {
-      field: 'status',
-      headerName: ' Status',
+    { field: 'escrow_id', headerName: 'Escrow ID', flex: 1 },
+ {
+      field: 'created_at',
+      headerName: 'Date of Transaction',
       flex: 1,
-      renderCell: (params) => (
-        <span style={{ backgroundColor: getStatusBackgroundColor(params.value), borderRadius: '8px', padding: '4px 8px' }}>{params.value}</span>
-      )
+      valueGetter: (params) => new Date(params.row.created_at).toLocaleDateString(),
+    },
+    { field: 'transactionId', headerName: 'Transaction ID', flex: 1 },
+    { field: 'productName', headerName: 'Product Name', flex: 1 },
+   {
+      field: 'buyerName',
+      headerName: 'Buyer Username',
+      flex: 1,
+      valueGetter: (params) => JSON.parse(params.row.buyer).username,
     },
     {
-      field: 'view',
-      headerName: 'View',
-      width: 100,
+      field: 'sellerName',
+      headerName: 'Merchant Username',
+      flex: 1,
+      valueGetter: (params) => JSON.parse(params.row.seller).username,
+    },
+    {
+      field: 'amount_to_seller',
+      headerName: 'Amount',
+      flex: 1,
+       renderCell: (params) => (
+         <span>&#8358;  
+           {params.value}
+          </span> 
+      )
+    },
+     {
+      field: 'escrow_status',
+      headerName: 'Delivery Status',
+      flex: 1,
+      renderCell: (params) => getStatusBackgroundColor(params.value),
+    },
+    {
+      field: 'action',
+      headerName: 'Action',
+      flex: 1,
       renderCell: (params) => (
-        <Button variant="outlined" color="primary" onClick={() => handleView(params)}>View</Button>
+        <Button
+          variant='contained'
+      color="primary" onClick={() => handleView(params)}>View</Button>
       )
     },
   ];
 
 
-  // Function to display images in a carousel
-  const renderProductImages = () => {
+ // Function to display images in a carousel
+const renderProductImages = () => {
+    const parsedProductData = JSON.parse(selectedProduct?.item);
+
+    // Check if parsedProductData.images is a string and parse it if necessary
+    const imagesArray = typeof parsedProductData.images === 'string' 
+        ? JSON.parse(parsedProductData.images) 
+        : parsedProductData.images;
+
     return (
-      <Carousel showArrows={false}>
-        {selectedProduct.images.map((image, index) => (
-          <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '60%', borderRadius: '5px' }} />
-        ))}
-      </Carousel>
+        <Carousel showArrows={false}>
+            {Array.isArray(imagesArray) && imagesArray.map((image, index) => (
+        <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '300px', height:'300px', borderRadius: '5px' }} />
+            ))}
+        </Carousel>
     );
-  };
+};
 
   return (
     <Container>
@@ -125,16 +174,25 @@ const OrderPage = () => {
           InputLabelProps={{ shrink: true }}
         />
       </div>
-      <div style={{ height: 400, width: '100%', marginBottom: '2rem' }}>
+      {loading ? (
+                <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
+      ) : (
+      <div style={{ height: 500, width: '100%', marginBottom: '2rem' }}>
         <DataGrid
           rows={handleSearch()}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
+          getRowId={(row) => row.escrow_id} // Use a field that you know is unique
+
         />
-      </div>
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle style={{ backgroundColor: '#f0f0f0', padding: '0.5rem',marginBottom:'20px', borderBottom: '1px solid #ccc' }}>{selectedProduct && selectedProduct.productName}</DialogTitle>
+        </div>
+          )
+        }
+      <Dialog open={openDialog} onClose={handleCloseDialog} 
+  fullWidth
+  > 
+        <DialogTitle style={{ backgroundColor: '#f0f0f0', padding: '0.5rem',marginBottom:'20px', borderBottom: '1px solid #ccc' }}>{selectedProduct && JSON.parse(selectedProduct?.item)?.name }</DialogTitle>
         <DialogContent>
           {selectedProduct && (
             <>
@@ -150,7 +208,20 @@ const OrderPage = () => {
           )}
         </DialogContent>
         <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
-          <Button onClick={handleCloseDialog}>Close</Button>
+   <Button
+      startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+      variant="contained"
+      onClick={handleCloseDialog}
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>

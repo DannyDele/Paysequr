@@ -22,6 +22,7 @@ import {
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
 import { styled, alpha } from '@mui/material/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import { Edit, Delete, Add } from '@mui/icons-material';
 import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
@@ -70,48 +71,6 @@ const StyledMenu = styled((props) => (
     },
   },
 }));
-
-
-
-
-// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
-// It creates CSS classes based on the provided theme.
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  uploadButton: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: theme.spacing(2),
-  },
-  input: {
-    display: 'none',
-  },
-  label: {
-    display: 'flex',
-    alignItems: 'center',
-    cursor: 'pointer',
-    color: theme.palette.primary.main,
-  },
-}));
-
-
-
-
-
 
 
 
@@ -364,7 +323,7 @@ const handleMenuAction = async (action) => {
   />
 </Snackbar>
 
-    <Typography variant="h5" className='text-gray-700'style={{marginTop:'20px'}} gutterBottom>Product Categories</Typography>
+    <Typography variant="h5" className={classes.globalTypography} style={{marginTop:'20px'}} gutterBottom>Product Categories</Typography>
 
           <Button
             startIcon={<Add />} 

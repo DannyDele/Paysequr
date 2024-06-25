@@ -1,51 +1,17 @@
+// UserDatabase.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
-import '../../assets/styles/DialogHeader.css';
-import {
-  Container,
-  TextField,
-  CircularProgress,
-  Box,
-  Button,
-  Snackbar,
-  SnackbarContent,
-  Slide,
-  IconButton,
-  Paper,
-  Typography,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
-import {
-  CheckCircle as CheckCircleIcon,
-  Close as CloseIcon,
-  ArrowDropDown as ArrowDropDownIcon,
-  Visibility as VisibilityIcon,
-  EditNote as EditNoteIcon,
-  QueryStats as QueryStatsIcon,
-  Delete as DeleteIcon,
-  HourglassEmpty,
-  Verified as VerifiedIcon,
-} from '@mui/icons-material';
-import { fetchUsers, fetchUserById, fetchUserAccount, deleteUsers} from './../../redux/userSlice';
-import { makeStyles } from '@mui/styles';
+import { Container, TextField, CircularProgress, Box, Button, Snackbar, SnackbarContent, Slide, IconButton, Paper, Typography, Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useTheme } from '@mui/material';
+import { CheckCircle as CheckCircleIcon, Close as CloseIcon, ArrowDropDown as ArrowDropDownIcon, Visibility as VisibilityIcon, EditNote as EditNoteIcon, QueryStats as QueryStatsIcon, Delete as DeleteIcon, HourglassEmpty, Verified as VerifiedIcon } from '@mui/icons-material';
+import { fetchUsers, fetchUserById, fetchUserAccount, deleteUsers } from './../../redux/userSlice';
 import { styled, alpha } from '@mui/material/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import ViewUser from '../features/user/ViewUser';
 import EditUser from '../features/user/EditUser';
 import Swal from 'sweetalert2';
 
-
-
-
-
-// StyledMenu is a styled component that customizes the appearance of the Menu component from Material-UI.
-// It sets specific styles for the paper, list, and menu item elements within the Menu component.
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
@@ -84,26 +50,6 @@ const StyledMenu = styled((props) => (
 
 
 
-// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
-// It creates CSS classes based on the provided theme.
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
 const UserDatabase = () => {
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -113,11 +59,8 @@ const UserDatabase = () => {
   const userDetails = useSelector((state) => state.users.userDetails);
   const userKyc = useSelector((state) => state.userKyc.userKyc);
 
-
-  // set error state when fetching a user details
-  const [userError, setUserError] = useState('')
-  const [userAccountError, setUserAccountError] = useState('')
-
+  const [userError, setUserError] = useState('');
+  const [userAccountError, setUserAccountError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -129,68 +72,43 @@ const UserDatabase = () => {
   const [isViewMode, setIsViewMode] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false); // State for delete confirmation dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
-
-
-// snackbar alert state
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  
-
-// state to manage datgrid table search filters
   const [allUsers, setAllUsers] = useState([]);
-const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      setLoading(true);
+      const result = await dispatch(fetchUsers());
+      setLoading(false);
+      setAllUsers(result.payload);
+      setFilteredUsers(result.payload);
+    };
+    fetchAllUsers();
+  }, [dispatch]);
 
-
-
-  
-  
-  // *************************************************
-  // function to fecth all users when the page loads
-  // *************************************************
-
-useEffect(() => {
-  const fetchAllUsers = async () => {
-    setLoading(true);
-    const result = await dispatch(fetchUsers());
-    setLoading(false);
-    setAllUsers(result.payload);
-    setFilteredUsers(result.payload);
-  };
-  fetchAllUsers();
-}, [dispatch]);
-
-
-
-  // *******************************************************************************
-  // Funtion to display error message if an error occurs while fetching users
-  // *******************************************************************************
-    useEffect(() => {
+  useEffect(() => {
     if (error) {
       setSnackbarSeverity('error');
       setSnackbarMessage(error || 'An error occurred');
       setSnackbarOpen(true);
     }
   }, [error]);
- 
 
-  // function to search for a user
- const handleSearch = (e) => {
-  const value = e.target.value;
-  setSearchQuery(value);
-
-  const filtered = users.filter((user) =>
-    user.username.toLowerCase().includes(value.toLowerCase()) ||
-    user.firstname.toLowerCase().includes(value.toLowerCase()) ||
-    user.lastname.toLowerCase().includes(value.toLowerCase())
-  );
-  setFilteredUsers(filtered);
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    const filtered = users.filter((user) =>
+      user.username.toLowerCase().includes(value.toLowerCase()) ||
+      user.firstname.toLowerCase().includes(value.toLowerCase()) ||
+      user.lastname.toLowerCase().includes(value.toLowerCase())
+    );
+    setFilteredUsers(filtered);
   };
-  
-
 
   const handleTabChange = async (event, newValue) => {
     setTabValue(newValue);
@@ -212,12 +130,6 @@ useEffect(() => {
     alert('Querying user...');
   };
 
-
-  
-  // **************************************
-  // function to delete a user
-  // **************************************
-
   const handleDeleteUser = async () => {
     try {
       setLoading(true);
@@ -226,10 +138,10 @@ useEffect(() => {
       setSnackbarSeverity('success');
       setSnackbarMessage('User deleted successfully!');
       setSnackbarOpen(true);
-      setDialogOpen(false); // Close the dialog after deletion
+      setDialogOpen(false);
     } catch (error) {
       setLoading(false);
-      setDialogOpen(false); // Close the dialog in case of error
+      setDialogOpen(false);
       console.error('Error deleting user:', error);
     }
   };
@@ -261,18 +173,10 @@ useEffect(() => {
     setMenuAnchorEl(null);
   };
 
-
-
-  
-  
-  // *************************************************************
-  // function to open action menu for delete, view or edit a user
-  // *************************************************************
-const handleMenuAction = async (action) => {
+  const handleMenuAction = async (action) => {
     handleMenuClose();
     if (action === 'View') {
       const userDetails = await dispatch(fetchUserById(selectedUserId));
-      console.log('User Details coming from dispatch:', userDetails)
       setUserError(userDetails.payload.msg);
       const userAccDetails = await dispatch(fetchUserAccount(selectedUserId));
       setIsViewMode(true);
@@ -282,7 +186,6 @@ const handleMenuAction = async (action) => {
     } else if (action === 'Query') {
       handleQueryUser(selectedUserId);
     } else if (action === 'Delete') {
-      // Use SweetAlert for delete confirmation
       Swal.fire({
         title: 'Are you sure?',
         text: 'You won\'t be able to revert this!',
@@ -370,8 +273,7 @@ const handleMenuAction = async (action) => {
           onClose={() => setIsEditMode(false)}
         />
       ) : (
-            <>
-              {/* snackbar component */}
+        <>
           <Snackbar
             anchorOrigin={{
               vertical: 'top',
@@ -399,37 +301,35 @@ const handleMenuAction = async (action) => {
           </Snackbar>
 
           <Box mt={4}>
-              <Typography variant="h6" gutterBottom>
-                User Database
-              </Typography>
-              <TextField
-                label="Search users"
-                variant="outlined"
-                fullWidth
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-              </Box>
-              
-          <div style={{ height: 500, width: '100%', marginTop:'1rem' }}>
+    <Typography variant="h4" sx={{marginBottom:'1rem'}} className={classes.globalTypography}>
+              User Database
+            </Typography>
+            <TextField
+              label="Search users"
+              variant="outlined"
+              fullWidth
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+          </Box>
+
+          <div style={{ height: 500, width: '100%', marginTop: '1rem' }}>
             {loading ? (
               <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
             ) : (
-            <DataGrid
-  rows={filteredUsers}
-  columns={columns}
-  pageSize={10}
-  rowsPerPageOptions={[10, 20, 50]}
-  checkboxSelection
-  disableSelectionOnClick
-  selectionModel={selectedUser ? [selectedUser.id] : []}
-  onSelectionModelChange={(newSelection) => handleRowSelection(newSelection)}
-/>
-
+              <DataGrid
+                rows={filteredUsers}
+                columns={columns}
+                pageSize={10}
+                rowsPerPageOptions={[10, 20, 50]}
+                checkboxSelection
+                disableSelectionOnClick
+                selectionModel={selectedUser ? [selectedUser.id] : []}
+                onSelectionModelChange={(newSelection) => handleRowSelection(newSelection)}
+              />
             )}
           </div>
 
-              {/* component for action menu */}
           <StyledMenu
             id="customized-menu"
             MenuListProps={{
@@ -468,7 +368,7 @@ const handleMenuAction = async (action) => {
             </MenuItem>
             <MenuItem
               onClick={(event) => {
-                event.stopPropagation();0
+                event.stopPropagation();
                 handleMenuAction('Delete');
               }}
             >
@@ -476,8 +376,6 @@ const handleMenuAction = async (action) => {
               Delete
             </MenuItem>
           </StyledMenu>
-
-        
         </>
       )}
     </Container>

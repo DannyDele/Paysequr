@@ -13,7 +13,7 @@ import {
 } from '@mui/icons-material';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 
-const DashboardBody = () => {
+const DashboardBody = ({setIsAuthenticated}) => {
   const iconStyle = {
     fontSize: '5rem', // Font size increased to 5rem
     color: '#F36C00',
@@ -36,7 +36,7 @@ const DashboardBody = () => {
 
   return (
     <>
-      <Header />
+      <Header setIsAuthenticated={setIsAuthenticated}  />
       <Box mt={3} px={4}>
         <Grid container spacing={3} justifyContent="center" alignItems="stretch"  >
           {/* First Row */}

@@ -27,11 +27,14 @@ import {
   HourglassEmpty,
 } from '@mui/icons-material';
 import { DataGrid } from '@mui/x-data-grid';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import { styled, alpha } from '@mui/material/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import { Edit, Delete, Add, Visibility} from '@mui/icons-material';
 import Carousel from 'react-elastic-carousel';
 import SearchIcon from '@mui/icons-material/Search';
-import { fetchAllItems, verifyItem } from '../../redux/itemsSlice'; // Import fetchAllItems action creator
+import { verifyItem, rejectItem } from '../../redux/itemsSlice'; // Import fetchAllItems action creator
+import { fetchAShop } from '../../redux/shopSlice'; // Import fetchAllItems action creator
 import Swal from 'sweetalert2';
 
 
@@ -86,34 +89,20 @@ const StyledMenu = styled((props) => (
 }));
 
 
-
-
-
-
-
-
-
-
-
-
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
+// fucntion to get status color
+const getStatusColor = (status) => {
+  switch (status) {
+     case 'pending':
+      return 'blue'
+    case 'approved':
+      return 'green'
+    case 'rejected':
+      return 'red'
+    default:
+      return 'black'
+  }
+   
+}
 
 
 
@@ -123,9 +112,9 @@ const ShopApprovalList = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   // Redux state for product items
-  const productItems = useSelector((state) => state.items.items);
+  const shop = useSelector((state) => state.shop.shop);
   const subcategories = useSelector((state) => state.subcategories.subcategories);
-    const loading = useSelector((state) => state.items.loading); // Access loading state
+    const loading = useSelector((state) => state.shop.loading); // Access loading state
 
   const dispatch = useDispatch();
   const classes = useStyles();
@@ -145,6 +134,9 @@ const ShopApprovalList = () => {
   
   // Local loading state for verifyShop action
   const [verifyLoading, setVerifyLoading] = useState(false);
+  
+  // Local loading state for rejectShop action
+  const [rejectLoading, setRejectLoading] = useState(false);
 
 
   
@@ -161,26 +153,16 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
 
 
-  // Fetch all items from the API when component mounts
-  useEffect(() => {
-    const fetch = async () => {
-      dispatch(fetchAllItems());
-      // dispatch(fetchAllSubCategories())
-
-    }
-    fetch()
-    
-  }, [dispatch]);
+ 
 
   
 
 
   // funtion to search for a user items in the store by the users store id
-
    const handleSearch = async () => {
     // Fetch items for the specified storeid
     if (storeid) {
-      const searchedItems = await dispatch(fetchAllItems(storeid));
+      const searchedItems = await dispatch(fetchAShop(storeid));
       console.log('All searched user items in the store:', searchedItems)
     }
   };
@@ -215,6 +197,28 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
       setSnackbarOpen(true);
     } finally {
       setVerifyLoading(false);
+      handleCloseDialog();
+    }
+  };
+
+  // function to reject a users item
+  const handleRejectProduct  = async () => {
+    // Logic to approve the selected shop
+    // This can include updating the shop status in the database, sending notifications, etc.
+     setRejectLoading(true);
+    try {
+      const rejectProductResponse = await dispatch(rejectItem(selectedProductId)).unwrap();
+      const rejectMessage = rejectProductResponse.msg && 'Product rejected';
+
+      setSnackbarSeverity('success');
+      setSnackbarMessage(rejectMessage);
+      setSnackbarOpen(true);
+    } catch (error) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage('Failed to approve shop');
+      setSnackbarOpen(true);
+    } finally {
+      setRejectLoading(false);
       handleCloseDialog();
     }
   };
@@ -277,7 +281,7 @@ const handleMenuAction = async (action) => {
   
 
   // Columns configuration for product categories table
-const itemColumns = [
+const shopColumns = [
     {
       field: 'id',
       headerName: 'Product Id',
@@ -297,6 +301,11 @@ const itemColumns = [
       field: 'price',
       headerName: 'Price',
       flex: 1,
+        renderCell: (params) => (
+         <span>&#8358;  
+           {params.value}
+          </span> 
+      )
   },
     
   {
@@ -308,7 +317,7 @@ const itemColumns = [
           {params.value}
           {params.value === 'approved' ? (
             <VerifiedIcon style={{ color: 'green', marginRight: 5 }} />
-          ) : (
+          ) : params.value === 'rejected' ? (<CloseIcon style={{ color: 'red', marginRight: 5 }}/>) : (
             <HourglassEmpty style={{ color: '#227BD4', marginRight: 5 }} />
           )}
         </span>
@@ -420,7 +429,7 @@ const itemColumns = [
 
 
 
-      <Typography variant="h4" className='text-gray-700' style={{ marginTop: '20px' }} gutterBottom>Product Approval List</Typography>
+      <Typography variant="h4" className={classes.globalTypography} style={{ marginTop: '20px' }} gutterBottom>Product Approval List</Typography>
 
 
         
@@ -458,17 +467,17 @@ const itemColumns = [
 
       {loading ? (
       <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
-      ) : productItems.length === 0 ? (
+      ) : shop.length === 0 ? (
          
           <Typography>No items available in the store...</Typography>
   
           ) 
         : (
-           <div style={{ height: 400, width: '100%', marginTop: '2rem' }}>
+           <div style={{ height: 500, width: '100%', marginTop: '2rem' }}>
         <DataGrid
           // rows={pendingList}
-          rows={productItems}
-            columns={itemColumns}
+          rows={shop}
+            columns={shopColumns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
         />
@@ -482,6 +491,7 @@ const itemColumns = [
               {renderProductImages()}
                             <Typography variant="body1" gutterBottom style={{ marginTop: '1rem' }}>{selectedProduct?.description}</Typography>
 
+              <div >
               <div className='flex items-center justify-between'>
                 <div>
       <Typography variant="body2" gutterBottom><strong>Price:</strong> ₦{selectedProduct?.price}</Typography>
@@ -506,20 +516,52 @@ const itemColumns = [
 
               <div className='items-center'>  
       <Typography variant="body2" gutterBottom><strong>Station ID:</strong> {selectedProduct?.stationid}</Typography>
-      <Typography variant="body2" gutterBottom><strong>Status:</strong> {selectedProduct?.status}</Typography>
+<Typography variant="body2" gutterBottom>
+  <strong>Status:</strong>{' '}
+  <span style={{ color: getStatusColor(selectedProduct?.status) }}>
+    {selectedProduct?.status}
+  </span>
+</Typography>
       <Typography variant="body2" gutterBottom><strong>Store ID:</strong> {selectedProduct?.store_id}</Typography>
       <Typography variant="body2" gutterBottom><strong>Subcategory:</strong> {selectedProduct?.subcategory}</Typography>
       <Typography variant="body2" gutterBottom><strong>Type:</strong> {selectedProduct?.type}</Typography>
-      <Typography variant="body2" gutterBottom><strong>Video:</strong> {selectedProduct?.video}</Typography>
                   <Typography variant="body2" gutterBottom><strong>Weight:</strong> {selectedProduct?.weight}</Typography>
                 </div>
+
                 
+                
+                </div>
+                
+                <div>
+
+                  
+                  <Button
+  startIcon={<PlayCircleIcon />}
+  variant="contained"
+  color="primary"
+  onClick={() => window.open(selectedProduct?.video, '_blank')}
+  style={{ marginTop: '1rem', marginBottom: '1rem' }}
+>
+  Play Video
+</Button>
+
+                </div>
       </div>
             </>
           )}
         </DialogContent>
         <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
-          <Button variant="outlined"  onClick={handleCloseDialog}>Close</Button>
+          <Button variant="outlined" onClick={handleCloseDialog}>Close</Button>
+          
+        
+
+
+
+
+
+          {selectedProduct?.status === 'approved' ? ('') : (
+            
+            <>
           <Button variant="contained" color="primary" onClick={handleVerifyProduct}>
          {verifyLoading ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -529,7 +571,27 @@ const itemColumns = [
         ) : (
           'Approve'
             )}
-          </Button>
+            
+            </Button>
+
+
+
+   <Button variant="contained" color="error" onClick={handleRejectProduct}>
+         {rejectLoading ? (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <CircularProgress size={20}  style={{ marginRight: 8 }} />
+            Rejecting...
+          </div>
+        ) : (
+          'Reject'
+            )}
+            </Button>
+            
+            </>
+            
+          ) 
+          }
+
         </DialogActions>
       </Dialog>
 

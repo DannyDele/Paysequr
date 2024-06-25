@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Paper, Typography, TextField, Button, Grid } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
+
 
 const CommunicationWithUsers = ({ users }) => {
   const [selectedUser, setSelectedUser] = useState(null); // Change initial state to null
   const [message, setMessage] = useState('');
+  const classes = useStyles()
 
   // Handle form submission
   const handleSubmit = () => {
@@ -16,7 +19,7 @@ const CommunicationWithUsers = ({ users }) => {
 
   return (
     <Paper elevation={3} style={{ marginLeft: '50px', marginTop: '20px', padding: '20px', marginBottom: '20px' }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h4" className={classes.globalTypography}  gutterBottom>
         Communication with Users
       </Typography>
       <Grid container spacing={2} alignItems="center">

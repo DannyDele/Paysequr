@@ -2,13 +2,13 @@ import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 90 },
-  { field: 'username', headerName: 'Username', width: 150 },
-  { field: 'firstName', headerName: 'First Name', width: 150 },
-  { field: 'middleName', headerName: 'Middle Name', width: 150 },
-  { field: 'lastName', headerName: 'Last Name', width: 150 },
-  { field: 'kycLevel', headerName: 'KYC Level', width: 150 },
-  { field: 'reasonForQuery', headerName: 'Reason for Query', width: 200 },
+  { field: 'id', headerName: 'ID', flex: 1 },
+  { field: 'username', headerName: 'Username', flex: 1 },
+  { field: 'firstName', headerName: 'First Name', flex: 1 },
+  { field: 'middleName', headerName: 'Middle Name', flex: 1 },
+  { field: 'lastName', headerName: 'Last Name', flex: 1 },
+  { field: 'kycLevel', headerName: 'KYC Level', flex: 1 },
+  { field: 'reasonForQuery', headerName: 'Reason for Query', flex: 1 },
 ];
 
 const rows = [
@@ -19,7 +19,7 @@ const rows = [
 
 const QueriedVerifications = () => {
   return (
-    <div style={{  marginLeft:'50px',marginTop:'20px',height: 500, width: '95%' }}>
+    <div style={{  height: 500, width: '95%' }}>
       <DataGrid
         rows={rows}
         columns={columns}

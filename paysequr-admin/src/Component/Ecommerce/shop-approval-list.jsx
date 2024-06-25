@@ -26,11 +26,13 @@ import {
   Verified as VerifiedIcon,
   HourglassEmpty,
 } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid } from '@mui/x-data-grid';
 import { styled, alpha } from '@mui/material/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import { Edit, Delete, Add, Visibility} from '@mui/icons-material';
 import Carousel from 'react-elastic-carousel';
-import { fetchAllShop, verifyShop } from '../../redux/shopSlice'; // Import fetchAllItems action creator
+import { fetchAllShop, verifyShop, rejectShop } from '../../redux/shopSlice'; // Import fetchAllItems action creator
 import Swal from 'sweetalert2';
 
 
@@ -39,6 +41,7 @@ import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon } from '@mui/icons-material';
+
 
 
 
@@ -89,31 +92,6 @@ const StyledMenu = styled((props) => (
 
 
 
-
-
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
-
-
-
-
-
 const ShopItemsList = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -133,6 +111,9 @@ const ShopItemsList = () => {
   const [openAddCategoryDialog, setOpenAddCategoryDialog] = useState(false);
 
 
+  
+  // State to store shop id
+  const [storeid, setStoreId] = useState(''); // State to hold the input value
 
   
   // state to manage the action button
@@ -146,6 +127,10 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
       const [message, setMessage] = useState('');
 
 
+// state to search and filter a shop
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredShops, setFilteredShops] = useState([]);
+  
   
   // Local loading state for verifyShop action
   const [verifyLoading, setVerifyLoading] = useState(false);
@@ -155,8 +140,9 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   // Fetch all items from the API when component mounts
   useEffect(() => {
     const fetch = async () => {
-      const allShop = await dispatch(fetchAllShop());
-      console.log('All Shop coming from dispatch:', allShop)
+      const allShop = await dispatch(fetchAllShop()).unwrap();
+      setFilteredShops(allShop)
+      console.log('All Shop coming from dispatch:', allShop);
       // dispatch(fetchAllSubCategories())
 
     }
@@ -178,6 +164,29 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   };
 
 
+
+   // funtion to search/filter  a shop in the store by the users shop name or username
+    const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+    if (query === '') {
+      setFilteredShops(shop);
+    } else {
+      const filtered = shop.filter((shop) => 
+        shop.name.toLowerCase().includes(query) ||
+        shop.username.toLowerCase().includes(query)
+      );
+      setFilteredShops(filtered);
+    }
+  };
+
+  // fucntion to restore table back to its initial state
+  const clearSearch = () => {
+    setSearchQuery('');
+    setFilteredShops(shop);
+  };
+
+
   // function to verify a users shop
   const handleVerifyShop  = async () => {
     // Logic to approve the selected shop
@@ -193,6 +202,28 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     } catch (error) {
       setSnackbarSeverity('error');
       setSnackbarMessage('Failed to approve shop');
+      setSnackbarOpen(true);
+    } finally {
+      setVerifyLoading(false);
+      handleCloseDialog();
+    }
+  };
+
+  // function to verify a users shop
+  const handleRejectShop  = async () => {
+    // Logic to approve the selected shop
+    // This can include updating the shop status in the database, sending notifications, etc.
+     setVerifyLoading(true);
+    try {
+      const rejectShopResponse = await dispatch(rejectShop(selectedShopId)).unwrap();
+      const verifyMessage = rejectShopResponse.msg && 'Store rejected successfully';
+
+      setSnackbarSeverity('success');
+      setSnackbarMessage(verifyMessage);
+      setSnackbarOpen(true);
+    } catch (error) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage('Failed to reject shop');
       setSnackbarOpen(true);
     } finally {
       setVerifyLoading(false);
@@ -283,7 +314,7 @@ const shopColumns = [
           {params.value}
           {params.value === 'verified' ? (
             <VerifiedIcon style={{ color: 'green', marginRight: 5 }} />
-          ) : (
+          ) : params.value === 'rejected' ? (<CloseIcon  style={{ color: 'red', marginRight: 5 }}/>) : (
             <HourglassEmpty style={{ color: '#227BD4', marginRight: 5 }} />
           )}
         </span>
@@ -371,9 +402,40 @@ const shopColumns = [
 
   
       
-        <Typography variant="h4" className='text-gray-700' style={{ marginTop: '20px' }} gutterBottom>Shop Approval List</Typography>
+        <Typography variant="h4" className={classes.globalTypography} style={{ marginTop: '20px' }} gutterBottom>Shop Approval List</Typography>
         
       
+ <div className='flex justify-end items-center'>
+
+          
+          
+        <div>
+           <TextField
+          label="Search by Name or Username"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          size="small"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end" sx={{marginLeft:'1.8rem'}}>
+                <IconButton onClick={clearSearch}>
+                  <CloseIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+        </div>
+
+
+
+
+        
+
+      </div>
+
+
+
 
       {loading ? (
       <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
@@ -383,10 +445,9 @@ const shopColumns = [
   
           ) 
         : (
-           <div style={{ height: 500, width: '100%', marginBottom: '2rem' }}>
+           <div style={{ height: 500, width: '100%', marginTop: '2rem' }}>
         <DataGrid
-          // rows={pendingList}
-          rows={shop}
+            rows={filteredShops}
             columns={shopColumns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
@@ -415,6 +476,9 @@ const shopColumns = [
         </DialogContent>
         <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
           <Button variant="outlined" onClick={handleCloseDialog}>Close</Button>
+
+          {selectedShop?.status === 'verified' ? '' : (
+            <>
            <Button variant="contained" color="primary" onClick={handleVerifyShop} disabled={verifyLoading}>
         {verifyLoading ? (
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -424,7 +488,21 @@ const shopColumns = [
         ) : (
           'Approve'
         )}
-      </Button>
+              </Button>
+           <Button variant="contained" color="error" onClick={handleRejectShop} disabled={verifyLoading}>
+        {verifyLoading ? (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <CircularProgress size={20}  style={{ marginRight: 8 }} />
+            Rejecting...
+          </div>
+        ) : (
+          'Reject'
+        )}
+              </Button>
+              </>
+            )
+          }
+
         </DialogActions>
       </Dialog>
 

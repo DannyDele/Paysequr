@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -8,9 +8,31 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import InputBase from '@mui/material/InputBase';
 import Avatar from '@mui/material/Avatar';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
 import paysequricon from './images/Paysequricon.png';
+import { removeToken } from '../utils/tokenManager'; // Import your token manager function
 
-const Header = () => {
+const Header = ({ setIsAuthenticated }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    // Remove token from localStorage
+    removeToken();
+    // Optionally, update local state to redirect or update isAuthenticated state
+    setIsAuthenticated(false);
+    // Close the menu
+    handleMenuClose();
+  };
+
   return (
     <AppBar position="static" style={{ backgroundColor: '#eff1f5' }}>
       <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -34,9 +56,34 @@ const Header = () => {
           <IconButton edge="end" color="inherit" aria-label="notifications" style={{ color: '#1F2937' }}>
             <NotificationsIcon />
           </IconButton>
-          <IconButton edge="end" color="inherit" aria-label="account of current user" style={{ color: '#1F2937' }}>
+          <IconButton
+            edge="end"
+            color="inherit"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenuOpen}
+            style={{ color: '#1F2937' }}
+          >
             <AccountCircleIcon />
           </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
           <Typography variant="subtitle1" style={{ marginLeft: '5px', color: '#1F2937' }}>
             Username
           </Typography>

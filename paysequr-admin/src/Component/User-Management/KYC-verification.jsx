@@ -4,12 +4,9 @@ import { DataGrid } from '@mui/x-data-grid';
 import '../../assets/styles/DialogHeader.css';
 import UserKyc from '../features/user/UserKyc'
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import { Typography, TextField, CircularProgress, IconButton, Link, Snackbar, SnackbarContent, Slide } from '@mui/material';
+import { Typography, Container, TextField, CircularProgress, IconButton, Link, Snackbar, SnackbarContent, Slide } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import CloseIcon from '@mui/icons-material/Close';
 import { CheckCircle as CheckCircleIcon, Done, ThumbUp as ThumbUpIcon, DoneAll as DoneAllIcon, VerifiedUser as VerifiedUserIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAddress } from './../../redux/userKycSlice';
@@ -17,26 +14,6 @@ import { fetchUserKyc, approveUserKyc, approveUserKycDocument, approveUserKycAdd
 
 
 
-
-// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
-// It creates CSS classes based on the provided theme.
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
 
 const KYCVerificationPage = () => {
   const dispatch = useDispatch();
@@ -173,14 +150,14 @@ const KYCVerificationPage = () => {
   };
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 100 },
-    { field: 'firstname', headerName: 'First Name', width: 200 },
-    { field: 'lastname', headerName: 'Last Name', width: 200 },
-    { field: 'bvn', headerName: 'Bvn', width: 200 },
+    { field: 'id', headerName: 'ID', flex: 1 },
+    { field: 'firstname', headerName: 'First Name', flex: 1 },
+    { field: 'lastname', headerName: 'Last Name', flex: 1 },
+    { field: 'bvn', headerName: 'Bvn', flex: 1 },
     {
       field: 'status',
       headerName: 'Status',
-      width: 200,
+      flex: 1,
       renderCell: (params) => (
         <span>
           {params.value}
@@ -192,7 +169,7 @@ const KYCVerificationPage = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 300,
+      flex: 1.2,
       renderCell: (params) => (
     <span className='flex'>
           <Button
@@ -231,8 +208,8 @@ const KYCVerificationPage = () => {
 
   return (
 
-
-    <div style={{ height: 400, width: '100%' }}>
+    <Container>
+    <div style={{ height: 500, width: '100%' }}>
   {isViewKycMode ? (
         <UserKyc userId={selectedUserKyc}
         onClose={() => setIsViewKycMode(false)}
@@ -263,7 +240,14 @@ const KYCVerificationPage = () => {
             </IconButton>,
           ]}
         />
-      </Snackbar>
+            </Snackbar>
+            
+            
+        <div className='mt-5'>
+           <Typography variant="h4" className={classes.globalTypography}  gutterBottom>
+        User Kyc Verification
+      </Typography>
+        </div>
 
       {loading ? (
         <CircularProgress sx={{ marginLeft: '40vw', marginTop: '30vh' }} />
@@ -278,7 +262,8 @@ const KYCVerificationPage = () => {
       )}
     </>
   )}
-</div>
+      </div>
+      </Container>
 
     
  

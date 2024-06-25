@@ -22,9 +22,11 @@ import {
   Delete as DeleteIcon,
   Verified as VerifiedIcon,
 } from '@mui/icons-material';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import Carousel from 'react-elastic-carousel';
 import { DataGrid } from '@mui/x-data-grid';
 import { styled, alpha } from '@mui/material/styles';
+import useStyles from '../../assets/muiStyles/styles'; // Adjust the path based on your actual file structure
 import { fetchAllItems, addItem, deleteItem } from './../../redux/itemsSlice'; // Import fetchAllItems action creator
 import { fetchAllSubCategories} from './../../redux/subCategoriesSlice'; // Import fetchCategories action
 import { Snackbar, SnackbarContent,  Slide } from '@mui/material';
@@ -82,30 +84,6 @@ const StyledMenu = styled((props) => (
 
 
 
-
-
-
-// useStyles is a function provided by Material-UI's makeStyles hook to define custom styles.
-// It creates CSS classes based on the provided theme.
-const useStyles = makeStyles((theme) => ({
-  success: {
-    backgroundColor: theme.palette.success.main,
-  },
-  error: {
-    backgroundColor: theme.palette.error.main,
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-}));
-
-
 const ProductManagementPage = () => {
 
 
@@ -147,8 +125,10 @@ const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   // Fetch all items from the API when component mounts
   useEffect(() => {
     const fetch = async () => {
-      dispatch(fetchAllItems());
-      dispatch(fetchAllSubCategories())
+      const items = await dispatch(fetchAllItems());
+      console.log('Product Items Fetched coming from dispatch:', items)
+
+      await dispatch(fetchAllSubCategories())
 
     }
     fetch()
@@ -332,6 +312,21 @@ const itemColumns = [
       field: 'name',
       headerName: 'Name',
       flex: 1,
+  },
+     {
+      field: 'price',
+      headerName: 'Price',
+       flex: 1,
+       renderCell: (params) => (
+         <span>&#8358;  
+           {params.value}
+          </span> 
+      )
+    },
+    {
+      field: 'category',
+      headerName: 'Category',
+      flex: 1,
     },
     {
       field: 'actions',
@@ -357,96 +352,6 @@ const itemColumns = [
     },
   ];
 
-// Recursive function to render form fields with custom labels
-const renderFormFields = (data, parentKey = '') => {
-  // Mapping object for custom labels
-  const customLabels = {
-    id: 'ID',
-    name: 'Name',
-    price: 'Price',
-    weight: 'Weight',
-    description: 'Description',
-    inspection_period: 'Inspection Period',
-    referred_from: 'Referred From',
-    delivery: 'Delivery',
-    sellerid: 'Seller ID',
-    brand: 'Brand',
-    size: 'Size',
-    color: 'Color',
-    key_features: 'Key Features',
-    reason_for_modification: 'Reason for Modification',
-    video: 'Video',
-    location: 'Location',
-    stationid: 'Station ID',
-    category: 'Category',
-    subcategory: 'Subcategory',
-    // Add more custom labels as needed
-  };
-
-  // Move image and images labels to the end
-  const orderedLabels = Object.keys(data)
-    .filter(key => key !== 'image' && key !== 'images')
-    .concat(['image', 'images']);
-
-  return orderedLabels.map((key) => {
-    const label = customLabels[key] || key.replace(/_/g, ' ').toUpperCase();
-    const value = data[key];
-
-    if (typeof value === 'object' && value !== null) {
-      return renderFormFields(value, key);
-    }
-
-    if (key === 'image') {
-      return (
-
-    <div key={parentKey ? `${parentKey}-${key}` : key}> {/* Add key prop here */}
-  {/* Typography header for product images */}
-      <Typography  className='Dialog-title-header' style={{ marginTop:'1rem' }} variant="h6" gutterBottom>
-        Product Images
-          </Typography>
-      
-          <div key={parentKey ? `${parentKey}-${key}` : key}>
-          <label>{label}</label>
-          <img src={value} alt="Product Image" />
-          </div>
-          </div>
-      );
-    }
-
-    if (key === 'images' && Array.isArray(value)) { // Check if value is an array
-      return (
-          
-        <div key={parentKey ? `${parentKey}-${key}` : key}>
-          <label>{label}</label>
-          {value.map((image, index) => (
-            <img key={index} src={image} alt={`Product Image ${index + 1}`} />
-          ))}
-        </div>
-      );
-    }
-
-    if (key === 'images') { // Handle non-array case
-      return (
-
-        
-        <div key={parentKey ? `${parentKey}-${key}` : key}>
-          <label>{label}</label>
-          <img src={value} alt={`Product Image`} />
-        </div>
-      );
-    }
-
-    return (
-      <TextField
-        key={parentKey ? `${parentKey}-${key}` : key}
-        label={label}
-        value={value}
-        fullWidth
-        margin="normal"
-      />
-    );
-  });
-};
 
 
 
@@ -458,7 +363,7 @@ const renderProductImages = () => {
   return (
     <Carousel showArrows={false}>
       {parsedImages.map((image, index) => (
-        <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '60%', borderRadius: '5px' }} />
+        <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '300px', height:'300px', borderRadius: '5px' }} />
       ))}
     </Carousel>
   );
@@ -476,7 +381,6 @@ const renderProductImages = () => {
     <div>
 
   {/* Snackbar component */}
-
 <Snackbar
   anchorOrigin={{
     vertical: 'top', // Change to 'top'
@@ -509,7 +413,7 @@ const renderProductImages = () => {
 
       <div style={{ marginBottom: '2rem' }}>
          <div className="flex mb-3 items-center justify-between mt-5">
-      <Typography variant="h5" className='text-gray-700' gutterBottom>
+      <Typography variant="h4" className={classes.globalTypography} gutterBottom>
         Product Management
       </Typography>
       <div className="flex" style={{ width: '20%' }}>
@@ -556,50 +460,67 @@ const renderProductImages = () => {
     
       {/* Product Dialog for viewing/editing */}
 
-        <Dialog open={openProductDialog} onClose={handleCloseProductDialog}>
-        <DialogTitle style={{ backgroundColor: '#f0f0f0', padding: '0.5rem',marginBottom:'20px', borderBottom: '1px solid #ccc' }}>{selectedProduct && selectedProduct.productName}</DialogTitle>
-        <DialogContent>
-          {selectedProduct && (
-            <>
-              {renderProductImages()}
-              <Typography variant="body1" gutterBottom style={{ marginTop: '1rem' }}>{selectedProduct?.description}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Product Id:</strong> {selectedProduct?.id}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Seller Id:</strong> {selectedProduct?.sellerid}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Station Id:</strong> {selectedProduct?.stationid}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Price:</strong> ₦{selectedProduct?.price}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Quantity:</strong> {selectedProduct?.quantity}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Color:</strong> {selectedProduct?.color}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Category:</strong> {selectedProduct?.category}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Size:</strong> {selectedProduct?.size}%</Typography>
-              <Typography variant="body2" gutterBottom><strong>Brand:</strong> {selectedProduct?.brand}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Type:</strong> {selectedProduct?.type}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Weight:</strong> {selectedProduct?.weight}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Location:</strong> {selectedProduct?.location}</Typography>
-              <Typography variant="body2" gutterBottom><strong>Delivery Information:</strong> {selectedProduct?.delivery}</Typography>
-            </>
-          )}
-        </DialogContent>
-        <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
-  <Button
-            startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
-                    variant="contained"
- onClick={handleCloseProductDialog}
-                        style={{ transition: 'background-color 0.3s' }}
+      <Dialog open={openProductDialog} onClose={handleCloseProductDialog}>
+  <DialogTitle style={{ backgroundColor: '#f0f0f0', padding: '0.5rem', marginBottom: '20px', borderBottom: '1px solid #ccc' }}>
+    {selectedProduct && selectedProduct.name}
+  </DialogTitle>
+  <DialogContent>
+    {selectedProduct && (
+      <>
+        {renderProductImages()}
+        <Typography variant="body1" gutterBottom style={{ marginTop: '1rem' }}>{selectedProduct?.description}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Product Id:</strong> {selectedProduct?.id}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Seller Id:</strong> {selectedProduct?.sellerid}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Station Id:</strong> {selectedProduct?.stationid}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Product Name:</strong> {selectedProduct?.name}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Price:</strong> ₦{selectedProduct?.price}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Quantity:</strong> {selectedProduct?.quantity}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Color:</strong> {selectedProduct?.color}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Category:</strong> {selectedProduct?.category}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Size:</strong> {selectedProduct?.size}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Brand:</strong> {selectedProduct?.brand}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Type:</strong> {selectedProduct?.type}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Weight:</strong> {selectedProduct?.weight}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Location:</strong> {selectedProduct?.location}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Delivery Information:</strong> {selectedProduct?.delivery}</Typography>
+        {/* <Typography variant="body2" gutterBottom><strong>Images:</strong> {selectedProduct?.images}</Typography> */}
+        <Typography variant="body2" gutterBottom><strong>Inspection Period:</strong> {selectedProduct?.inspection_period}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Key Features:</strong> {selectedProduct?.key_features}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Reason for Modification:</strong> {selectedProduct?.reason_for_modification}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Referred From:</strong> {selectedProduct?.referred_from}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Status:</strong> {selectedProduct?.status}</Typography>
+        <Typography variant="body2" gutterBottom><strong>Store Id:</strong> {selectedProduct?.store_id}</Typography>
+              <Typography variant="body2" gutterBottom><strong>Subcategory:</strong> {selectedProduct?.subcategory}</Typography>
+              <Button
+  startIcon={<PlayCircleIcon />}
+  variant="contained"
+  color="primary"
+  onClick={() => window.open(selectedProduct?.video, '_blank')}
+  style={{ marginTop: '1rem', marginBottom: '1rem' }}
+>
+  Play Video
+</Button>
 
-            onMouseEnter={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
-    }}
-          
-          >
-          Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-      
-
+      </>
+    )}
+  </DialogContent>
+  <DialogActions style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
+    <Button
+      startIcon={<CloseIcon style={{ transition: 'transform 0.3s' }} />}
+      variant="contained"
+      onClick={handleCloseProductDialog}
+      style={{ transition: 'background-color 0.3s' }}
+      onMouseEnter={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.querySelector('svg').style.transform = 'scale(1)';
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
 
 
 
@@ -638,7 +559,7 @@ const renderProductImages = () => {
 
 
       
-          </div>
+      </div>
   );
 };
 

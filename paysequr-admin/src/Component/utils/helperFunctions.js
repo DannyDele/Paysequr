@@ -1,4 +1,3 @@
-// Funtion to give table cells colors
 
 // Function to give table cells colors
 const tableCellStyle = (isHeader, index, status) => {

@@ -33,6 +33,7 @@ function Product() {
     
     
   return (
+    <Container>
     <div>
       <div style={{ marginTop: '20px'}}>
         {/* Button for viewing all products */}
@@ -60,7 +61,8 @@ function Product() {
 
       {/* Conditionally render either ProductManagementPage or ProductCategories */}
       {showProductManagement ? <ProductManagementPage /> : <ProductCategories />}
-    </div>
+      </div>
+      </Container>
   );
 }
 
